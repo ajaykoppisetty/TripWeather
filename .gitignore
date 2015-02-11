@@ -11,6 +11,7 @@
 # Generated files
 bin/
 gen/
+crashlytics-build.properties
 
 # Gradle files
 .gradle/
@@ -24,3 +25,11 @@ proguard/
 
 # Log Files
 *.log
+
+# IDE files
+*.swp
+.idea
+*.iml
+
+# Keys
+crashlytics.properties
