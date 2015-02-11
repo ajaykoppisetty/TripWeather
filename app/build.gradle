@@ -5,7 +5,7 @@ android {
     buildToolsVersion "21.1.2"
 
     defaultConfig {
-        applicationId "faudroids.org.tripweather"
+        applicationId "org.faudroids.tripweather"
         minSdkVersion 9
         targetSdkVersion 21
         versionCode 1

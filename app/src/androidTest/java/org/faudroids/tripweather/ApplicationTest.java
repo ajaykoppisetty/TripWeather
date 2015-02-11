@@ -1,4 +1,4 @@
-package faudroids.org.tripweather;
+package org.faudroids.tripweather;
 
 import android.app.Application;
 import android.test.ApplicationTestCase;
