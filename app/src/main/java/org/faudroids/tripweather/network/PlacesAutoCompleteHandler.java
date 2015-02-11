@@ -1,5 +1,6 @@
 package org.faudroids.tripweather.network;
 
+import android.content.Context;
 import android.util.Log;
 
 import org.faudroids.tripweather.R;
@@ -21,10 +22,20 @@ import java.util.ArrayList;
 
 public class PlacesAutoCompleteHandler {
 
-    private static final String PLACES_API_BASE_URL = "https://maps.googleapis.com/maps/api/place";
-    private static final String AUTOCOMPLETE_TYPE = "/autocomplete";
-    private static final String OUTPUT_FORMAT_JSON = "/json";
+    private String placesBaseUrl;
+    private String placesRequestType;
+    private String placesReturnFormat;
 
+    private Context context = null;
+
+
+    public PlacesAutoCompleteHandler(Context context) {
+        this.context = context;
+
+        placesBaseUrl = context.getString(R.string.places_base_url);
+        placesRequestType = context.getString(R.string.places_request_type);
+        placesReturnFormat = context.getString(R.string.places_return_format);
+    }
 
     public ArrayList<String> complete(String input) throws RuntimeException {
 
@@ -34,12 +45,13 @@ public class PlacesAutoCompleteHandler {
         StringBuilder jsonResults = new StringBuilder();
 
         try {
-            StringBuilder sb = new StringBuilder(PLACES_API_BASE_URL + AUTOCOMPLETE_TYPE +
-                    OUTPUT_FORMAT_JSON);
-            sb.append("?key=" + R.string.google_places_key);
-            sb.append("&components;=country:de");
-            sb.append("&input;=" + URLEncoder.encode(input, "utf8"));
+            StringBuilder sb = new StringBuilder(placesBaseUrl + placesRequestType +
+                    placesReturnFormat);
+            sb.append("?input=" + URLEncoder.encode(input, "utf8"));
+            sb.append("&types=(cities)");
+            sb.append("&key=" + this.context.getString(R.string.google_places_key));
 
+            Log.d("REQUEST", "request: " + sb.toString());
             URL url = new URL(sb.toString());
             httpConnection = (HttpURLConnection) url.openConnection();
             InputStream in = httpConnection.getInputStream();
@@ -63,7 +75,7 @@ public class PlacesAutoCompleteHandler {
 
             String jsonStatus = jsonObject.getString("status");
 
-            if(jsonStatus.equals(R.string.places_api_auth_error)) {
+            if(jsonStatus.equals(this.context.getString(R.string.places_api_auth_error))) {
                 throw new RuntimeException(jsonObject.getString("error_message"));
             }
 

@@ -16,9 +16,13 @@ public class MainActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        AutoCompleteTextView autoCompleteTextView = (AutoCompleteTextView) findViewById(R.id
-                .main_autocomplete);
-        autoCompleteTextView.setAdapter(new PlacesAutoCompleteAdapter(this, R.layout.autocomplete_item));
+        AutoCompleteTextView autoCompleteFrom = (AutoCompleteTextView) findViewById(R.id
+                .autocomplete_from);
+        autoCompleteFrom.setAdapter(new PlacesAutoCompleteAdapter(this,
+                R.layout.autocomplete_item));
+        AutoCompleteTextView autoCompleteTo = (AutoCompleteTextView) findViewById(R.id
+                .autocomplete_to);
+        autoCompleteTo.setAdapter(new PlacesAutoCompleteAdapter(this, R.layout.autocomplete_item));
     }
 
 

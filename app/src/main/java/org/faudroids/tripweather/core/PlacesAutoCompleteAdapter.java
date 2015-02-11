@@ -12,10 +12,11 @@ import java.util.ArrayList;
 public class PlacesAutoCompleteAdapter extends ArrayAdapter<String> implements Filterable {
 
     private ArrayList<String> results = null;
-    private PlacesAutoCompleteHandler autoCompleter = new PlacesAutoCompleteHandler();
+    private PlacesAutoCompleteHandler autoCompleter = null;
 
     public PlacesAutoCompleteAdapter(Context context, int textViewResourceId) {
         super(context, textViewResourceId);
+        this.autoCompleter = new PlacesAutoCompleteHandler(context);
     }
 
 
