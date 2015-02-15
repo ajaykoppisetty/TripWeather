@@ -11,4 +11,6 @@
     <string name="places_base_url">https://maps.googleapis.com/maps/api/place</string>
     <string name="places_request_type">/autocomplete</string>
     <string name="places_return_format">/json</string>
+
+    <string name="open_weather_base_url">http://api.openweathermap.org/data/2.5</string>
 </resources>
