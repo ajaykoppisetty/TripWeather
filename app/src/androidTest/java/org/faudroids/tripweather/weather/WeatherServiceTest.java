@@ -8,14 +8,9 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import junit.framework.Assert;
 
-import org.faudroids.tripweather.R;
-
 import retrofit.Callback;
-import retrofit.RequestInterceptor;
-import retrofit.RestAdapter;
 import retrofit.RetrofitError;
 import retrofit.client.Response;
-import retrofit.converter.JacksonConverter;
 
 public final class WeatherServiceTest extends AndroidTestCase {
 
@@ -25,17 +20,7 @@ public final class WeatherServiceTest extends AndroidTestCase {
 	@Override
 	public void setUp() throws Exception {
 		super.setUp();
-		RestAdapter adapter = new RestAdapter.Builder()
-				.setEndpoint(getContext().getString(R.string.open_weather_base_url))
-				.setConverter(new JacksonConverter())
-				.setRequestInterceptor(new RequestInterceptor() {
-					@Override
-					public void intercept(RequestFacade request) {
-						request.addHeader("x-api-key", getContext().getString(R.string.open_weather_key));
-					}
-				})
-				.build();
-		this.service = adapter.create(WeatherService.class);
+		this.service = new WeatherServiceProvider(getContext()).get();
 		this.lock = new Object();
 	}
 
