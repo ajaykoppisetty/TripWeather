@@ -7,7 +7,6 @@ import android.view.MenuItem;
 import android.widget.AutoCompleteTextView;
 
 import org.faudroids.tripweather.R;
-import org.faudroids.tripweather.core.PlacesAutoCompleteAdapter;
 
 public class MainActivity extends ActionBarActivity {
 

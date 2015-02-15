@@ -1,4 +1,4 @@
-package org.faudroids.tripweather.core;
+package org.faudroids.tripweather.ui;
 
 import android.content.Context;
 import android.widget.ArrayAdapter;
