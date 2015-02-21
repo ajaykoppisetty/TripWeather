@@ -28,5 +28,6 @@
     <string name="directions_api_avoid_prefix">&amp;avoid=</string>
     <string name="directions_api_alternatives_prefix">&amp;alternatives=</string>
 
+    <string name="google_places_base_url">https://maps.googleapis.com/maps/api/place</string>
     <string name="open_weather_base_url">http://api.openweathermap.org/data/2.5</string>
 </resources>
