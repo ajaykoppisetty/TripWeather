@@ -7,6 +7,7 @@ import android.widget.Toast;
 import com.fasterxml.jackson.databind.JsonNode;
 
 import org.faudroids.tripweather.R;
+import org.faudroids.tripweather.directions.PlacesService;
 import org.faudroids.tripweather.weather.WeatherService;
 
 import javax.inject.Inject;
@@ -25,12 +26,13 @@ public class MainActivity extends RoboActivity {
 	@InjectView(R.id.autocomplete_from) AutoCompleteTextView autoCompleteFrom;
 	@InjectView(R.id.autocomplete_to) AutoCompleteTextView autoCompleteTo;
 	@Inject WeatherService weatherService;
+	@Inject PlacesService placesService;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        autoCompleteFrom.setAdapter(new PlacesAutoCompleteAdapter(this, R.layout.autocomplete_item));
-        autoCompleteTo.setAdapter(new PlacesAutoCompleteAdapter(this, R.layout.autocomplete_item));
+        autoCompleteFrom.setAdapter(new PlacesAutoCompleteAdapter(this, R.layout.autocomplete_item, placesService));
+        autoCompleteTo.setAdapter(new PlacesAutoCompleteAdapter(this, R.layout.autocomplete_item, placesService));
 
 		// small example of how to use the weather service
 		weatherService.getCurrentWeather(49.5778294, 10.9942273, new Callback<JsonNode>() {

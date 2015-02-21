@@ -5,56 +5,66 @@ import android.widget.ArrayAdapter;
 import android.widget.Filter;
 import android.widget.Filterable;
 
-import org.faudroids.tripweather.network.PlacesAutoCompleteHandler;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
-import java.util.ArrayList;
+import org.faudroids.tripweather.directions.PlacesLocation;
+import org.faudroids.tripweather.directions.PlacesService;
 
-public class PlacesAutoCompleteAdapter extends ArrayAdapter<String> implements Filterable {
+import java.util.Collection;
+import java.util.LinkedList;
+import java.util.List;
 
-    private ArrayList<String> results = null;
-    private PlacesAutoCompleteHandler autoCompleter = null;
+public class PlacesAutoCompleteAdapter extends ArrayAdapter<PlacesLocation> implements Filterable {
 
-    public PlacesAutoCompleteAdapter(Context context, int textViewResourceId) {
+	private final PlacesService placesService;
+
+    public PlacesAutoCompleteAdapter(
+			Context context,
+			int textViewResourceId,
+			PlacesService placesService) {
+
         super(context, textViewResourceId);
-        this.autoCompleter = new PlacesAutoCompleteHandler(context);
-    }
-
-
-    @Override
-    public int getCount() {
-        return results.size();
-    }
-
-
-    @Override
-    public String getItem(int index) {
-        return results.get(index);
+		this.placesService = placesService;
     }
 
 
     @Override
     public Filter getFilter() {
-        Filter filter = new Filter() {
-            @Override
-            protected FilterResults performFiltering(CharSequence constraint) {
-                FilterResults filterResults = new FilterResults();
-                if(constraint != null) {
-                    results = autoCompleter.complete(constraint.toString());
-                    filterResults.values = results;
-                    filterResults.count = results.size();
-                }
-                return filterResults;
-            }
+		return new Filter() {
+			@Override
+			protected FilterResults performFiltering(CharSequence constraint) {
+				FilterResults filterResults = new FilterResults();
+				if(constraint != null) {
+					ObjectNode data = placesService.getAutocomplete(constraint.toString());
+					List<PlacesLocation> places = new LinkedList<>();
+					for (JsonNode prediction : data.get("predictions")) {
+						places.add(new PlacesLocation(
+								prediction.get("place_id").asText(),
+								prediction.get("description").asText()));
+					}
+					filterResults.values = places;
+					filterResults.count = places.size();
+				}
+				return filterResults;
+			}
 
-            @Override
-            protected void publishResults(CharSequence constraint, FilterResults results) {
-                if(results != null && results.count > 0) {
-                    notifyDataSetChanged();
-                } else {
-                    notifyDataSetInvalidated();
-                }
-            }
-        };
-        return filter;
+			@Override
+			@SuppressWarnings("unchecked")
+			protected void publishResults(CharSequence constraint, FilterResults results) {
+				clear();
+				if (results.count > 0) {
+					addAll((Collection<PlacesLocation>) results.values);
+				}
+				/*
+				if(results != null && results.count > 0) {
+					notifyDataSetChanged();
+				} else {
+					notifyDataSetInvalidated();
+				}
+				*/
+			}
+		};
+
     }
 }
