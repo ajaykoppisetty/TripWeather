@@ -10,24 +10,21 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
 
-//I know that's kind of a shitty name, but i couldn't figure out a better right now :D
-public class JsonFromUrlParser extends AsyncTask<URL, Void, JSONObject> {
+//I know that's kind of a shitty class name, but i couldn't figure out a better one at the moment :D
+public class JsonFromUrlParser {
 
-    private StringBuilder sBuilder = new StringBuilder();
+    JSONObject get(URL url) {
+        StringBuilder sBuilder = new StringBuilder();
 
-    @Override
-    protected JSONObject doInBackground(URL... params) {
         try {
-            for(URL url : params) {
-                InputStreamReader input = new InputStreamReader(url.openStream());
-                BufferedReader bReader = new BufferedReader(input);
-                String line = null;
-                while((line = bReader.readLine()) != null) {
-                    sBuilder.append(line);
-                    sBuilder.append("\n");
-                }
-                input.close();
+            InputStreamReader input = new InputStreamReader(url.openStream());
+            BufferedReader bReader = new BufferedReader(input);
+            String line = null;
+            while ((line = bReader.readLine()) != null) {
+                sBuilder.append(line);
+                sBuilder.append("\n");
             }
+            input.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
