@@ -21,12 +21,12 @@
 
     <string name="directions_api_base_url">https://maps.googleapis.com/maps/api/directions/json?</string>
     <string name="directions_api_origin_prefix">origin=</string>
-    <string name="directions_api_destination_prefix">&destination=</string>
-    <string name="directions_api_sensor_prefix">&sensor=</string>
-    <string name="directions_api_mode_prefix">&mode=</string>
-    <string name="directions_api_unit_prefix">&units=</string>
-    <string name="directions_api_avoid_prefix">&avoid=</string>
-    <string name="directions_api_alternatives_prefix">&alternatives=</string>
+    <string name="directions_api_destination_prefix">&amp;destination=</string>
+    <string name="directions_api_sensor_prefix">&amp;sensor=</string>
+    <string name="directions_api_mode_prefix">&amp;mode=</string>
+    <string name="directions_api_unit_prefix">&amp;units=</string>
+    <string name="directions_api_avoid_prefix">&amp;avoid=</string>
+    <string name="directions_api_alternatives_prefix">&amp;alternatives=</string>
 
     <string name="open_weather_base_url">http://api.openweathermap.org/data/2.5</string>
 </resources>
