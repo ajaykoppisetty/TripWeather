@@ -12,5 +12,21 @@
     <string name="places_request_type">/autocomplete</string>
     <string name="places_return_format">/json</string>
 
+    <string name="directions_api_driving">driving</string>
+    <string name="directions_api_walking">walking</string>
+    <string name="directions_api_bicycling">bicycling</string>
+    <string name="directions_api_transit">transit</string>
+    <string name="directions_api_unit_metric">metric</string>
+    <string name="directions_api_unit_imerial">imperial</string>
+
+    <string name="directions_api_base_url">https://maps.googleapis.com/maps/api/directions/json?</string>
+    <string name="directions_api_origin_prefix">origin=</string>
+    <string name="directions_api_destination_prefix">&destination=</string>
+    <string name="directions_api_sensor_prefix">&sensor=</string>
+    <string name="directions_api_mode_prefix">&mode=</string>
+    <string name="directions_api_unit_prefix">&units=</string>
+    <string name="directions_api_avoid_prefix">&avoid=</string>
+    <string name="directions_api_alternatives_prefix">&alternatives=</string>
+
     <string name="open_weather_base_url">http://api.openweathermap.org/data/2.5</string>
 </resources>
