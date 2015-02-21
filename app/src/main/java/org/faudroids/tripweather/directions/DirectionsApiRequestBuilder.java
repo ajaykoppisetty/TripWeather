@@ -1,38 +1,29 @@
 package org.faudroids.tripweather.directions;
 
+import android.content.Context;
+
+import org.faudroids.tripweather.R;
+
 import java.util.HashMap;
 
 public class DirectionsApiRequestBuilder {
 
-    static enum TravelMode {
+    private final Context context;
+
+    enum TravelMode {
         TRAVEL_MODE_DRIVING,
         TRAVEL_MODE_WALKING,
         TRAVEL_MODE_BICYCLING,
         TRAVEL_MODE_TRANSIT
     }
 
-
-    static enum Units {
+    enum Units {
         UNIT_METRIC,
         UNIT_IMPERIAL
     }
 
-
-    static HashMap<TravelMode, String> travelModeMap = new HashMap<>();
-    static {
-        travelModeMap.put(TravelMode.TRAVEL_MODE_DRIVING, "driving");
-        travelModeMap.put(TravelMode.TRAVEL_MODE_WALKING, "walking");
-        travelModeMap.put(TravelMode.TRAVEL_MODE_BICYCLING, "bicycling");
-        travelModeMap.put(TravelMode.TRAVEL_MODE_TRANSIT, "transit");
-    }
-
-
-    static HashMap<Units, String> unitMap = new HashMap<>();
-    static {
-        unitMap.put(Units.UNIT_METRIC, "metric");
-        unitMap.put(Units.UNIT_IMPERIAL, "imperial");
-    }
-
+    HashMap<TravelMode, String> travelModeMap = new HashMap<>();
+    HashMap<Units, String> unitMap = new HashMap<>();
 
     /*
     Required fields for every request.
@@ -40,7 +31,6 @@ public class DirectionsApiRequestBuilder {
     String origin = null;
     String destination = null;
     boolean useSensor = true;
-
 
     /*
     Optional parameters.
@@ -52,8 +42,26 @@ public class DirectionsApiRequestBuilder {
     Units units = Units.UNIT_METRIC;
 
 
-    DirectionsApiRequestBuilder origin(String val) { this.origin = val; return this; }
-    DirectionsApiRequestBuilder destination(String val) { this.destination= val; return this; }
+    public DirectionsApiRequestBuilder(Context ctx) {
+        context = ctx;
+
+        travelModeMap.put(TravelMode.TRAVEL_MODE_DRIVING,
+                          this.context.getString(R.string.directions_api_driving));
+        travelModeMap.put(TravelMode.TRAVEL_MODE_WALKING,
+                          this.context.getString(R.string.directions_api_walking));
+        travelModeMap.put(TravelMode.TRAVEL_MODE_BICYCLING,
+                          this.context.getString(R.string.directions_api_bicycling));
+        travelModeMap.put(TravelMode.TRAVEL_MODE_TRANSIT,
+                          this.context.getString(R.string.directions_api_transit));
+
+        unitMap.put(Units.UNIT_METRIC,
+                    this.context.getString(R.string.directions_api_unit_metric));
+        unitMap.put(Units.UNIT_IMPERIAL,
+                    this.context.getString(R.string.directions_api_unit_imerial));
+    }
+
+
+    DirectionsApiRequestBuilder destination(String val) { this.destination = val; return this; }
     DirectionsApiRequestBuilder sensor(boolean val) { this.useSensor = val; return this; }
     DirectionsApiRequestBuilder travelMode(TravelMode val) { this.travelMode = val; return this; }
     DirectionsApiRequestBuilder alternatives(boolean val) { this.alternatives= val; return this; }
@@ -68,14 +76,22 @@ public class DirectionsApiRequestBuilder {
             throw new RuntimeException("Arguments missing!");
         }
 
-        return DirectionApiFields.requestBaseUrl +
-               DirectionApiFields.originPrefix + origin +
-               DirectionApiFields.destinationPrefix + destination +
-               DirectionApiFields.sensorPrefix + String.valueOf(useSensor) +
-               DirectionApiFields.modePrefix + travelModeMap.get(travelMode) +
-               DirectionApiFields.unitPrefix + unitMap.get(units) +
-               DirectionApiFields.avoidPrefix + String.valueOf(avoidHighways) +
-               DirectionApiFields.avoidPrefix + String.valueOf(avoidTolls) +
-               DirectionApiFields.alternativesPrefix + String.valueOf(alternatives);
+        return this.context.getString(R.string.directions_api_base_url) +
+               this.context.getString(R.string.directions_api_origin_prefix) +
+               origin +
+               this.context.getString(R.string.directions_api_destination_prefix) +
+               destination +
+               this.context.getString(R.string.directions_api_destination_prefix) +
+               String.valueOf(useSensor) +
+               this.context.getString(R.string.directions_api_destination_prefix) +
+               travelModeMap.get(travelMode) +
+               this.context.getString(R.string.directions_api_destination_prefix) +
+               unitMap.get(units) +
+               this.context.getString(R.string.directions_api_destination_prefix) +
+               String.valueOf(avoidHighways) +
+               this.context.getString(R.string.directions_api_destination_prefix) +
+               String.valueOf(avoidTolls) +
+               this.context.getString(R.string.directions_api_destination_prefix) +
+               String.valueOf(alternatives);
     }
 }
