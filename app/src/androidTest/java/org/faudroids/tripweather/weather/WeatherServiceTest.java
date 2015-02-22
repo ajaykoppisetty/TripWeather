@@ -3,7 +3,6 @@ package org.faudroids.tripweather.weather;
 
 import android.test.AndroidTestCase;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import junit.framework.Assert;
@@ -28,9 +27,8 @@ public final class WeatherServiceTest extends AndroidTestCase {
 	public void testGetCurrentWeather() throws Exception {
 		service.getCurrentWeather(45.0, 45.0, new CallbackAssertion(lock) {
 			@Override
-			protected void doSuccess(JsonNode jsonNode) {
-				Assert.assertTrue(jsonNode instanceof ObjectNode);
-				Assert.assertTrue(jsonNode.has("weather"));
+			protected void doSuccess(ObjectNode objectNode) {
+				Assert.assertTrue(objectNode.has("weather"));
 			}
 		});
 		waitForCallback();
@@ -40,8 +38,8 @@ public final class WeatherServiceTest extends AndroidTestCase {
 	public void testGetForecast() throws Exception {
 		service.getForecast(45.0, 45.0, new CallbackAssertion(lock) {
 			@Override
-			protected void doSuccess(JsonNode jsonNode) {
-				Assert.assertEquals(41, jsonNode.get("list").size());
+			protected void doSuccess(ObjectNode objectNode) {
+				Assert.assertEquals(41, objectNode.get("list").size());
 			}
 		});
 		waitForCallback();
@@ -51,8 +49,8 @@ public final class WeatherServiceTest extends AndroidTestCase {
 	public void testGetDailyForecast() throws Exception {
 		service.getDailyForecast(45.0, 45.0, 7, new CallbackAssertion(lock) {
 			@Override
-			protected void doSuccess(JsonNode jsonNode) {
-				Assert.assertEquals(7, jsonNode.get("list").size());
+			protected void doSuccess(ObjectNode objectNode) {
+				Assert.assertEquals(7, objectNode.get("list").size());
 			}
 		});
 		waitForCallback();
@@ -66,7 +64,7 @@ public final class WeatherServiceTest extends AndroidTestCase {
 	}
 
 
-	private static abstract class CallbackAssertion implements Callback<JsonNode> {
+	private static abstract class CallbackAssertion implements Callback<ObjectNode> {
 
 		private final Object lock;
 
@@ -75,8 +73,8 @@ public final class WeatherServiceTest extends AndroidTestCase {
 		}
 
 		@Override
-		public final void success(JsonNode jsonNode, Response response) {
-			doSuccess(jsonNode);
+		public final void success(ObjectNode objectNode, Response response) {
+			doSuccess(objectNode);
 			synchronized (lock) {
 				lock.notify();
 			}
@@ -87,7 +85,7 @@ public final class WeatherServiceTest extends AndroidTestCase {
 			Assert.fail(error.getMessage());
 		}
 
-		protected abstract void doSuccess(JsonNode jsonNode);
+		protected abstract void doSuccess(ObjectNode objectNode);
 
 	}
 
