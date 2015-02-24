@@ -2,10 +2,11 @@ package org.faudroids.tripweather.ui;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
-import android.widget.Button;
 
 import org.faudroids.tripweather.R;
 import org.faudroids.tripweather.directions.DirectionsService;
@@ -20,12 +21,13 @@ import roboguice.inject.ContentView;
 import roboguice.inject.InjectView;
 
 
-@ContentView(R.layout.activity_main)
+@ContentView(R.layout.activity_input)
 public class MainActivity extends RoboActivity implements View.OnClickListener {
 
-	@InjectView(R.id.autocomplete_from) AutoCompleteTextView autoCompleteFrom;
-	@InjectView(R.id.autocomplete_to) AutoCompleteTextView autoCompleteTo;
-	@InjectView(R.id.start) Button startButton;
+	@InjectView(R.id.input_from) AutoCompleteTextView autoCompleteFrom;
+	@InjectView(R.id.input_to) AutoCompleteTextView autoCompleteTo;
+	@InjectView(R.id.card_list) RecyclerView cardList;
+	// @InjectView(R.id.start) Button startButton;
 	@Inject PlacesService placesService;
     @Inject DirectionsService directionsService;
 
@@ -38,7 +40,13 @@ public class MainActivity extends RoboActivity implements View.OnClickListener {
 		toAdapter = new PlacesAutoCompleteAdapter(this, R.layout.autocomplete_item, placesService);
         autoCompleteFrom.setAdapter(fromAdapter);
         autoCompleteTo.setAdapter(toAdapter);
-		startButton.setOnClickListener(this);
+		// startButton.setOnClickListener(this);
+
+		cardList.setHasFixedSize(true);
+		LinearLayoutManager layoutManager = new LinearLayoutManager(this);
+		layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
+		cardList.setLayoutManager(layoutManager);
+		cardList.setAdapter(new InputAdapter());
     }
 
 
@@ -52,5 +60,6 @@ public class MainActivity extends RoboActivity implements View.OnClickListener {
 		Intent intent = GraphActivity.createIntent(this, "", "");
 		startActivity(intent);
 	}
+
 
 }

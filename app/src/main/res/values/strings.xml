@@ -34,4 +34,7 @@
     <string name="open_weather_base_url">http://api.openweathermap.org/data/2.5</string>
 
     <string name="graph_temp_legend">Temperature</string>
+
+    <string name="input_your_location">Your location</string>
+    <string name="input_choose_location">Choose destination</string>
 </resources>
