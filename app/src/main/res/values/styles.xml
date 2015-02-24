@@ -8,6 +8,10 @@
         <item name="android:textColor">@android:color/white</item>
     </style>
 
+    <style name="DefaultTextStyleBlack" parent="@style/DefaultTextStyle">
+        <item name="android:textColor">@android:color/black</item>
+    </style>
+
     <style name="InputTextStyle" parent="@style/DefaultTextStyle">
         <item name="android:background">@android:color/transparent</item>
         <item name="android:gravity">center</item>
