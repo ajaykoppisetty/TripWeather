@@ -36,10 +36,10 @@
 
     </LinearLayout>
 
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/card_list"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        />
+   <com.google.android.gms.maps.MapView
+       android:id="@+id/map"
+       android:layout_height="match_parent"
+       android:layout_width="match_parent"
+       />
 
 </LinearLayout>
