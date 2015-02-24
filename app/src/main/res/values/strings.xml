@@ -19,14 +19,16 @@
     <string name="directions_api_unit_metric">metric</string>
     <string name="directions_api_unit_imerial">imperial</string>
 
-    <string name="directions_api_base_url">https://maps.googleapis.com/maps/api/directions/json?</string>
-    <string name="directions_api_origin_prefix">origin=</string>
-    <string name="directions_api_destination_prefix">&amp;destination=</string>
-    <string name="directions_api_sensor_prefix">&amp;sensor=</string>
-    <string name="directions_api_mode_prefix">&amp;mode=</string>
-    <string name="directions_api_unit_prefix">&amp;units=</string>
-    <string name="directions_api_avoid_prefix">&amp;avoid=</string>
-    <string name="directions_api_alternatives_prefix">&amp;alternatives=</string>
+    <string name="directions_api_base_url">https://maps.googleapis.com/maps/api/directions</string>
+
+    <string name="directions_api_return_ok">OK</string>
+    <string name="directions_api_return_not_found">NOT_FOUND</string>
+    <string name="directions_api_return_zero_results">ZERO_RESULTS</string>
+    <string name="directions_api_return_max_waypoints">MAX_WAYPOINTS_EXCEEDED</string>
+    <string name="directions_api_return_invalid">INVALID_REQUEST</string>
+    <string name="directions_api_return_query_limit">OVER_QUERY_LIMIT</string>
+    <string name="directions_api_return_denied">REQUEST_DENIED</string>
+    <string name="direction_api_return_unknown_error">UNKNOWN_ERROR</string>
 
     <string name="google_places_base_url">https://maps.googleapis.com/maps/api/place</string>
     <string name="open_weather_base_url">http://api.openweathermap.org/data/2.5</string>
