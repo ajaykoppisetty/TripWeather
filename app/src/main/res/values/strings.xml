@@ -30,4 +30,6 @@
 
     <string name="google_places_base_url">https://maps.googleapis.com/maps/api/place</string>
     <string name="open_weather_base_url">http://api.openweathermap.org/data/2.5</string>
+
+    <string name="graph_temp_legend">Temperature</string>
 </resources>
