@@ -18,11 +18,11 @@ import roboguice.inject.ContentView;
 import roboguice.inject.InjectView;
 
 
-@ContentView(R.layout.activity_main)
+@ContentView(R.layout.activity_input)
 public class MainActivity extends RoboActivity implements View.OnClickListener {
 
-	@InjectView(R.id.autocomplete_from) AutoCompleteTextView autoCompleteFrom;
-	@InjectView(R.id.autocomplete_to) AutoCompleteTextView autoCompleteTo;
+	@InjectView(R.id.input_from) AutoCompleteTextView autoCompleteFrom;
+	@InjectView(R.id.input_to) AutoCompleteTextView autoCompleteTo;
 	@InjectView(R.id.start) Button startButton;
 	@Inject PlacesService placesService;
 
