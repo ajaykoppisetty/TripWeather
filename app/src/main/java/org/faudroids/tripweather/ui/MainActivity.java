@@ -8,6 +8,8 @@ import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 
 import org.faudroids.tripweather.R;
+import org.faudroids.tripweather.directions.DirectionsService;
+import org.faudroids.tripweather.directions.DirectionsServiceCallback;
 import org.faudroids.tripweather.directions.PlacesLocation;
 import org.faudroids.tripweather.directions.PlacesService;
 
@@ -25,6 +27,7 @@ public class MainActivity extends RoboActivity implements View.OnClickListener {
 	@InjectView(R.id.autocomplete_to) AutoCompleteTextView autoCompleteTo;
 	@InjectView(R.id.start) Button startButton;
 	@Inject PlacesService placesService;
+    @Inject DirectionsService directionsService;
 
 	private ArrayAdapter<PlacesLocation> fromAdapter, toAdapter;
 
@@ -44,6 +47,8 @@ public class MainActivity extends RoboActivity implements View.OnClickListener {
 		// String fromPlaceId = fromAdapter.getItem(0).getId();
 		// String toPlaceId = toAdapter.getItem(0).getId();
 		// Intent intent = GraphActivity.createIntent(this, fromPlaceId, toPlaceId);
+
+        directionsService.getRoute("Erlangen", "München", new DirectionsServiceCallback());
 		Intent intent = GraphActivity.createIntent(this, "", "");
 		startActivity(intent);
 	}
