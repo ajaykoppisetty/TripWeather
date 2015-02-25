@@ -57,18 +57,21 @@ public class RouteParser {
             }
 
             for (int legIdx = 0; legIdx < legs.size(); ++legIdx) {
-                origin = new Waypoint(legs.get(legIdx).get("start_location")
-                                                 .get("lat").asDouble(),
-                                             legs.get(legIdx).get("start_location")
-                                                 .get("lng").asDouble());
+                origin = new Waypoint(legs.get(legIdx)
+                                          .get("start_location")
+                                          .get("lat").asDouble(),
+                                      legs.get(legIdx)
+                                          .get("start_location")
+                                          .get("lng").asDouble());
+                wp.add(origin);
 
 
                 destination = new Waypoint(legs.get(legIdx)
-                                                        .get("end_location")
-                                                        .get("lat").asDouble(),
-                                                    legs.get(legIdx)
-                                                        .get("end_location")
-                                                        .get("lng").asDouble());
+                                               .get("end_location")
+                                               .get("lat").asDouble(),
+                                           legs.get(legIdx)
+                                               .get("end_location")
+                                               .get("lng").asDouble());
 
 
                 JsonNode steps = legs.get(legIdx).get("steps");
