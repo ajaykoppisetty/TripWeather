@@ -16,6 +16,13 @@ public interface PlacesService {
 	public void getAutocomplete(@Query("input") String input, Callback<ObjectNode> callback);
 
 
+	@GET("/textsearch/json")
+	public ObjectNode getTextSearch(@Query("query") String query);
+
+	@GET("/textsearch/json")
+	public void getTextSearch(@Query("query") String query, Callback<ObjectNode> callback);
+
+
 	@GET("/details/json")
 	public ObjectNode getDetails(@Query("placeid") String placeId);
 

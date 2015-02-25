@@ -10,10 +10,13 @@ public class PlacesLocation {
 
 	private final String id;
 	private final String description;
+	private final double lat, lon;
 
-	public PlacesLocation(String id, String description) {
+	public PlacesLocation(String id, String description, double lat, double lon) {
 		this.id = id;
 		this.description = description;
+		this.lat = lat;
+		this.lon = lon;
 	}
 
 
@@ -27,9 +30,13 @@ public class PlacesLocation {
 	}
 
 
-	@Override
-	public String toString() {
-		return description;
+	public double getLat() {
+		return lat;
+	}
+
+
+	public double getLon() {
+		return lon;
 	}
 
 
@@ -37,13 +44,16 @@ public class PlacesLocation {
 	public boolean equals(Object other) {
 		if (other == null || !(other instanceof PlacesLocation)) return false;
 		PlacesLocation location = (PlacesLocation) other;
-		return Objects.equal(id, location.id) && Objects.equal(description, location.description);
+		return Objects.equal(id, location.id)
+				&& Objects.equal(description, location.description)
+				&& Objects.equal(lat, location.lat)
+				&& Objects.equal(lon, location.lon);
 	}
 
 
 	@Override
 	public int hashCode() {
-		return Objects.hashCode(id, description);
+		return Objects.hashCode(id, description, lat, lon);
 	}
 
 }

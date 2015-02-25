@@ -8,14 +8,13 @@ import android.widget.Filterable;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
-import org.faudroids.tripweather.directions.PlacesLocation;
 import org.faudroids.tripweather.directions.PlacesService;
 
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
-public class PlacesAutoCompleteAdapter extends ArrayAdapter<PlacesLocation> implements Filterable {
+public class PlacesAutoCompleteAdapter extends ArrayAdapter<String> implements Filterable {
 
 	private final PlacesService placesService;
 
@@ -37,11 +36,9 @@ public class PlacesAutoCompleteAdapter extends ArrayAdapter<PlacesLocation> impl
 				FilterResults filterResults = new FilterResults();
 				if(constraint != null) {
 					ObjectNode data = placesService.getAutocomplete(constraint.toString());
-					List<PlacesLocation> places = new LinkedList<>();
+					List<String> places = new LinkedList<>();
 					for (JsonNode prediction : data.get("predictions")) {
-						places.add(new PlacesLocation(
-								prediction.get("place_id").asText(),
-								prediction.get("description").asText()));
+						places.add(prediction.get("description").asText());
 					}
 					filterResults.values = places;
 					filterResults.count = places.size();
@@ -54,15 +51,8 @@ public class PlacesAutoCompleteAdapter extends ArrayAdapter<PlacesLocation> impl
 			protected void publishResults(CharSequence constraint, FilterResults results) {
 				clear();
 				if (results.count > 0) {
-					addAll((Collection<PlacesLocation>) results.values);
+					addAll((Collection<String>) results.values);
 				}
-				/*
-				if(results != null && results.count > 0) {
-					notifyDataSetChanged();
-				} else {
-					notifyDataSetInvalidated();
-				}
-				*/
 			}
 		};
 
