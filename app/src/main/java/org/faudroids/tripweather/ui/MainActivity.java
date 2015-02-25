@@ -1,6 +1,8 @@
 package org.faudroids.tripweather.ui;
 
 import android.content.Intent;
+import android.content.IntentSender;
+import android.location.Location;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
@@ -8,6 +10,10 @@ import android.widget.Toast;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GooglePlayServicesUtil;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
@@ -32,14 +38,20 @@ import timber.log.Timber;
 
 
 @ContentView(R.layout.activity_main)
-public class MainActivity extends RoboActivity implements View.OnClickListener {
+public class MainActivity extends RoboActivity implements
+		View.OnClickListener,
+		GoogleApiClient.ConnectionCallbacks,
+		GoogleApiClient.OnConnectionFailedListener {
 
-	private static final int LOCATION_REQUEST = 42;
+	private static final int
+			LOCATION_REQUEST = 42,
+			GOOGLE_API_CLIENT_REQUEST = 43;
 
 	@InjectView(R.id.input_from) TextView textFrom;
 	@InjectView(R.id.input_to) TextView textTo;
 	@InjectView(R.id.map) MapView mapView;
 	@Inject PlacesService placesService;
+	private GoogleApiClient googleApiClient;
 
 	private PlacesLocation locationFrom, locationTo; // contain the actual lat / lon
 
@@ -47,6 +59,9 @@ public class MainActivity extends RoboActivity implements View.OnClickListener {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+		googleApiClient = createGoogleApiClient();
+		googleApiClient.connect();
+
 		mapView.onCreate(savedInstanceState);
 		textFrom.setOnClickListener(this);
 		textTo.setOnClickListener(this);
@@ -78,6 +93,7 @@ public class MainActivity extends RoboActivity implements View.OnClickListener {
 	@Override
 	public void onDestroy() {
 		mapView.onDestroy();
+		googleApiClient.disconnect();
 		super.onDestroy();
 	}
 
@@ -94,32 +110,57 @@ public class MainActivity extends RoboActivity implements View.OnClickListener {
 
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-		if (requestCode != LOCATION_REQUEST) return;
 		if (resultCode != RESULT_OK) return;
-		final String locationDescription = data.getExtras().getString(LocationInputActivity.EXTRA_LOCATION);
-		final boolean fromInput = data.getBooleanExtra(LocationInputActivity.EXTRA_FROM, false);
+		switch(requestCode) {
+			// user has selected location
+			case LOCATION_REQUEST:
+				final String locationDescription = data.getExtras().getString(LocationInputActivity.EXTRA_LOCATION);
+				final boolean fromInput = data.getBooleanExtra(LocationInputActivity.EXTRA_FROM, false);
+				PlacesLocation selectedLocation = null;
 
-		if (fromInput) {
-			textFrom.setText(locationDescription);
-			placesService.getTextSearch(locationDescription, new PlacesQueryCallback() {
-				@Override
-				public void success(ObjectNode objectNode, Response response) {
-					locationFrom = parseLocation(objectNode);
-					updateMarkers();
+				// handle current user location
+				if (getString(R.string.input_your_location).equals(locationDescription)) {
+					Location location = LocationServices.FusedLocationApi.getLastLocation(googleApiClient);
+					if (location != null) {
+						selectedLocation = new PlacesLocation("my location", getString(R.string.input_your_location), location.getLatitude(), location.getLongitude());
+					} else {
+						Toast.makeText(this, getString(R.string.input_your_location_unavailable), Toast.LENGTH_LONG).show();
+						Timber.i("Current location unavailable");
+						return;
+					}
 				}
-			});
 
-		} else {
-			textTo.setText(locationDescription);
-			placesService.getTextSearch(locationDescription, new PlacesQueryCallback() {
-				@Override
-				public void success(ObjectNode objectNode, Response response) {
-					locationTo = parseLocation(objectNode);
-					updateMarkers();
+				// handle location query
+				if (fromInput) textFrom.setText(locationDescription);
+				else textTo.setText(locationDescription);
+
+				if (selectedLocation == null) {
+					placesService.getTextSearch(locationDescription, new PlacesQueryCallback() {
+						@Override
+						public void success(ObjectNode objectNode, Response response) {
+							updateSelectedLocation(parseLocation(objectNode), fromInput);
+						}
+					});
+				} else {
+					updateSelectedLocation(selectedLocation, fromInput);
 				}
-			});
+				break;
+
+			// resolved google api client connection?
+			case GOOGLE_API_CLIENT_REQUEST:
+				if (!googleApiClient.isConnected() && !googleApiClient.isConnecting()) {
+					googleApiClient.connect();
+				}
+				break;
 
 		}
+	}
+
+
+	private void updateSelectedLocation(PlacesLocation selectedLocation, boolean fromInput) {
+		if (fromInput) locationFrom = selectedLocation;
+		else locationTo = selectedLocation;
+		updateMarkers();
 	}
 
 
@@ -167,6 +208,42 @@ public class MainActivity extends RoboActivity implements View.OnClickListener {
 		return new PlacesLocation(placeId, description, lat, lon);
 	}
 
+
+	private GoogleApiClient createGoogleApiClient() {
+		return new GoogleApiClient.Builder(this)
+				.addConnectionCallbacks(this)
+				.addOnConnectionFailedListener(this)
+				.addApi(LocationServices.API)
+				.build();
+	}
+
+
+	@Override
+	public void onConnected(Bundle bundle) {
+		Timber.d("Google Api Client connected");
+	}
+
+
+	@Override
+	public void onConnectionSuspended(int i) {
+		Timber.d("Google Api Client connection suspended (" + i + ")");
+	}
+
+
+	@Override
+	public void onConnectionFailed(ConnectionResult connectionResult) {
+		Timber.w("Google Api Client connection failed, " + connectionResult.getErrorCode());
+		if (connectionResult.hasResolution()) {
+			try {
+				connectionResult.startResolutionForResult(this, GOOGLE_API_CLIENT_REQUEST);
+			} catch (IntentSender.SendIntentException e) {
+				Timber.e(e, "failed to start google client api resolution");
+				googleApiClient.connect();
+			}
+		} else {
+			GooglePlayServicesUtil.getErrorDialog(connectionResult.getErrorCode(), this, GOOGLE_API_CLIENT_REQUEST).show();
+		}
+	}
 
 
 	private abstract class PlacesQueryCallback implements Callback<ObjectNode> {

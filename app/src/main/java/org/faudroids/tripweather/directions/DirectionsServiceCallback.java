@@ -16,8 +16,6 @@ public class DirectionsServiceCallback implements Callback<ObjectNode> {
         ArrayList<Route> routes = test.parse();
         Timber.d("Empty? - " + test.isEmpty());
         Timber.d("Elements: " + routes.size());
-        Timber.d("TravelMode: " + routes.get(0).getTravelMode() + " speed: " + routes.get(0)
-                .getTravelSpeed());
         for(int i = 0; i < routes.size(); ++i) {
             Timber.d("no. of waypoints: " + routes.get(i).getWaypoints().size());
             for(int j = 0; j < routes.get(i).getWaypoints().size(); ++j) {

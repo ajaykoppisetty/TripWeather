@@ -16,7 +16,6 @@
             android:id="@+id/input_from"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:text="@string/input_your_location"
             android:hint="@string/input_choose_origin"
             style="@style/InputTextStyle"
             />
