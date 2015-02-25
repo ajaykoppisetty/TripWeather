@@ -36,8 +36,13 @@
             </intent-filter>
         </activity>
         <activity
+            android:name=".ui.LocationInputActivity"
+            android:label="@string/title_activity_main"
+            />
+        <activity
             android:name=".ui.GraphActivity"
-            android:label="@string/title_activity_main" />
+            android:label="@string/title_activity_main"
+            />
 
     </application>
 

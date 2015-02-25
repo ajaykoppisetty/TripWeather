@@ -3,13 +3,19 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="wrap_content"
+    style="@style/DefaultCard"
+    >
 
-    <TextView
-        android:id="@+id/route"
+    <AutoCompleteTextView
+        android:id="@+id/input"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="@dimen/padding_default"
+        android:drawableEnd="@drawable/ic_action_cancel"
+        android:drawableRight="@drawable/ic_action_cancel"
+        android:layout_margin="@dimen/padding_default"
+        android:background="@android:color/transparent"
+        android:hint="@string/input_choose_location"
         style="@style/DefaultTextStyleBlack"
         />
 

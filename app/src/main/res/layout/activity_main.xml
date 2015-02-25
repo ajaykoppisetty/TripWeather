@@ -1,0 +1,45 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:orientation="vertical"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              >
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="@color/green"
+        android:padding="@dimen/padding_default"
+        >
+
+        <TextView
+            android:id="@+id/input_from"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/input_your_location"
+            style="@style/InputTextStyle"
+            />
+
+        <View
+            android:layout_width="fill_parent"
+            android:layout_height="@dimen/separator_height"
+            android:background="@android:color/white"
+            />
+
+        <TextView
+            android:id="@+id/input_to"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/input_choose_destination"
+            style="@style/InputTextStyle"
+            />
+
+    </LinearLayout>
+
+   <com.google.android.gms.maps.MapView
+       android:id="@+id/map"
+       android:layout_height="match_parent"
+       android:layout_width="match_parent"
+       />
+
+</LinearLayout>

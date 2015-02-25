@@ -19,7 +19,7 @@ public class PlacesAutoCompleteAdapter extends ArrayAdapter<PlacesLocation> impl
 
 	private final PlacesService placesService;
 
-    public PlacesAutoCompleteAdapter(
+    PlacesAutoCompleteAdapter(
 			Context context,
 			int textViewResourceId,
 			PlacesService placesService) {
