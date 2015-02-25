@@ -25,7 +25,7 @@ public class Route {
     private final String copyright;
     private final String warnings;
     private final TravelMode travelMode;
-    private final ArrayList<Waypoint> waypoints;
+    private final ArrayList<Waypoint> waypoints = new ArrayList<>();
 
 
     private Route(Builder builder) {
@@ -34,7 +34,7 @@ public class Route {
         this.copyright = builder.copyright;
         this.warnings = builder.warnings;
         this.travelMode = builder.travelMode;
-        this.waypoints = builder.waypoints;
+        this.waypoints.addAll(builder.waypoints);
     }
 
 
@@ -63,13 +63,22 @@ public class Route {
     }
 
 
+    public TravelMode getTravelMode() {
+        return travelMode;
+    }
+
+
+    public int getTravelSpeed() {
+        return travelMode.value();
+    }
+
     public static class Builder {
         private Waypoint origin;
         private Waypoint destination;
         private String copyright;
         private String warnings;
         private TravelMode travelMode;
-        private ArrayList<Waypoint> waypoints;
+        private ArrayList<Waypoint> waypoints = new ArrayList<>();
 
         public Builder from(Waypoint origin) {
             this.origin = origin;

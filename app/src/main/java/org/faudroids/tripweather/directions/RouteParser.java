@@ -52,7 +52,7 @@ public class RouteParser {
 
             if(legs.size() > 0) {
                 if(legs.get(0).get("steps").size() > 0) {
-                    travelMode = legs.get(0).get("steps").get("travel_mode").asText();
+                    travelMode = legs.get(0).get("steps").get(0).get("travel_mode").asText();
                 }
             }
 
@@ -86,6 +86,7 @@ public class RouteParser {
                                        .from(origin)
                                        .to(destination)
                                        .travelMode (travelModeHashMap.get(travelMode))
+                                       .waypoints(wp)
                                        .copyright(copyright)
                                        .warnings(warnings)
                                        .construct();
