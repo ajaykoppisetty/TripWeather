@@ -1,31 +1,17 @@
 package org.faudroids.tripweather.directions;
 
+import android.util.Pair;
+
 import java.util.ArrayList;
 
 public class Route {
-
-
-    public enum TravelMode {
-        walking(5), bicycling(15), driving(80);
-
-        private final int speed;
-
-        private TravelMode(int speed) {
-            this.speed = speed;
-        }
-
-        public int value() {
-            return speed;
-        }
-    }
 
 
     private final Waypoint origin;
     private final Waypoint destination;
     private final String copyright;
     private final String warnings;
-    private final TravelMode travelMode;
-    private final ArrayList<Waypoint> waypoints = new ArrayList<>();
+    private final ArrayList<Pair<Waypoint, Double>> waypoints = new ArrayList<>();
 
 
     private Route(Builder builder) {
@@ -33,13 +19,16 @@ public class Route {
         this.destination = builder.destination;
         this.copyright = builder.copyright;
         this.warnings = builder.warnings;
-        this.travelMode = builder.travelMode;
         this.waypoints.addAll(builder.waypoints);
     }
 
 
     public ArrayList<Waypoint> getWaypoints() {
-        return waypoints;
+        ArrayList<Waypoint> returnList = new ArrayList<>();
+        for(int i = 0; i < waypoints.size(); ++i) {
+            returnList.add(waypoints.get(i).first);
+        }
+        return returnList;
     }
 
 
@@ -54,22 +43,39 @@ public class Route {
 
 
     public double getTotalLength() {
-        return 0;
+        double totalLength = 0;
+        for(int i = 0; i < waypoints.size()-1; ++i) {
+            totalLength += waypoints.get(i).first.getDistance(waypoints.get(i+1).first);
+        }
+        return totalLength;
     }
 
 
     public double getTotalTime() {
-        return 0;
+        double totalTime = 0;
+        for(int i = 0; i < waypoints.size()-1; ++i) {
+            totalTime += waypoints.get(i).first.getDuration(waypoints.get(i+1).first,
+                    waypoints.get(i+1).second);
+        }
+        return totalTime;
     }
 
 
-    public TravelMode getTravelMode() {
-        return travelMode;
+    public ArrayList<Double> getMeanTravelSpeeds() {
+        ArrayList<Double> returnList = new ArrayList<>();
+        for(int i = 0; i < waypoints.size(); ++i) {
+            returnList.add(waypoints.get(i).second);
+        }
+        return returnList;
     }
 
 
-    public int getTravelSpeed() {
-        return travelMode.value();
+    public ArrayList<Waypoint> interpolate() {
+        ArrayList<Waypoint> interpolatedRoute = new ArrayList<>();
+
+        interpolatedRoute.add(waypoints.get(0).first);
+
+        return null;
     }
 
     public static class Builder {
@@ -77,8 +83,7 @@ public class Route {
         private Waypoint destination;
         private String copyright;
         private String warnings;
-        private TravelMode travelMode;
-        private ArrayList<Waypoint> waypoints = new ArrayList<>();
+        private ArrayList<Pair<Waypoint, Double>> waypoints = new ArrayList<>();
 
         public Builder from(Waypoint origin) {
             this.origin = origin;
@@ -104,13 +109,7 @@ public class Route {
         }
 
 
-        public Builder travelMode(TravelMode mode) {
-            this.travelMode = mode;
-            return this;
-        }
-
-
-        public Builder waypoints(ArrayList<Waypoint> wp) {
+        public Builder waypoints(ArrayList<Pair<Waypoint, Double>> wp) {
             this.waypoints.addAll(wp);
             return this;
         }

@@ -1,19 +1,14 @@
 package org.faudroids.tripweather.directions;
 
+import android.util.Pair;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 
 public class RouteParser {
 
-    private static HashMap<String, Route.TravelMode> travelModeHashMap = new HashMap<>();
-    static {
-        travelModeHashMap.put("DRIVING", Route.TravelMode.driving);
-        travelModeHashMap.put("WALKING", Route.TravelMode.walking);
-        travelModeHashMap.put("BICYCLING", Route.TravelMode.bicycling);
-    }
 
     private ObjectNode routeJSON = null;
 
@@ -37,10 +32,10 @@ public class RouteParser {
 
         String copyright = null;
         String warnings = null;
-        String travelMode = null;
         Waypoint origin = null;
         Waypoint destination = null;
-        ArrayList<Waypoint> wp = new ArrayList<>();
+        double meanSpeed;
+        ArrayList<Pair<Waypoint, Double>> wp = new ArrayList<>();
 
         JsonNode routes = routeJSON.get("routes");
 
@@ -50,20 +45,15 @@ public class RouteParser {
 
             JsonNode legs = routes.get(routeIdx).get("legs");
 
-            if(legs.size() > 0) {
-                if(legs.get(0).get("steps").size() > 0) {
-                    travelMode = legs.get(0).get("steps").get(0).get("travel_mode").asText();
-                }
-            }
-
             for (int legIdx = 0; legIdx < legs.size(); ++legIdx) {
+
                 origin = new Waypoint(legs.get(legIdx)
                                           .get("start_location")
                                           .get("lat").asDouble(),
                                       legs.get(legIdx)
                                           .get("start_location")
                                           .get("lng").asDouble());
-                wp.add(origin);
+                wp.add(new Pair<>(origin, 0.0));
 
 
                 destination = new Waypoint(legs.get(legIdx)
@@ -77,18 +67,21 @@ public class RouteParser {
                 JsonNode steps = legs.get(legIdx).get("steps");
 
                 for (int idx = 0; idx < steps.size(); ++idx) {
-                    wp.add(new Waypoint(steps.get(idx)
-                                             .get("end_location")
-                                             .get("lat").asDouble(),
-                                        steps.get(idx)
-                                             .get("end_location")
-                                             .get("lng").asDouble()));
+                    meanSpeed = (steps.get(idx).get("distance").get("value").asDouble()/
+                                 steps.get(idx).get("duration").get("value").asDouble())*3.6;
+
+                    wp.add(new Pair<>(new Waypoint(steps.get(idx)
+                                                        .get("end_location")
+                                                        .get("lat").asDouble(),
+                                                   steps.get(idx)
+                                                        .get("end_location")
+                                                        .get("lng").asDouble()),
+                                      meanSpeed));
                 }
 
                 Route route = new Route.Builder()
                                        .from(origin)
                                        .to(destination)
-                                       .travelMode (travelModeHashMap.get(travelMode))
                                        .waypoints(wp)
                                        .copyright(copyright)
                                        .warnings(warnings)

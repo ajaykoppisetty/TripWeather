@@ -55,12 +55,12 @@ public class Waypoint {
 
 
     //Returns traveling time from current waypoint to another according to given travel mode
-    public double getDuration(Waypoint other, Route.TravelMode travelMode) {
-        return (double)(getDistance(other)/travelMode.value());
+    public double getDuration(Waypoint other, double meanTravelSpeed) {
+        return getDistance(other)/meanTravelSpeed;
     }
 
 
-    public double getDuration(double lat, double lng, Route.TravelMode travelMode) {
-        return (double)(getDistance(lat, lng)/travelMode.value());
+    public double getDuration(double lat, double lng, double meanTravelSpeed) {
+        return getDistance(lat, lng)/meanTravelSpeed;
     }
 }
