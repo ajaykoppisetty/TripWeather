@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="green">#ff29a900</color>
-    <color name="gray_light">#ffe2e2e2</color>
+    <color name="gray_light">#ffcecece</color>
 </resources>
