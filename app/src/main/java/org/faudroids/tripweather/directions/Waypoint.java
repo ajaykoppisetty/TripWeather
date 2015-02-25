@@ -6,38 +6,30 @@ public class Waypoint {
     private double lat;
     private double lng;
 
-    private double duration;
-    private double distance;
 
     //Earth radius in km
     private double earthRadius = 6371.009;
 
-    public Waypoint(double lat, double lng, double distance, double duration) {
+
+    public Waypoint(double lat, double lng) {
         this.lat = lat;
         this.lng = lng;
-        this.duration = duration;
-        this.distance = distance;
     }
 
-    public double getDuration() {
-        return duration;
-    }
-
-    public double getDistance() {
-        return distance;
-    }
 
     public double getLng() {
         return lng;
     }
 
+
     public double getLat() {
         return lat;
     }
 
+
     //Returns geographic distance between two points given by latitude/longitude
     //"Spherical Earth projected to a plane"
-    public double distance(Waypoint other) {
+    public double getDistance(Waypoint other) {
         double deltaPhi = Math.toRadians(other.getLat()-this.getLat());
         double deltaLambda = Math.toRadians(other.getLng() - this.getLng());
 
@@ -49,7 +41,7 @@ public class Waypoint {
                 (deltaLambda*deltaLambda))));
     }
 
-    public double distance(double lat, double lng) {
+    public double getDistance(double lat, double lng) {
         double deltaPhi = Math.toRadians(lat-this.getLat());
         double deltaLambda = Math.toRadians(lng - this.getLng());
 
@@ -59,5 +51,16 @@ public class Waypoint {
                 (deltaPhi*deltaPhi)+
                 (Math.cos(meanPhi)*
                 (deltaLambda*deltaLambda))));
+    }
+
+
+    //Returns traveling time from current waypoint to another according to given travel mode
+    public double getDuration(Waypoint other, Route.TravelMode travelMode) {
+        return (double)(getDistance(other)/travelMode.value());
+    }
+
+
+    public double getDuration(double lat, double lng, Route.TravelMode travelMode) {
+        return (double)(getDistance(lat, lng)/travelMode.value());
     }
 }
