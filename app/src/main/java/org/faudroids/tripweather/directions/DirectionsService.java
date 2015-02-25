@@ -13,6 +13,5 @@ public interface DirectionsService {
 
 
     @GET("/json?sensor=true&units=metric")
-    public void getRoute(@Query("origin") String start, @Query("destination") String end,
-                               Callback<ObjectNode> callback);
+    public void getRoute(@Query("origin") String start, @Query("destination") String end, Callback<ObjectNode> callback);
 }

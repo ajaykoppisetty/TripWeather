@@ -21,10 +21,15 @@ import com.google.android.gms.maps.MapsInitializer;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.PolylineOptions;
+import com.google.maps.android.PolyUtil;
 
 import org.faudroids.tripweather.R;
+import org.faudroids.tripweather.directions.DirectionsService;
 import org.faudroids.tripweather.directions.PlacesLocation;
 import org.faudroids.tripweather.directions.PlacesService;
+
+import java.util.List;
 
 import javax.inject.Inject;
 
@@ -51,6 +56,7 @@ public class MainActivity extends RoboActivity implements
 	@InjectView(R.id.input_to) TextView textTo;
 	@InjectView(R.id.map) MapView mapView;
 	@Inject PlacesService placesService;
+	@Inject DirectionsService directionsService;
 	private GoogleApiClient googleApiClient;
 
 	private PlacesLocation locationFrom, locationTo; // contain the actual lat / lon
@@ -135,7 +141,7 @@ public class MainActivity extends RoboActivity implements
 				else textTo.setText(locationDescription);
 
 				if (selectedLocation == null) {
-					placesService.getTextSearch(locationDescription, new PlacesQueryCallback() {
+					placesService.getTextSearch(locationDescription, new AbstractCallback() {
 						@Override
 						public void success(ObjectNode objectNode, Response response) {
 							updateSelectedLocation(parseLocation(objectNode), fromInput);
@@ -169,7 +175,10 @@ public class MainActivity extends RoboActivity implements
 		map.clear();
 		if (locationFrom != null) updateMarker(map, locationFrom);
 		if (locationTo != null) updateMarker(map, locationTo);
-		if (locationFrom != null && locationTo != null)  moveCameraToRoute(map);
+		if (locationFrom != null && locationTo != null) {
+			moveCameraToRoute(map);
+			showRoutePolyLine();
+		}
 		else if (locationFrom != null) moveCameraToMarker(locationFrom, map);
 		else if (locationTo != null) moveCameraToMarker(locationFrom, map);
 	}
@@ -194,6 +203,29 @@ public class MainActivity extends RoboActivity implements
 	private void moveCameraToMarker(PlacesLocation location, GoogleMap map) {
 		Timber.d("Moving camera to " + location.getLat() + " " + location.getLon());
 		map.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location.getLat(), location.getLon()), 14));
+	}
+
+
+	private void showRoutePolyLine() {
+		String start = locationFrom.getLat() + "," + locationFrom.getLon();
+		String end = locationTo.getLat() + "," + locationTo.getLon();
+		directionsService.getRoute(start, end, new AbstractCallback() {
+			@Override
+			public void success(ObjectNode objectNode, Response response) {
+				String encodedRoute = objectNode.path("routes").path(0).path("overview_polyline").path("points").asText();
+				if (encodedRoute == null || "".equals(encodedRoute)) {
+					Timber.w("failed to find polyline for route");
+					return;
+				}
+
+				List<LatLng> points = PolyUtil.decode(encodedRoute);
+				GoogleMap map = mapView.getMap();
+				if (map == null) return;
+				map.addPolyline(new PolylineOptions()
+						.addAll(points)
+						.color(R.color.green_dark));
+			}
+		});
 	}
 
 
@@ -246,7 +278,7 @@ public class MainActivity extends RoboActivity implements
 	}
 
 
-	private abstract class PlacesQueryCallback implements Callback<ObjectNode> {
+	private abstract class AbstractCallback implements Callback<ObjectNode> {
 
 		@Override
 		public void failure(RetrofitError error) {
