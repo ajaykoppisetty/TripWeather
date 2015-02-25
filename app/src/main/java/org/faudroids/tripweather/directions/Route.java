@@ -23,6 +23,10 @@ public class Route {
     }
 
 
+    /**
+     *
+     * @return ArrayList containing all waypoints.
+     */
     public ArrayList<Waypoint> getWaypoints() {
         ArrayList<Waypoint> returnList = new ArrayList<>();
         for(int i = 0; i < waypoints.size(); ++i) {
@@ -32,16 +36,28 @@ public class Route {
     }
 
 
+    /**
+     *
+     * @return Destination waypoint.
+     */
     public Waypoint getDestination() {
         return destination;
     }
 
 
+    /**
+     *
+     * @return Starting waypoint.
+     */
     public Waypoint getOrigin() {
         return origin;
     }
 
 
+    /**
+     *
+     * @return Total length of the route in km.
+     */
     public double getTotalLength() {
         double totalLength = 0;
         for(int i = 0; i < waypoints.size()-1; ++i) {
@@ -51,6 +67,10 @@ public class Route {
     }
 
 
+    /**
+     *
+     * @return Total time to travel the route in hours.
+     */
     public double getTotalTime() {
         double totalTime = 0;
         for(int i = 0; i < waypoints.size()-1; ++i) {
@@ -61,6 +81,10 @@ public class Route {
     }
 
 
+    /**
+     *
+     * @return Returns an ArrayList containing the mean traveling speed for each waypoint.
+     */
     public ArrayList<Double> getMeanTravelSpeeds() {
         ArrayList<Double> returnList = new ArrayList<>();
         for(int i = 0; i < waypoints.size(); ++i) {
@@ -73,7 +97,27 @@ public class Route {
     public ArrayList<Waypoint> interpolate() {
         ArrayList<Waypoint> interpolatedRoute = new ArrayList<>();
 
+        double epsilon = 0.16;
+
         interpolatedRoute.add(waypoints.get(0).first);
+
+        double travelTime = 0;
+
+        for(int i = 0; i < waypoints.size(); ++i) {
+            Waypoint startPoint = interpolatedRoute.get(interpolatedRoute.size()-1);
+            Waypoint currentWaypoint = waypoints.get(i).first;
+            double currentSpeed = waypoints.get(i).second;
+            double duration = startPoint.getDuration(currentWaypoint, currentSpeed);
+
+            //TODO: Finish me :)
+            if(Math.abs(1 - duration) <= epsilon) {
+                interpolatedRoute.add(currentWaypoint);
+            } else if(1 - duration < 0) {
+
+            } else {
+                travelTime += startPoint.getDuration(currentWaypoint, currentSpeed);
+            }
+        }
 
         return null;
     }

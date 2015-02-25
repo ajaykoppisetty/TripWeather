@@ -14,15 +14,11 @@ public class DirectionsServiceCallback implements Callback<ObjectNode> {
     public void success(ObjectNode jsonNodes, Response response) {
         RouteParser test = new RouteParser(jsonNodes);
         ArrayList<Route> routes = test.parse();
-        Timber.d("Empty? - " + test.isEmpty());
-        Timber.d("Elements: " + routes.size());
-        Timber.d("TravelMode: " + routes.get(0).getTravelMode() + " speed: " + routes.get(0)
-                .getTravelSpeed());
         for(int i = 0; i < routes.size(); ++i) {
-            Timber.d("no. of waypoints: " + routes.get(i).getWaypoints().size());
             for(int j = 0; j < routes.get(i).getWaypoints().size(); ++j) {
-                Timber.d("lat: " + routes.get(i).getWaypoints().get(j).getLat());
-                Timber.d("lng: " + routes.get(i).getWaypoints().get(j).getLng());
+                Timber.d("Duration: " + routes.get(i).getWaypoints().get(j).getDuration(routes
+                        .get(i)
+                        .getWaypoints().get(j+1), routes.get(i).getMeanTravelSpeeds().get(j+1)));
             }
         }
         Timber.d("Success: " + jsonNodes.get("status"));
