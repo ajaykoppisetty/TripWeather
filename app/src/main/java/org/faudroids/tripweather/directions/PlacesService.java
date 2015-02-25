@@ -9,10 +9,10 @@ import retrofit.http.Query;
 
 public interface PlacesService {
 
-	@GET("/autocomplete/json?types=(cities)")
+	@GET("/autocomplete/json")
 	public ObjectNode getAutocomplete(@Query("input") String input);
 
-	@GET("/autocomplete/json?types=(cities)")
+	@GET("/autocomplete/json")
 	public void getAutocomplete(@Query("input") String input, Callback<ObjectNode> callback);
 
 
