@@ -19,6 +19,8 @@ import roboguice.inject.InjectView;
 @ContentView(R.layout.activity_main)
 public class MainActivity extends RoboActivity implements View.OnClickListener {
 
+	private static final int LOCATION_REQUEST = 42;
+
 	@InjectView(R.id.input_from) TextView textFrom;
 	@InjectView(R.id.input_to) TextView textTo;
 	@InjectView(R.id.map) MapView mapView;
@@ -61,9 +63,23 @@ public class MainActivity extends RoboActivity implements View.OnClickListener {
 
 
 	@Override
-	public void onClick(View v) {
-		Intent intent = LocationInputActivity.createIntent(this, ((TextView) v).getText().toString());
-		startActivity(intent);
+	public void onClick(View view) {
+		String currentLocation = ((TextView) view).getText().toString();
+		boolean fromInput;
+		fromInput = (R.id.input_from == view.getId());
+		Intent intent = LocationInputActivity.createIntent(this, currentLocation, fromInput);
+		startActivityForResult(intent, LOCATION_REQUEST);
+	}
+
+
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		if (requestCode != LOCATION_REQUEST) return;
+		if (resultCode != RESULT_OK) return;
+		String location = data.getExtras().getString(LocationInputActivity.EXTRA_LOCATION);
+		boolean fromInput = data.getBooleanExtra(LocationInputActivity.EXTRA_FROM, false);
+		if (fromInput) textFrom.setText(location);
+		else textTo.setText(location);
 	}
 
 }

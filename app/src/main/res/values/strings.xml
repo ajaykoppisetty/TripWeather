@@ -34,6 +34,7 @@
 
     <string name="graph_temp_legend">Temperature</string>
 
+    <string name="input_choose_origin">Choose origin</string>
     <string name="input_choose_destination">Choose destination</string>
     <string name="input_choose_location">Choose location</string>
     <string name="input_your_location">Your location</string>

@@ -11,13 +11,15 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="@dimen/padding_default"
         >
 
         <LinearLayout
+            android:id="@+id/your_location"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
+            android:background="?android:attr/selectableItemBackground"
+            android:padding="@dimen/padding_default"
             >
 
             <ImageView
@@ -27,7 +29,6 @@
                 />
 
             <TextView
-                android:id="@+id/your_location"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/input_your_location"
@@ -42,14 +43,16 @@
             android:layout_width="match_parent"
             android:layout_height="@dimen/separator_height"
             android:background="@color/gray_light"
-            android:layout_marginTop="@dimen/padding_default"
+            android:layout_marginLeft="@dimen/padding_default"
+            android:layout_marginRight="@dimen/padding_default"
             />
 
         <LinearLayout
+            android:id="@+id/map_location"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:layout_marginTop="@dimen/padding_default"
+            android:padding="@dimen/padding_default"
             >
 
             <ImageView
@@ -59,7 +62,6 @@
                 />
 
             <TextView
-                android:id="@+id/map_location"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/input_choose_from_map"

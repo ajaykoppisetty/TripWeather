@@ -15,7 +15,8 @@
         android:drawableRight="@drawable/ic_action_cancel"
         android:layout_margin="@dimen/padding_default"
         android:background="@android:color/transparent"
-        android:hint="@string/input_choose_location"
+        android:inputType="text"
+        android:imeOptions="actionSearch"
         style="@style/DefaultTextStyleBlack"
         />
 

@@ -2,36 +2,48 @@ package org.faudroids.tripweather.ui;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.EditorInfo;
 import android.widget.AutoCompleteTextView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.faudroids.tripweather.R;
 import org.faudroids.tripweather.directions.PlacesService;
 
-import javax.inject.Inject;
+public final class LocationInputAdapter extends RecyclerView.Adapter<LocationInputAdapter.AbstractViewHolder> {
 
-public final class LocationInputAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
-
-	private final Context context;
 	private final PlacesService placesService;
+	private final LocationListener locationListener;
+	private final String currentLocation;
+	private final boolean chooseFrom;
 
-	@Inject
-	public LocationInputAdapter(Context context, PlacesService placesService) {
-		this.context = context;
+	public LocationInputAdapter(
+			PlacesService placesService,
+			LocationListener locationListener,
+			String currentLocation,
+			boolean chooseFrom) {
+
 		this.placesService = placesService;
+		this.locationListener = locationListener;
+		this.currentLocation = currentLocation;
+		this.chooseFrom = chooseFrom;
 	}
 
 
 	@Override
-	public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
+	public AbstractViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
 		LayoutInflater inflater = LayoutInflater
 				.from(viewGroup.getContext());
 		switch(viewType) {
-			case InputViewHolder.VIEW_TYPE: return new InputViewHolder(inflater.inflate(R.layout.card_input, viewGroup, false));
-			case CommonLocationsViewHolder.VIEW_TYPE: return new CommonLocationsViewHolder(inflater.inflate(R.layout.card_locations_common, viewGroup, false));
+			case InputViewHolder.VIEW_TYPE:
+				return new InputViewHolder(inflater.inflate(R.layout.card_input, viewGroup, false));
+			case CommonLocationsViewHolder.VIEW_TYPE:
+				return new CommonLocationsViewHolder(inflater.inflate(R.layout.card_locations_common, viewGroup, false));
 		}
 		return null;
 	}
@@ -48,25 +60,8 @@ public final class LocationInputAdapter extends RecyclerView.Adapter<RecyclerVie
 
 
 	@Override
-	public void onBindViewHolder(RecyclerView.ViewHolder viewHolder, int viewType) {
-		switch(viewType) {
-			case InputViewHolder.VIEW_TYPE:
-				InputViewHolder inputViewHolder = (InputViewHolder) viewHolder;
-				PlacesAutoCompleteAdapter adapter = new PlacesAutoCompleteAdapter(context, android.R.layout.simple_dropdown_item_1line, placesService);
-				inputViewHolder.autocompleteTextView.setAdapter(adapter);
-				break;
-
-			case CommonLocationsViewHolder.VIEW_TYPE:
-				CommonLocationsViewHolder locationsViewHolder = (CommonLocationsViewHolder) viewHolder;
-				/*
-				locationsViewHolder.textYourLocation.setOnClickListener(new View.OnClickListener() {
-					@Override
-					public void onClick(View view) {
-						Toast.makeText(context, "foo bar", Toast.LENGTH_SHORT).show();
-					}
-				});
-				*/
-		}
+	public void onBindViewHolder(AbstractViewHolder viewHolder, int viewType) {
+		viewHolder.onBindViewHolder();
 	}
 
 
@@ -76,7 +71,22 @@ public final class LocationInputAdapter extends RecyclerView.Adapter<RecyclerVie
 	}
 
 
-	private static final class InputViewHolder extends RecyclerView.ViewHolder {
+
+	abstract class AbstractViewHolder extends RecyclerView.ViewHolder {
+
+		protected final Context context;
+
+		public AbstractViewHolder(View view) {
+			super(view);
+			this.context = view.getContext();
+		}
+
+		public abstract void onBindViewHolder();
+
+	}
+
+
+	private final class InputViewHolder extends AbstractViewHolder {
 
 		private static final int VIEW_TYPE = 0;
 		private final AutoCompleteTextView autocompleteTextView;
@@ -86,19 +96,73 @@ public final class LocationInputAdapter extends RecyclerView.Adapter<RecyclerVie
 			this.autocompleteTextView = (AutoCompleteTextView) view.findViewById(R.id.input);
 		}
 
+
+		@Override
+		public void onBindViewHolder() {
+			PlacesAutoCompleteAdapter adapter = new PlacesAutoCompleteAdapter(context, android.R.layout.simple_dropdown_item_1line, placesService);
+			if ("".equals(autocompleteTextView.getText().toString())) autocompleteTextView.setText(currentLocation);
+			if (chooseFrom) autocompleteTextView.setHint(context.getString(R.string.input_choose_origin));
+			else autocompleteTextView.setHint(context.getString(R.string.input_choose_destination));
+			autocompleteTextView.setAdapter(adapter);
+			autocompleteTextView.setOnTouchListener(new View.OnTouchListener() {
+				@Override
+				public boolean onTouch(View v, MotionEvent event) {
+					if (event.getAction() == MotionEvent.ACTION_UP) {
+						if (event.getRawX() >= (autocompleteTextView.getRight() - autocompleteTextView.getCompoundDrawables()[2].getBounds().width())) {
+							autocompleteTextView.setText("");
+							autocompleteTextView.dismissDropDown();
+							return true;
+						}
+					}
+					return false;
+				}
+			});
+			autocompleteTextView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+				@Override
+				public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+					if (EditorInfo.IME_ACTION_SEARCH == actionId) {
+						locationListener.onLocationSelected(autocompleteTextView.getText().toString());
+						return true;
+					}
+					return false;
+				}
+			});
+		}
+
 	}
 
 
-	private static final class CommonLocationsViewHolder extends RecyclerView.ViewHolder {
+	private final class CommonLocationsViewHolder extends AbstractViewHolder {
 
 		private static final int VIEW_TYPE = 1;
-		private final TextView textYourLocation;
-		private final TextView textMapLocation;
+
+		private final View yourLocation;
+		private final View mapLocation;
 
 		public CommonLocationsViewHolder(View view) {
+
 			super(view);
-			this.textYourLocation = (TextView) view.findViewById(R.id.your_location);
-			this.textMapLocation = (TextView) view.findViewById(R.id.map_location);
+			this.yourLocation = view.findViewById(R.id.your_location);
+			this.mapLocation = view.findViewById(R.id.map_location);
+		}
+
+
+		@Override
+		public void onBindViewHolder() {
+			yourLocation.setOnClickListener(new View.OnClickListener() {
+				@Override
+				public void onClick(View view) {
+					locationListener.onLocationSelected(context.getString(R.string.input_your_location));
+				}
+			});
+			mapLocation.setOnClickListener(new View.OnClickListener() {
+				@Override
+				public void onClick(View view) {
+					Toast.makeText(context, "Stub", Toast.LENGTH_SHORT).show();
+					// TODO
+				}
+			});
+
 		}
 
 	}
