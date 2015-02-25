@@ -126,7 +126,6 @@ public class MainActivity extends RoboActivity implements View.OnClickListener {
 	private void updateMarkers() {
 		GoogleMap map = mapView.getMap();
 		map.clear();
-		map.set
 		if (locationFrom != null) updateMarker(map, locationFrom);
 		if (locationTo != null) updateMarker(map, locationTo);
 		if (locationFrom != null && locationTo != null)  moveCameraToRoute(map);
