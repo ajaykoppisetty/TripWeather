@@ -4,24 +4,17 @@ package org.faudroids.tripweather.geo;
 import org.roboguice.shaded.goole.common.base.Objects;
 
 /**
- * Represents one location in the google places api.
+ * Represents one location in the google maps api.
  */
-public class PlacesLocation {
+public class Location {
 
-	private final String id;
 	private final String description;
 	private final double lat, lon;
 
-	public PlacesLocation(String id, String description, double lat, double lon) {
-		this.id = id;
+	public Location(String description, double lat, double lon) {
 		this.description = description;
 		this.lat = lat;
 		this.lon = lon;
-	}
-
-
-	public String getId() {
-		return id;
 	}
 
 
@@ -42,10 +35,9 @@ public class PlacesLocation {
 
 	@Override
 	public boolean equals(Object other) {
-		if (other == null || !(other instanceof PlacesLocation)) return false;
-		PlacesLocation location = (PlacesLocation) other;
-		return Objects.equal(id, location.id)
-				&& Objects.equal(description, location.description)
+		if (other == null || !(other instanceof Location)) return false;
+		Location location = (Location) other;
+		return Objects.equal(description, location.description)
 				&& Objects.equal(lat, location.lat)
 				&& Objects.equal(lon, location.lon);
 	}
@@ -53,7 +45,7 @@ public class PlacesLocation {
 
 	@Override
 	public int hashCode() {
-		return Objects.hashCode(id, description, lat, lon);
+		return Objects.hashCode(description, lat, lon);
 	}
 
 }

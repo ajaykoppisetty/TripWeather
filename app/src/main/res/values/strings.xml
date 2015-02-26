@@ -18,8 +18,6 @@
     <string name="directions_api_unit_metric">metric</string>
     <string name="directions_api_unit_imerial">imperial</string>
 
-    <string name="directions_api_base_url">https://maps.googleapis.com/maps/api/directions</string>
-
     <string name="directions_api_return_ok">OK</string>
     <string name="directions_api_return_not_found">NOT_FOUND</string>
     <string name="directions_api_return_zero_results">ZERO_RESULTS</string>
@@ -29,7 +27,9 @@
     <string name="directions_api_return_denied">REQUEST_DENIED</string>
     <string name="direction_api_return_unknown_error">UNKNOWN_ERROR</string>
 
-    <string name="google_places_base_url">https://maps.googleapis.com/maps/api/place</string>
+    <string name="google_directions_api_base_url">https://maps.googleapis.com/maps/api/directions</string>
+    <string name="google_geocoding_api_base_url">https://maps.googleapis.com/maps/api/geocode</string>
+    <string name="google_places_api_base_url">https://maps.googleapis.com/maps/api/place</string>
     <string name="open_weather_base_url">http://api.openweathermap.org/data/2.5</string>
 
     <string name="graph_temp_legend">Temperature</string>

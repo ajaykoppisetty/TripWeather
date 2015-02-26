@@ -2,7 +2,6 @@ package org.faudroids.tripweather.ui;
 
 import android.content.Intent;
 import android.content.IntentSender;
-import android.location.Location;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
@@ -27,8 +26,8 @@ import com.google.maps.android.PolyUtil;
 import org.faudroids.tripweather.R;
 import org.faudroids.tripweather.geo.DirectionsService;
 import org.faudroids.tripweather.geo.DirectionsServiceCallback;
-import org.faudroids.tripweather.geo.PlacesLocation;
-import org.faudroids.tripweather.geo.PlacesService;
+import org.faudroids.tripweather.geo.GeoCodingService;
+import org.faudroids.tripweather.geo.Location;
 
 import java.util.List;
 
@@ -56,11 +55,11 @@ public class MainActivity extends RoboActivity implements
 	@InjectView(R.id.input_from) TextView textFrom;
 	@InjectView(R.id.input_to) TextView textTo;
 	@InjectView(R.id.map) MapView mapView;
-	@Inject PlacesService placesService;
+	@Inject GeoCodingService geoCodingService;
 	@Inject DirectionsService directionsService;
 	private GoogleApiClient googleApiClient;
 
-	private PlacesLocation locationFrom, locationTo; // contain the actual lat / lon
+	private Location locationFrom, locationTo; // contain the actual lat / lon
 
 
     @Override
@@ -124,13 +123,13 @@ public class MainActivity extends RoboActivity implements
 			case LOCATION_REQUEST:
 				final String locationDescription = data.getExtras().getString(LocationInputActivity.EXTRA_LOCATION);
 				final boolean fromInput = data.getBooleanExtra(LocationInputActivity.EXTRA_FROM, false);
-				PlacesLocation selectedLocation = null;
+				Location selectedLocation = null;
 
 				// handle current user location
 				if (getString(R.string.input_your_location).equals(locationDescription)) {
-					Location location = LocationServices.FusedLocationApi.getLastLocation(googleApiClient);
+					android.location.Location location = LocationServices.FusedLocationApi.getLastLocation(googleApiClient);
 					if (location != null) {
-						selectedLocation = new PlacesLocation("my location", getString(R.string.input_your_location), location.getLatitude(), location.getLongitude());
+						selectedLocation = new Location(getString(R.string.input_your_location), location.getLatitude(), location.getLongitude());
 					} else {
 						Toast.makeText(this, getString(R.string.input_your_location_unavailable), Toast.LENGTH_LONG).show();
 						Timber.i("Current location unavailable");
@@ -143,7 +142,7 @@ public class MainActivity extends RoboActivity implements
 				else textTo.setText(locationDescription);
 
 				if (selectedLocation == null) {
-					placesService.getTextSearch(locationDescription, new AbstractCallback() {
+					geoCodingService.getGeoCodeForAddress(locationDescription, new AbstractCallback() {
 						@Override
 						public void success(ObjectNode objectNode, Response response) {
 							updateSelectedLocation(parseLocation(objectNode), fromInput);
@@ -165,7 +164,7 @@ public class MainActivity extends RoboActivity implements
 	}
 
 
-	private void updateSelectedLocation(PlacesLocation selectedLocation, boolean fromInput) {
+	private void updateSelectedLocation(Location selectedLocation, boolean fromInput) {
 		if (fromInput) locationFrom = selectedLocation;
 		else locationTo = selectedLocation;
 		updateMarkers();
@@ -186,7 +185,7 @@ public class MainActivity extends RoboActivity implements
 	}
 
 
-	private void updateMarker(GoogleMap map, PlacesLocation location) {
+	private void updateMarker(GoogleMap map, Location location) {
 		map.addMarker(new MarkerOptions()
 				.position(new LatLng(location.getLat(), location.getLon()))
 				.title(location.getDescription()));
@@ -202,7 +201,7 @@ public class MainActivity extends RoboActivity implements
 	}
 
 
-	private void moveCameraToMarker(PlacesLocation location, GoogleMap map) {
+	private void moveCameraToMarker(Location location, GoogleMap map) {
 		Timber.d("Moving camera to " + location.getLat() + " " + location.getLon());
 		map.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location.getLat(), location.getLon()), 14));
 	}
@@ -231,15 +230,14 @@ public class MainActivity extends RoboActivity implements
 	}
 
 
-	private PlacesLocation parseLocation(ObjectNode data) {
+	private Location parseLocation(ObjectNode data) {
 		Timber.d(data.toString());
 		JsonNode result = data.path("results").path(0);
-		String placeId = result.path("place_id").asText();
 		String description = result.path("formatted_address").asText();
 		JsonNode locationResult = result.path("geometry").path("location");
 		double lat = locationResult.path("lat").asDouble();
 		double lon = locationResult.path("lng").asDouble();
-		return new PlacesLocation(placeId, description, lat, lon);
+		return new Location(description, lat, lon);
 	}
 
 

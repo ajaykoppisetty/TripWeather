@@ -23,7 +23,7 @@ public class DirectionsServiceProvider implements Provider<DirectionsService> {
     @Override
     public DirectionsService get() {
         RestAdapter restAdapter = new RestAdapter.Builder()
-                .setEndpoint(context.getString(R.string.directions_api_base_url))
+                .setEndpoint(context.getString(R.string.google_directions_api_base_url))
                 .setConverter(new JacksonConverter())
                 .build();
 

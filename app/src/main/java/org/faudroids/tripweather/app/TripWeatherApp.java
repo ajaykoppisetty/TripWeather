@@ -3,7 +3,7 @@ package org.faudroids.tripweather.app;
 
 import android.app.Application;
 
-import org.faudroids.tripweather.geo.DirectionsModule;
+import org.faudroids.tripweather.geo.GeoModule;
 import org.faudroids.tripweather.weather.WeatherModule;
 
 import roboguice.RoboGuice;
@@ -20,7 +20,7 @@ public final class TripWeatherApp extends Application {
 				RoboGuice.DEFAULT_STAGE,
 				RoboGuice.newDefaultRoboModule(this),
 				new WeatherModule(),
-				new DirectionsModule());
+				new GeoModule());
 	}
 
 }

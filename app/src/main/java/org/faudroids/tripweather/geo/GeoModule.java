@@ -3,7 +3,9 @@ package org.faudroids.tripweather.geo;
 
 import android.content.Context;
 
-import com.google.inject.Provider;
+import com.google.inject.Binder;
+import com.google.inject.Module;
+import com.google.inject.Provides;
 
 import org.faudroids.tripweather.R;
 
@@ -14,22 +16,21 @@ import retrofit.RestAdapter;
 import retrofit.converter.JacksonConverter;
 import roboguice.inject.ContextSingleton;
 
+public final class GeoModule implements Module {
 
-public final class PlacesServiceProvider implements Provider<PlacesService> {
-
-	private final Context context;
-
-	@Inject
-	public PlacesServiceProvider(Context context) {
-		this.context = context;
+	@Override
+	public void configure(Binder binder) {
+		binder.bind(PlacesService.class).toProvider(PlacesServiceProvider.class);
+        binder.bind(DirectionsService.class).toProvider(DirectionsServiceProvider.class);
 	}
 
 
-	@Override
+	@Provides
 	@ContextSingleton
-	public PlacesService get() {
+	@Inject
+	public GeoCodingService provideGeoCodingService(final Context context) {
 		RestAdapter adapter = new RestAdapter.Builder()
-				.setEndpoint(context.getString(R.string.google_places_api_base_url))
+				.setEndpoint(context.getString(R.string.google_geocoding_api_base_url))
 				.setConverter(new JacksonConverter())
 				.setRequestInterceptor(new RequestInterceptor() {
 					@Override
@@ -38,7 +39,7 @@ public final class PlacesServiceProvider implements Provider<PlacesService> {
 					}
 				})
 				.build();
-		return adapter.create(PlacesService.class);
+		return adapter.create(GeoCodingService.class);
 	}
 
 }
