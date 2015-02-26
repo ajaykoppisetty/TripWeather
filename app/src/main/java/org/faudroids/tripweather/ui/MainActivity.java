@@ -25,7 +25,6 @@ import com.google.maps.android.PolyUtil;
 
 import org.faudroids.tripweather.R;
 import org.faudroids.tripweather.geo.DirectionsService;
-import org.faudroids.tripweather.geo.DirectionsServiceCallback;
 import org.faudroids.tripweather.geo.GeoCodingService;
 import org.faudroids.tripweather.geo.Location;
 
@@ -84,7 +83,6 @@ public class MainActivity extends RoboActivity implements
 			map.setMyLocationEnabled(true);
 			map.getUiSettings().setMyLocationButtonEnabled(true);
 			MapsInitializer.initialize(this);
-			updateMarkers();
 		}
 	}
 
@@ -107,9 +105,7 @@ public class MainActivity extends RoboActivity implements
 	@Override
 	public void onClick(View view) {
 		String currentLocation = ((TextView) view).getText().toString();
-		boolean fromInput;
-        directionsService.getRoute("Erlangen", "München", new DirectionsServiceCallback());
-		fromInput = (R.id.input_from == view.getId());
+		boolean fromInput = (R.id.input_from == view.getId());
 		Intent intent = LocationInputActivity.createIntent(this, currentLocation, fromInput);
 		startActivityForResult(intent, LOCATION_REQUEST);
 	}
@@ -174,6 +170,7 @@ public class MainActivity extends RoboActivity implements
 	private void updateMarkers() {
 		GoogleMap map = mapView.getMap();
 		map.clear();
+		Timber.d("Clearing map");
 		if (locationFrom != null) updateMarker(map, locationFrom);
 		if (locationTo != null) updateMarker(map, locationTo);
 		if (locationFrom != null && locationTo != null) {
@@ -210,6 +207,7 @@ public class MainActivity extends RoboActivity implements
 	private void showRoutePolyLine() {
 		String start = locationFrom.getLat() + "," + locationFrom.getLon();
 		String end = locationTo.getLat() + "," + locationTo.getLon();
+		Timber.d("Starting directions request");
 		directionsService.getRoute(start, end, new AbstractCallback() {
 			@Override
 			public void success(ObjectNode objectNode, Response response) {
@@ -222,6 +220,7 @@ public class MainActivity extends RoboActivity implements
 				List<LatLng> points = PolyUtil.decode(encodedRoute);
 				GoogleMap map = mapView.getMap();
 				if (map == null) return;
+				Timber.d("adding polyline");
 				map.addPolyline(new PolylineOptions()
 						.addAll(points)
 						.color(R.color.green_dark));
