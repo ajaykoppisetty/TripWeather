@@ -101,6 +101,7 @@ public final class LocationInputAdapter extends RecyclerView.Adapter<LocationInp
 		public void onBindViewHolder() {
 			PlacesAutoCompleteAdapter adapter = new PlacesAutoCompleteAdapter(context, android.R.layout.simple_dropdown_item_1line, placesService);
 			if ("".equals(autocompleteTextView.getText().toString())) autocompleteTextView.setText(currentLocation);
+			autocompleteTextView.setSelection(autocompleteTextView.getText().length());
 			if (chooseFrom) autocompleteTextView.setHint(context.getString(R.string.input_choose_origin));
 			else autocompleteTextView.setHint(context.getString(R.string.input_choose_destination));
 			autocompleteTextView.setAdapter(adapter);
