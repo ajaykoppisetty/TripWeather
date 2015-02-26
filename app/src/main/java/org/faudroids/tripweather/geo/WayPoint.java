@@ -1,6 +1,6 @@
 package org.faudroids.tripweather.geo;
 
-public class Waypoint {
+public class WayPoint {
 
     //Latitude and longitude in degrees
     private double lat;
@@ -16,7 +16,7 @@ public class Waypoint {
      * @param lat: Latidude of waypoint.
      * @param lng: Longitude of waypoint.
      */
-    public Waypoint(double lat, double lng) {
+    public WayPoint(double lat, double lng) {
         this.lat = lat;
         this.lng = lng;
     }
@@ -47,7 +47,7 @@ public class Waypoint {
      * @param other: Destination waypoint.
      * @return Distance in km.
      */
-    public double getDistance(Waypoint other) {
+    public double getDistance(WayPoint other) {
         double deltaPhi = Math.toRadians(other.getLat()-this.getLat());
         double deltaLambda = Math.toRadians(other.getLng() - this.getLng());
 
@@ -85,7 +85,7 @@ public class Waypoint {
      * @param meanTravelSpeed: Average traveling speed in km/h
      * @return Duration in hours.
      */
-    public double getDuration(Waypoint other, double meanTravelSpeed) {
+    public double getDuration(WayPoint other, double meanTravelSpeed) {
         return getDistance(other)/meanTravelSpeed;
     }
 

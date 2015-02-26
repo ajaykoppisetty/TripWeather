@@ -7,37 +7,21 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import java.util.ArrayList;
 
+import javax.inject.Inject;
+
 public class RouteParser {
 
+	@Inject
+	RouteParser() { }
 
-    private ObjectNode routeJSON = null;
-
-    public RouteParser(ObjectNode routeJSON) {
-        this.routeJSON = routeJSON;
-    }
-
-    public boolean isEmpty() {
-        if(routeJSON.get("status")
-                    .asText()
-                    .equals("OK")) {
-            return false;
-        } else {
-            return true;
-        }
-    }
-
-    public ArrayList<Route> parse() {
-        Route.Builder builder = new Route.Builder();
+    public ArrayList<Route> parse(ObjectNode routeJson) {
         ArrayList<Route> routeList = new ArrayList<>();
-
-        String copyright = null;
-        String warnings = null;
-        Waypoint origin = null;
-        Waypoint destination = null;
+        String copyright, warnings;
+        WayPoint origin, destination;
         double meanSpeed;
-        ArrayList<Pair<Waypoint, Double>> wp = new ArrayList<>();
+        ArrayList<Pair<WayPoint, Double>> wp = new ArrayList<>();
 
-        JsonNode routes = routeJSON.get("routes");
+        JsonNode routes = routeJson.get("routes");
 
         for(int routeIdx = 0; routeIdx < routes.size(); ++routeIdx) {
             copyright = routes.get(routeIdx).get("copyrights").asText();
@@ -47,7 +31,7 @@ public class RouteParser {
 
             for (int legIdx = 0; legIdx < legs.size(); ++legIdx) {
 
-                origin = new Waypoint(legs.get(legIdx)
+                origin = new WayPoint(legs.get(legIdx)
                                           .get("start_location")
                                           .get("lat").asDouble(),
                                       legs.get(legIdx)
@@ -56,7 +40,7 @@ public class RouteParser {
                 wp.add(new Pair<>(origin, 0.0));
 
 
-                destination = new Waypoint(legs.get(legIdx)
+                destination = new WayPoint(legs.get(legIdx)
                                                .get("end_location")
                                                .get("lat").asDouble(),
                                            legs.get(legIdx)
@@ -70,7 +54,7 @@ public class RouteParser {
                     meanSpeed = (steps.get(idx).get("distance").get("value").asDouble()/
                                  steps.get(idx).get("duration").get("value").asDouble())*3.6;
 
-                    wp.add(new Pair<>(new Waypoint(steps.get(idx)
+                    wp.add(new Pair<>(new WayPoint(steps.get(idx)
                                                         .get("end_location")
                                                         .get("lat").asDouble(),
                                                    steps.get(idx)
@@ -93,4 +77,5 @@ public class RouteParser {
 
         return routeList;
     }
+
 }

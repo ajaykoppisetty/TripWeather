@@ -10,12 +10,19 @@ import retrofit.client.Response;
 import timber.log.Timber;
 
 public class DirectionsServiceCallback implements Callback<ObjectNode> {
+
+	private final RouteParser routeParser;
+
+	public DirectionsServiceCallback(RouteParser routeParser) {
+		this.routeParser = routeParser;
+	}
+
+
     @Override
     public void success(ObjectNode jsonNodes, Response response) {
-        RouteParser test = new RouteParser(jsonNodes);
-        ArrayList<Route> routes = test.parse();
+        ArrayList<Route> routes = routeParser.parse(jsonNodes);
         for(int i = 0; i < routes.size(); ++i) {
-            ArrayList<Waypoint> w = routes.get(i).interpolate();
+            ArrayList<WayPoint> w = routes.get(i).interpolate();
 
             double total = 0;
             for(int j = 0; j < w.size()-1; ++j) {
@@ -35,4 +42,5 @@ public class DirectionsServiceCallback implements Callback<ObjectNode> {
     public void failure(RetrofitError error) {
         Timber.e(error.getMessage());
     }
+
 }

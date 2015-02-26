@@ -27,6 +27,7 @@ import org.faudroids.tripweather.R;
 import org.faudroids.tripweather.geo.DirectionsService;
 import org.faudroids.tripweather.geo.GeoCodingService;
 import org.faudroids.tripweather.geo.Location;
+import org.faudroids.tripweather.geo.RouteParser;
 
 import java.util.List;
 
@@ -57,6 +58,7 @@ public class MainActivity extends RoboActivity implements
 	@Inject GeoCodingService geoCodingService;
 	@Inject DirectionsService directionsService;
 	private GoogleApiClient googleApiClient;
+	@Inject RouteParser routeParser;
 
 	private Location locationFrom, locationTo; // contain the actual lat / lon
 

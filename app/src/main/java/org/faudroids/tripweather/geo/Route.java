@@ -9,11 +9,11 @@ import timber.log.Timber;
 public class Route {
 
 
-    private final Waypoint origin;
-    private final Waypoint destination;
+    private final WayPoint origin;
+    private final WayPoint destination;
     private final String copyright;
     private final String warnings;
-    private final ArrayList<Pair<Waypoint, Double>> waypoints = new ArrayList<>();
+    private final ArrayList<Pair<WayPoint, Double>> waypoints = new ArrayList<>();
 
 
     private Route(Builder builder) {
@@ -29,8 +29,8 @@ public class Route {
      *
      * @return ArrayList containing all waypoints.
      */
-    public ArrayList<Waypoint> getWaypoints() {
-        ArrayList<Waypoint> returnList = new ArrayList<>();
+    public ArrayList<WayPoint> getWaypoints() {
+        ArrayList<WayPoint> returnList = new ArrayList<>();
         for(int i = 0; i < waypoints.size(); ++i) {
             returnList.add(waypoints.get(i).first);
         }
@@ -42,7 +42,7 @@ public class Route {
      *
      * @return Destination waypoint.
      */
-    public Waypoint getDestination() {
+    public WayPoint getDestination() {
         return destination;
     }
 
@@ -51,7 +51,7 @@ public class Route {
      *
      * @return Starting waypoint.
      */
-    public Waypoint getOrigin() {
+    public WayPoint getOrigin() {
         return origin;
     }
 
@@ -100,20 +100,20 @@ public class Route {
      * Interpolates a given list of waypoints to segment a route in 1 hour chunks.
      * @return ArrayList\<Waypoint\>
      */
-    public ArrayList<Waypoint> interpolate() {
-        ArrayList<Waypoint> interpolatedRoute = new ArrayList<>();
+    public ArrayList<WayPoint> interpolate() {
+        ArrayList<WayPoint> interpolatedRoute = new ArrayList<>();
 
         interpolatedRoute.add(waypoints.get(0).first);
 
         double travelTime = 0;
         int i = 1;
 
-        Waypoint startPoint = interpolatedRoute.get(interpolatedRoute.size()-1);
+        WayPoint startPoint = interpolatedRoute.get(interpolatedRoute.size()-1);
 
         while(i < waypoints.size()) {
-            Waypoint currentWaypoint = waypoints.get(i).first;
+            WayPoint currentWayPoint = waypoints.get(i).first;
             double currentSpeed = waypoints.get(i).second;
-            double duration = startPoint.getDuration(currentWaypoint, currentSpeed);
+            double duration = startPoint.getDuration(currentWayPoint, currentSpeed);
 
             travelTime += duration;
             if(travelTime > 1) {
@@ -125,7 +125,7 @@ public class Route {
 
                 Timber.d("Adding new waypoint!");
                 interpolatedRoute.add(new Interpolator().getIntermediatePoint(startPoint,
-                        currentWaypoint, deltaLength));
+						currentWayPoint, deltaLength));
 
                 startPoint = interpolatedRoute.get(interpolatedRoute.size()-1);
                 Timber.d("New Lat: " + startPoint.getLat());
@@ -154,7 +154,7 @@ public class Route {
 
         private final double earthRadius = 6371.009;
 
-        private double calculateBearing(Waypoint start, Waypoint end) {
+        private double calculateBearing(WayPoint start, WayPoint end) {
 
             double phi1 = Math.toRadians(start.getLat());
             double lambda1 = Math.toRadians(start.getLng());
@@ -174,7 +174,7 @@ public class Route {
         }
 
 
-        public Waypoint getIntermediatePoint(Waypoint start, Waypoint end, double distance) {
+        public WayPoint getIntermediatePoint(WayPoint start, WayPoint end, double distance) {
             double bearing = calculateBearing(start, end);
 ;
             double phi1 = Math.toRadians(start.getLat());
@@ -194,25 +194,25 @@ public class Route {
                                        Math.cos(angularDistance) -
                                        Math.sin(phi1)*Math.sin(newLat)));
 
-            return new Waypoint(newLat, newLng);
+            return new WayPoint(newLat, newLng);
         }
     }
 
 
     public static class Builder {
-        private Waypoint origin;
-        private Waypoint destination;
+        private WayPoint origin;
+        private WayPoint destination;
         private String copyright;
         private String warnings;
-        private ArrayList<Pair<Waypoint, Double>> waypoints = new ArrayList<>();
+        private ArrayList<Pair<WayPoint, Double>> waypoints = new ArrayList<>();
 
-        public Builder from(Waypoint origin) {
+        public Builder from(WayPoint origin) {
             this.origin = origin;
             return this;
         }
 
 
-        public Builder to(Waypoint destination) {
+        public Builder to(WayPoint destination) {
             this.destination = destination;
             return this;
         }
@@ -230,7 +230,7 @@ public class Route {
         }
 
 
-        public Builder waypoints(ArrayList<Pair<Waypoint, Double>> wp) {
+        public Builder waypoints(ArrayList<Pair<WayPoint, Double>> wp) {
             this.waypoints.addAll(wp);
             return this;
         }
