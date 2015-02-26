@@ -8,7 +8,7 @@ public class Waypoint {
 
 
     //Earth radius in km
-    private double earthRadius = 6371.009;
+    private final double earthRadius = 6371.009;
 
 
     /**
