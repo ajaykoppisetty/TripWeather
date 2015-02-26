@@ -14,7 +14,7 @@ public final class PlacesServiceTest extends AndroidTestCase {
 	@Override
 	public void setUp() throws Exception {
 		super.setUp();
-		this.placesService = new PlacesServiceProvider(getContext()).get();
+		this.placesService = new GeoModule().providePlacesService(getContext());
 	}
 
 

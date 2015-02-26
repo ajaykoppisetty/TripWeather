@@ -19,7 +19,7 @@ public final class WeatherServiceTest extends AndroidTestCase {
 	@Override
 	public void setUp() throws Exception {
 		super.setUp();
-		this.service = new WeatherServiceProvider(getContext()).get();
+		this.service = new WeatherModule().provideWeatherService(getContext());
 		this.lock = new Object();
 	}
 
