@@ -26,6 +26,7 @@ import com.google.maps.android.PolyUtil;
 
 import org.faudroids.tripweather.R;
 import org.faudroids.tripweather.directions.DirectionsService;
+import org.faudroids.tripweather.directions.DirectionsServiceCallback;
 import org.faudroids.tripweather.directions.PlacesLocation;
 import org.faudroids.tripweather.directions.PlacesService;
 
@@ -108,6 +109,7 @@ public class MainActivity extends RoboActivity implements
 	public void onClick(View view) {
 		String currentLocation = ((TextView) view).getText().toString();
 		boolean fromInput;
+        directionsService.getRoute("Erlangen", "München", new DirectionsServiceCallback());
 		fromInput = (R.id.input_from == view.getId());
 		Intent intent = LocationInputActivity.createIntent(this, currentLocation, fromInput);
 		startActivityForResult(intent, LOCATION_REQUEST);
