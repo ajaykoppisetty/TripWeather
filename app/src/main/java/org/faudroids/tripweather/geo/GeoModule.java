@@ -9,8 +9,6 @@ import com.google.inject.Provides;
 
 import org.faudroids.tripweather.R;
 
-import javax.inject.Inject;
-
 import retrofit.RequestInterceptor;
 import retrofit.RestAdapter;
 import retrofit.converter.JacksonConverter;
@@ -20,26 +18,49 @@ public final class GeoModule implements Module {
 
 	@Override
 	public void configure(Binder binder) {
-		binder.bind(PlacesService.class).toProvider(PlacesServiceProvider.class);
-        binder.bind(DirectionsService.class).toProvider(DirectionsServiceProvider.class);
+		// nothing to do for now ...
 	}
 
 
 	@Provides
 	@ContextSingleton
-	@Inject
-	public GeoCodingService provideGeoCodingService(final Context context) {
-		RestAdapter adapter = new RestAdapter.Builder()
+	public GeoCodingService provideGeoCodingService(Context context) {
+		RestAdapter adapter = createBaseRestAdapter(context)
 				.setEndpoint(context.getString(R.string.google_geocoding_api_base_url))
+				.build();
+		return adapter.create(GeoCodingService.class);
+	}
+
+
+	@Provides
+	@ContextSingleton
+	public PlacesService providePlacesService(Context context) {
+		RestAdapter adapter = createBaseRestAdapter(context)
+				.setEndpoint(context.getString(R.string.google_places_api_base_url))
+				.build();
+		return adapter.create(PlacesService.class);
+	}
+
+
+	@Provides
+	@ContextSingleton
+	public DirectionsService provideDirectionsService(Context context) {
+		RestAdapter restAdapter = createBaseRestAdapter(context)
+				.setEndpoint(context.getString(R.string.google_directions_api_base_url))
+				.build();
+		return restAdapter.create(DirectionsService.class);
+	}
+
+
+	private RestAdapter.Builder createBaseRestAdapter(final Context context) {
+		return new RestAdapter.Builder()
 				.setConverter(new JacksonConverter())
 				.setRequestInterceptor(new RequestInterceptor() {
 					@Override
 					public void intercept(RequestFacade request) {
 						request.addQueryParam("key", context.getString(R.string.google_places_key));
 					}
-				})
-				.build();
-		return adapter.create(GeoCodingService.class);
+				});
 	}
 
 }
