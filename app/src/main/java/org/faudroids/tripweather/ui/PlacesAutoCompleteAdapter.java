@@ -8,7 +8,7 @@ import android.widget.Filterable;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
-import org.faudroids.tripweather.directions.PlacesService;
+import org.faudroids.tripweather.geo.PlacesService;
 
 import java.util.Collection;
 import java.util.LinkedList;

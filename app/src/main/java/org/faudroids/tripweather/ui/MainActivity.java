@@ -25,10 +25,10 @@ import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.maps.android.PolyUtil;
 
 import org.faudroids.tripweather.R;
-import org.faudroids.tripweather.directions.DirectionsService;
-import org.faudroids.tripweather.directions.DirectionsServiceCallback;
-import org.faudroids.tripweather.directions.PlacesLocation;
-import org.faudroids.tripweather.directions.PlacesService;
+import org.faudroids.tripweather.geo.DirectionsService;
+import org.faudroids.tripweather.geo.DirectionsServiceCallback;
+import org.faudroids.tripweather.geo.PlacesLocation;
+import org.faudroids.tripweather.geo.PlacesService;
 
 import java.util.List;
 

@@ -3,7 +3,7 @@ package org.faudroids.tripweather.app;
 
 import android.app.Application;
 
-import org.faudroids.tripweather.directions.DirectionsModule;
+import org.faudroids.tripweather.geo.DirectionsModule;
 import org.faudroids.tripweather.weather.WeatherModule;
 
 import roboguice.RoboGuice;

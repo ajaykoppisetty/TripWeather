@@ -7,7 +7,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 
 import org.faudroids.tripweather.R;
-import org.faudroids.tripweather.directions.PlacesService;
+import org.faudroids.tripweather.geo.PlacesService;
 
 import javax.inject.Inject;
 

@@ -16,7 +16,7 @@ import com.github.mikephil.charting.utils.XLabels;
 import com.github.mikephil.charting.utils.YLabels;
 
 import org.faudroids.tripweather.R;
-import org.faudroids.tripweather.directions.PlacesService;
+import org.faudroids.tripweather.geo.PlacesService;
 import org.faudroids.tripweather.weather.WeatherService;
 import org.faudroids.tripweather.weather.WeatherUtils;
 

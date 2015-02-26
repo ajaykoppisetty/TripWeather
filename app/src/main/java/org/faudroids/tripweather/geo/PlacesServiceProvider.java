@@ -1,4 +1,4 @@
-package org.faudroids.tripweather.directions;
+package org.faudroids.tripweather.geo;
 
 
 import android.content.Context;

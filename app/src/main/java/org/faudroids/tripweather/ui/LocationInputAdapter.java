@@ -13,7 +13,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import org.faudroids.tripweather.R;
-import org.faudroids.tripweather.directions.PlacesService;
+import org.faudroids.tripweather.geo.PlacesService;
 
 public final class LocationInputAdapter extends RecyclerView.Adapter<LocationInputAdapter.AbstractViewHolder> {
 
