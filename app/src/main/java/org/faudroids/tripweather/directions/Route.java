@@ -143,6 +143,13 @@ public class Route {
     }
 
 
+    /**
+     * Used to interpolate intermediate points to split routes in equal chunks.
+     * Formulas for coordinate calculation were taken from:
+     *
+     * http://www.movable-type.co.uk/scripts/latlong.html
+     *
+     */
     private static class Interpolator {
 
         private final double earthRadius = 6371.009;
