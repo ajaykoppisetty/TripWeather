@@ -1,6 +1,9 @@
 package org.faudroids.tripweather.weather;
 
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import org.faudroids.tripweather.geo.WayPoint;
 import org.roboguice.shaded.goole.common.base.Objects;
 
@@ -13,10 +16,11 @@ public final class Forecast {
 	private final double temperature;
 	private final int timestamp; // hours in the future
 
+	@JsonCreator
 	public Forecast(
-			WayPoint wayPoint,
-			double temperature,
-			int timestamp) {
+			@JsonProperty("wayPoint") WayPoint wayPoint,
+			@JsonProperty("temperature") double temperature,
+			@JsonProperty("timestamp") int timestamp) {
 
 		this.wayPoint = wayPoint;
 		this.temperature = temperature;

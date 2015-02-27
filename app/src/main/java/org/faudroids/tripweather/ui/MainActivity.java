@@ -43,6 +43,7 @@ import rx.Observable;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
 import rx.functions.Func1;
+import rx.functions.Func2;
 import rx.observables.ConnectableObservable;
 import rx.schedulers.Schedulers;
 import rx.subscriptions.CompositeSubscription;
@@ -265,10 +266,17 @@ public class MainActivity extends RoboActivity implements
 						return forecastGenerator.createForecast(wayPoints);
 					}
 				})
-				.subscribe(new Action1<Forecast>() {
+				.toSortedList(new Func2<Forecast, Forecast, Integer>() {
 					@Override
-					public void call(Forecast forecast) {
-						Timber.d("found forecast with temperature " + forecast.getTemperature());
+					public Integer call(Forecast forecast, Forecast forecast2) {
+						return Integer.valueOf(forecast.getTimestamp()).compareTo(forecast2.getTimestamp());
+					}
+				})
+				.subscribe(new Action1<List<Forecast>>() {
+					@Override
+					public void call(List<Forecast> forecasts) {
+						Intent intent = GraphActivity.createIntent(MainActivity.this, forecasts);
+						startActivity(intent);
 					}
 				}, new ErrorHandler()));
 
@@ -322,7 +330,6 @@ public class MainActivity extends RoboActivity implements
 			GooglePlayServicesUtil.getErrorDialog(connectionResult.getErrorCode(), this, GOOGLE_API_CLIENT_REQUEST).show();
 		}
 	}
-
 
 
 	private final class ErrorHandler implements Action1<Throwable> {

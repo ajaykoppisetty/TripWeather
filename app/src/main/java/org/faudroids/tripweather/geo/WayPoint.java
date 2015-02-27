@@ -1,24 +1,25 @@
 package org.faudroids.tripweather.geo;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import org.roboguice.shaded.goole.common.base.Objects;
 
-public class WayPoint {
+public final class WayPoint {
+
+	//Earth radius in km
+	private static final double earthRadius = 6371.009;
 
     //Latitude and longitude in degrees
-    private double lat;
-    private double lng;
+    private final double lat;
+    private final double lng;
 
 
-    //Earth radius in km
-    private final double earthRadius = 6371.009;
+	@JsonCreator
+    public WayPoint(
+			@JsonProperty("lat") double lat,
+			@JsonProperty("lng") double lng) {
 
-
-    /**
-     *
-     * @param lat: Latidude of waypoint.
-     * @param lng: Longitude of waypoint.
-     */
-    public WayPoint(double lat, double lng) {
         this.lat = lat;
         this.lng = lng;
     }
