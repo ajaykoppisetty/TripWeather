@@ -66,10 +66,10 @@ public class RouteParser {
                 Route route = new Route.Builder()
                                        .from(origin)
                                        .to(destination)
-                                       .waypoints(wp)
+                                       .wayPoints(wp)
                                        .copyright(copyright)
                                        .warnings(warnings)
-                                       .construct();
+                                       .create();
                 routeList.add(route);
                 wp.clear();
             }

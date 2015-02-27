@@ -24,6 +24,7 @@ public final class WeatherServiceTest extends AndroidTestCase {
 	}
 
 
+	/*
 	public void testGetCurrentWeather() throws Exception {
 		service.getCurrentWeather(45.0, 45.0, new CallbackAssertion(lock) {
 			@Override
@@ -55,6 +56,7 @@ public final class WeatherServiceTest extends AndroidTestCase {
 		});
 		waitForCallback();
 	}
+	*/
 
 
 	private void waitForCallback() throws Exception {

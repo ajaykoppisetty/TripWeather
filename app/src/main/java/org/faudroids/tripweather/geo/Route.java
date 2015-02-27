@@ -3,10 +3,13 @@ package org.faudroids.tripweather.geo;
 import android.util.Pair;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import timber.log.Timber;
 
 public class Route {
+
+	private static final WayPointInterpolator wayPointInterpolator = new WayPointInterpolator();
 
 
     private final WayPoint origin;
@@ -21,13 +24,13 @@ public class Route {
         this.destination = builder.destination;
         this.copyright = builder.copyright;
         this.warnings = builder.warnings;
-        this.waypoints.addAll(builder.waypoints);
+        this.waypoints.addAll(builder.wayPoints);
     }
 
 
     /**
      *
-     * @return ArrayList containing all waypoints.
+     * @return ArrayList containing all wayPoints.
      */
     public ArrayList<WayPoint> getWaypoints() {
         ArrayList<WayPoint> returnList = new ArrayList<>();
@@ -76,8 +79,9 @@ public class Route {
     public double getTotalTime() {
         double totalTime = 0;
         for(int i = 0; i < waypoints.size()-1; ++i) {
-            totalTime += waypoints.get(i).first.getDuration(waypoints.get(i+1).first,
-                    waypoints.get(i+1).second);
+            totalTime += waypoints.get(i).first.getDuration(
+					waypoints.get(i+1).first,
+					waypoints.get(i+1).second);
         }
         return totalTime;
     }
@@ -97,114 +101,60 @@ public class Route {
 
 
     /**
-     * Interpolates a given list of waypoints to segment a route in 1 hour chunks.
-     * @return ArrayList\<Waypoint\>
+     * Interpolates a given list of way points to segment a route in 1 hour chunks.
+	 * @return list of way points including an timestamp in minutes when user is expected to arrive a location,
+	 * assuming that a trip starts at 0 minutes.
      */
-    public ArrayList<WayPoint> interpolate() {
-        ArrayList<WayPoint> interpolatedRoute = new ArrayList<>();
+    public List<Pair<WayPoint, Long>> interpolate() {
+        List<Pair<WayPoint, Long>> interpolatedRoute = new ArrayList<>();
+        interpolatedRoute.add(new Pair<>(waypoints.get(0).first, 0l));
 
-        interpolatedRoute.add(waypoints.get(0).first);
+		long totalTravelTime = 0;
+        int wayPointIdx = 1;
+        WayPoint startPoint = interpolatedRoute.get(0).first;
+		double travelTime = 0;
 
-        double travelTime = 0;
-        int i = 1;
-
-        WayPoint startPoint = interpolatedRoute.get(interpolatedRoute.size()-1);
-
-        while(i < waypoints.size()) {
-            WayPoint currentWayPoint = waypoints.get(i).first;
-            double currentSpeed = waypoints.get(i).second;
+        while (wayPointIdx < waypoints.size()) {
+            WayPoint currentWayPoint = waypoints.get(wayPointIdx).first;
+            double currentSpeed = waypoints.get(wayPointIdx).second;
             double duration = startPoint.getDuration(currentWayPoint, currentSpeed);
 
-            travelTime += duration;
+			travelTime += duration;
             if(travelTime > 1) {
-                double deltaTime = duration - Math.abs(1-travelTime);
-                assert(deltaTime > 0);
-
+				double deltaTime = duration - (travelTime - 1);
                 double deltaLength = currentSpeed * deltaTime;
-                assert(deltaLength > 0);
+				totalTravelTime += 60;
 
-                Timber.d("Adding new waypoint!");
-                interpolatedRoute.add(new Interpolator().getIntermediatePoint(startPoint,
-						currentWayPoint, deltaLength));
+                Timber.d("Adding new way point!");
+				WayPoint newWayPoint = wayPointInterpolator.getIntermediatePoint(startPoint, currentWayPoint, deltaLength);
+                interpolatedRoute.add(new Pair<>(
+						newWayPoint,
+						totalTravelTime));
 
-                startPoint = interpolatedRoute.get(interpolatedRoute.size()-1);
-                Timber.d("New Lat: " + startPoint.getLat());
-                Timber.d("New Lng: " + startPoint.getLng());
-                travelTime = 0;
+				startPoint = newWayPoint;
+				travelTime = 0;
+
             } else {
-                startPoint = waypoints.get(i).first;
-                ++i;
+				startPoint = waypoints.get(wayPointIdx).first;
+                ++wayPointIdx;
             }
         }
 
-        interpolatedRoute.add(waypoints.get(waypoints.size()-1).first);
+		totalTravelTime += travelTime * 60;
+        interpolatedRoute.add(new Pair<>(
+				waypoints.get(waypoints.size()-1).first,
+				totalTravelTime));
 
         return interpolatedRoute;
     }
 
 
-    /**
-     * Used to interpolate intermediate points to split routes in equal chunks.
-     * Formulas for coordinate calculation were taken from:
-     *
-     * http://www.movable-type.co.uk/scripts/latlong.html
-     *
-     */
-    private static class Interpolator {
-
-        private final double earthRadius = 6371.009;
-
-        private double calculateBearing(WayPoint start, WayPoint end) {
-
-            double phi1 = Math.toRadians(start.getLat());
-            double lambda1 = Math.toRadians(start.getLng());
-            double phi2 = Math.toRadians(end.getLat());
-            double lambda2 = Math.toRadians(end.getLng());
-
-            double y = Math.sin(lambda2-lambda1)*
-                       Math.cos(phi2);
-
-            double x = Math.cos(phi1) *
-                       Math.sin(phi2) -
-                       Math.sin(phi1) *
-                       Math.cos(phi2) *
-                       Math.cos(lambda2 - lambda1);
-
-            return Math.atan2(y, x);
-        }
-
-
-        public WayPoint getIntermediatePoint(WayPoint start, WayPoint end, double distance) {
-            double bearing = calculateBearing(start, end);
-;
-            double phi1 = Math.toRadians(start.getLat());
-            double lambda1 = Math.toRadians(start.getLng());
-            double angularDistance = distance/earthRadius;
-
-            double newLat = Math.toDegrees(Math.asin(Math.sin(phi1) *
-                                           Math.cos(angularDistance) +
-                                           Math.cos(phi1) *
-                                           Math.sin(angularDistance) *
-                                           Math.cos(bearing)));
-
-            double newLng = Math.toDegrees(lambda1 +
-                            Math.atan2(Math.sin(bearing) *
-                                       Math.sin(angularDistance) *
-                                       Math.cos(phi1),
-                                       Math.cos(angularDistance) -
-                                       Math.sin(phi1)*Math.sin(newLat)));
-
-            return new WayPoint(newLat, newLng);
-        }
-    }
-
-
-    public static class Builder {
+	public static final class Builder {
         private WayPoint origin;
         private WayPoint destination;
         private String copyright;
         private String warnings;
-        private ArrayList<Pair<WayPoint, Double>> waypoints = new ArrayList<>();
+        private ArrayList<Pair<WayPoint, Double>> wayPoints = new ArrayList<>();
 
         public Builder from(WayPoint origin) {
             this.origin = origin;
@@ -230,13 +180,13 @@ public class Route {
         }
 
 
-        public Builder waypoints(ArrayList<Pair<WayPoint, Double>> wp) {
-            this.waypoints.addAll(wp);
+        public Builder wayPoints(ArrayList<Pair<WayPoint, Double>> wp) {
+            this.wayPoints.addAll(wp);
             return this;
         }
 
 
-        public Route construct() {
+        public Route create() {
             return new Route(this);
         }
     }

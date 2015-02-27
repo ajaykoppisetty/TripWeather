@@ -1,5 +1,7 @@
 package org.faudroids.tripweather.weather;
 
+import android.util.Pair;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
@@ -12,7 +14,6 @@ import java.util.List;
 import javax.inject.Inject;
 
 import rx.Observable;
-import rx.functions.Func1;
 
 /**
  * Builds the weather forecast for a given route.
@@ -32,7 +33,9 @@ public final class WeatherForecastGenerator {
 	/**
 	 * Assumes that each way point is one hour from the next.
 	 */
-	public Observable<Forecast> createForecast(List<WayPoint> wayPoints) {
+	public Observable<Forecast> createForecast(List<Pair<WayPoint, Long>> wayPoints) {
+		System.out.println(wayPoints.size());
+		/*
 		// keep only every nth way point based on accuracy for forecast
 		int hoursCount = wayPoints.size();
 		final ForecastMode forecastMode;
@@ -70,6 +73,8 @@ public final class WeatherForecastGenerator {
 								});
 					}
 				});
+				*/
+		return null;
 	}
 
 

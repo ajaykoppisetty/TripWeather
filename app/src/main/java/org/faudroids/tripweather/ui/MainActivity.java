@@ -3,6 +3,7 @@ package org.faudroids.tripweather.ui;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.os.Bundle;
+import android.util.Pair;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -254,15 +255,15 @@ public class MainActivity extends RoboActivity implements
 
 		// final subscription to receive weather forecast
 		compositeSubscription.add(directionsObservable
-				.map(new Func1<ObjectNode, List<WayPoint>>() {
+				.map(new Func1<ObjectNode, List<Pair<WayPoint, Long>>>() {
 					@Override
-					public List<WayPoint> call(ObjectNode objectNode) {
+					public List<Pair<WayPoint, Long>> call(ObjectNode objectNode) {
 						return routeParser.parse(objectNode).get(0).interpolate();
 					}
 				})
-				.flatMap(new Func1<List<WayPoint>, Observable<Forecast>>() {
+				.flatMap(new Func1<List<Pair<WayPoint, Long>>, Observable<Forecast>>() {
 					@Override
-					public Observable<Forecast> call(List<WayPoint> wayPoints) {
+					public Observable<Forecast> call(List<Pair<WayPoint, Long>> wayPoints) {
 						return forecastGenerator.createForecast(wayPoints);
 					}
 				})
