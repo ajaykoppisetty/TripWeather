@@ -19,13 +19,13 @@ import rx.functions.Func1;
  */
 public final class WeatherForecastGenerator {
 
+	private static final float KELVIN_BASE = 273.15f;
+
 	private final WeatherService weatherService;
-	private final WeatherUtils weatherUtils;
 
 	@Inject
-	WeatherForecastGenerator(WeatherService weatherService, WeatherUtils weatherUtils) {
+	WeatherForecastGenerator(WeatherService weatherService) {
 		this.weatherService = weatherService;
-		this.weatherUtils = weatherUtils;
 	}
 
 
@@ -35,11 +35,11 @@ public final class WeatherForecastGenerator {
 	public Observable<Forecast> createForecast(List<WayPoint> wayPoints) {
 		// keep only every nth way point based on accuracy for forecast
 		int hoursCount = wayPoints.size();
-		int hourInterval;
-		if (hoursCount < 5 * 24) hourInterval = 3;
-		else if (hoursCount < 16 * 24) hourInterval = 24;
+		final ForecastMode forecastMode;
+		if (hoursCount < ForecastMode.FIVE_DAYS.getDaysOfForecast() * 24) forecastMode = ForecastMode.FIVE_DAYS;
+		else if (hoursCount < ForecastMode.SIXTEEN_DAYS.getDaysOfForecast() * 24) forecastMode = ForecastMode.SIXTEEN_DAYS;
 		else throw new RuntimeException("too many way points");
-		LinkedList<Forecast.Builder> forecastBuilders = retainEveryNthElement(wayPoints, hourInterval);
+		final LinkedList<Forecast.Builder> forecastBuilders = retainEveryNthElement(wayPoints, forecastMode.getHourInterval());
 
 		// always add last way point to avoid forecasts with one element only
 		WayPoint lastWayPoint = wayPoints.get(wayPoints.size() - 1);
@@ -52,11 +52,20 @@ public final class WeatherForecastGenerator {
 				.flatMap(new Func1<Forecast.Builder, Observable<Forecast>>() {
 					@Override
 					public Observable<Forecast> call(final Forecast.Builder builder) {
-						return weatherService.getForecast(builder.wayPoint().getLat(), builder.wayPoint().getLng())
+						Observable<ObjectNode> observable = null;
+						switch(forecastMode) {
+							case FIVE_DAYS:
+								observable =  weatherService.getForecast(builder.wayPoint().getLat(), builder.wayPoint().getLng());
+								break;
+							case SIXTEEN_DAYS:
+								int daysCount = Math.min(forecastBuilders.size(), forecastMode.getMaxForecastItems());
+								observable = weatherService.getDailyForecast(builder.wayPoint().getLat(), builder.wayPoint().getLat(), daysCount);
+						}
+						return observable
 								.map(new Func1<ObjectNode, Forecast>() {
 									@Override
 									public Forecast call(ObjectNode objectNode) {
-										return parseWeatherData(builder, objectNode);
+										return parseWeatherData(builder, objectNode, forecastMode);
 									}
 								});
 					}
@@ -82,11 +91,23 @@ public final class WeatherForecastGenerator {
 	}
 
 
-	private Forecast parseWeatherData(Forecast.Builder builder, ObjectNode weatherData) {
-		int idx = builder.timestamp() / 3;
-		JsonNode weather = weatherData.path("list").path(idx);
-		double temperature = weatherUtils.getTemperature((ObjectNode) weather);
+	private Forecast parseWeatherData(Forecast.Builder builder, ObjectNode forecast, ForecastMode forecastMode) {
+		int idx = builder.timestamp() / forecastMode.getHourInterval();
+		JsonNode singleForecast = forecast.path("list").path(idx);
+		double temperature = 0;
+		if (forecastMode.equals(ForecastMode.FIVE_DAYS)) temperature = parseHourlyTemperature(singleForecast);
+		else if (forecastMode.equals(ForecastMode.SIXTEEN_DAYS)) temperature = parseDailyTemperature(singleForecast);
 		return builder.temperature(temperature).build();
+	}
+
+
+	private double parseDailyTemperature(JsonNode dayData) {
+		return dayData.path("temp").path("day").asDouble() - KELVIN_BASE;
+	}
+
+
+	private double parseHourlyTemperature(JsonNode hourData) {
+		return hourData.path("main").path("temp").asDouble() - KELVIN_BASE;
 	}
 
 }
