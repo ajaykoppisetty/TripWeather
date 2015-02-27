@@ -14,6 +14,8 @@ import java.util.List;
 import javax.inject.Inject;
 
 import rx.Observable;
+import rx.functions.Func1;
+import timber.log.Timber;
 
 /**
  * Builds the weather forecast for a given route.
@@ -32,22 +34,22 @@ public final class WeatherForecastGenerator {
 
 	/**
 	 * Assumes that each way point is one hour from the next.
+	 * @param startTimestamp unix start time for this trip
+	 * @param wayPoints way points of this tripped paired with their estimated timestamp in minutes (starts from zero!)
 	 */
-	public Observable<Forecast> createForecast(List<Pair<WayPoint, Long>> wayPoints) {
-		System.out.println(wayPoints.size());
-		/*
+	public Observable<Forecast> createForecast(final long startTimestamp, List<Pair<WayPoint, Long>> wayPoints) {
 		// keep only every nth way point based on accuracy for forecast
 		int hoursCount = wayPoints.size();
 		final ForecastMode forecastMode;
 		if (hoursCount < ForecastMode.FIVE_DAYS.getDaysOfForecast() * 24) forecastMode = ForecastMode.FIVE_DAYS;
 		else if (hoursCount < ForecastMode.SIXTEEN_DAYS.getDaysOfForecast() * 24) forecastMode = ForecastMode.SIXTEEN_DAYS;
 		else throw new RuntimeException("too many way points");
-		final LinkedList<Forecast.Builder> forecastBuilders = retainEveryNthElement(wayPoints, forecastMode.getHourInterval());
+		final LinkedList<Forecast.Builder> forecastBuilders = retainEveryNthElement(startTimestamp, wayPoints, forecastMode.getHourInterval());
 
 		// always add last way point to avoid forecasts with one element only
-		WayPoint lastWayPoint = wayPoints.get(wayPoints.size() - 1);
-		if (!lastWayPoint.equals(forecastBuilders.getLast().wayPoint())) {
-			forecastBuilders.add(new Forecast.Builder().wayPoint(lastWayPoint).timestamp(wayPoints.size() - 1));
+		Pair<WayPoint, Long> lastWayPoint = wayPoints.get(wayPoints.size() - 1);
+		if (!lastWayPoint.first.equals(forecastBuilders.getLast().wayPoint())) {
+			forecastBuilders.add(new Forecast.Builder().wayPoint(lastWayPoint.first).timestamp(startTimestamp + lastWayPoint.second * 60));
 		}
 
 		// fetch weather data for each way point
@@ -56,14 +58,15 @@ public final class WeatherForecastGenerator {
 					@Override
 					public Observable<Forecast> call(final Forecast.Builder builder) {
 						Observable<ObjectNode> observable = null;
-						switch(forecastMode) {
+						switch (forecastMode) {
 							case FIVE_DAYS:
-								observable =  weatherService.getForecast(builder.wayPoint().getLat(), builder.wayPoint().getLng());
+								observable = weatherService.getForecast(builder.wayPoint().getLat(), builder.wayPoint().getLng());
 								break;
 							case SIXTEEN_DAYS:
 								int daysCount = Math.min(forecastBuilders.size(), forecastMode.getMaxForecastItems());
 								observable = weatherService.getDailyForecast(builder.wayPoint().getLat(), builder.wayPoint().getLat(), daysCount);
 						}
+						Timber.d("fetching weather data for time " + builder.timestamp());
 						return observable
 								.map(new Func1<ObjectNode, Forecast>() {
 									@Override
@@ -73,22 +76,20 @@ public final class WeatherForecastGenerator {
 								});
 					}
 				});
-				*/
-		return null;
 	}
 
 
-	private LinkedList<Forecast.Builder> retainEveryNthElement(List<WayPoint> wayPoints, int nth) {
+	private LinkedList<Forecast.Builder> retainEveryNthElement(long startTimestamp, List<Pair<WayPoint, Long>> wayPoints, int nth) {
 		LinkedList<Forecast.Builder> result = new LinkedList<>();
-		Iterator<WayPoint> iter = wayPoints.iterator();
+		Iterator<Pair<WayPoint, Long>> iter = wayPoints.iterator();
 		int hours = 0;
 		while (iter.hasNext()) {
-			WayPoint wayPoint = iter.next();
+			Pair<WayPoint, Long> pair = iter.next();
 			if (hours % nth == 0) {
 				result.add(new Forecast
 						.Builder()
-						.wayPoint(wayPoint)
-						.timestamp(hours));
+						.wayPoint(pair.first)
+						.timestamp(startTimestamp + pair.second * 60));
 			}
 			++hours;
 		}
@@ -97,22 +98,40 @@ public final class WeatherForecastGenerator {
 
 
 	private Forecast parseWeatherData(Forecast.Builder builder, ObjectNode forecast, ForecastMode forecastMode) {
-		int idx = builder.timestamp() / forecastMode.getHourInterval();
-		JsonNode singleForecast = forecast.path("list").path(idx);
-		double temperature = 0;
-		if (forecastMode.equals(ForecastMode.FIVE_DAYS)) temperature = parseHourlyTemperature(singleForecast);
-		else if (forecastMode.equals(ForecastMode.SIXTEEN_DAYS)) temperature = parseDailyTemperature(singleForecast);
+		Timber.d("parsing weather data for builder " + builder.timestamp());
+
+		// search for the two corresponding weather entries
+		JsonNode forecastEntries = forecast.path("list");
+		JsonNode previousWeather, nextWeather;
+		int entryIdx = 0;
+		do {
+			previousWeather = forecastEntries.path(entryIdx);
+			nextWeather = forecastEntries.path(entryIdx + 1);
+			if (entryIdx % 10 == 0) Timber.d("in loop with idx " + entryIdx);
+			++entryIdx;
+		} while (parseTimestamp(nextWeather) < builder.timestamp());
+
+		long previousTimestamp = parseTimestamp(previousWeather);
+		long nextTimestamp = parseTimestamp(nextWeather);
+		double previousTemp = parseTemperature(previousWeather, forecastMode);
+		double nextTemp = parseTemperature(nextWeather, forecastMode);
+
+		double interpolationWeight = (builder.timestamp() - previousTimestamp) / ((double) nextTimestamp - previousTimestamp);
+		double temperature = previousTemp + interpolationWeight * (nextTemp - previousTemp);
+		Timber.d("builder time = " + builder.timestamp() + ", prev time = " + previousTimestamp + ", next time = " + nextTimestamp);
+		Timber.d("previous temp = " + previousTemp + ", next temp " + nextTemp + ", weight = " + interpolationWeight + ", temp = " + temperature);
 		return builder.temperature(temperature).build();
 	}
 
 
-	private double parseDailyTemperature(JsonNode dayData) {
-		return dayData.path("temp").path("day").asDouble() - KELVIN_BASE;
+	private double parseTemperature(JsonNode data, ForecastMode mode) {
+		if (mode.equals(ForecastMode.SIXTEEN_DAYS)) return data.path("temp").path("day").asDouble() - KELVIN_BASE;
+		else return data.path("main").path("temp").asDouble() - KELVIN_BASE;
 	}
 
 
-	private double parseHourlyTemperature(JsonNode hourData) {
-		return hourData.path("main").path("temp").asDouble() - KELVIN_BASE;
+	private long parseTimestamp(JsonNode weatherEntry) {
+		return weatherEntry.path("dt").asLong();
 	}
 
 }

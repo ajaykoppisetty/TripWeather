@@ -264,13 +264,13 @@ public class MainActivity extends RoboActivity implements
 				.flatMap(new Func1<List<Pair<WayPoint, Long>>, Observable<Forecast>>() {
 					@Override
 					public Observable<Forecast> call(List<Pair<WayPoint, Long>> wayPoints) {
-						return forecastGenerator.createForecast(wayPoints);
+						return forecastGenerator.createForecast(System.currentTimeMillis() / 1000l, wayPoints);
 					}
 				})
 				.toSortedList(new Func2<Forecast, Forecast, Integer>() {
 					@Override
 					public Integer call(Forecast forecast, Forecast forecast2) {
-						return Integer.valueOf(forecast.getTimestamp()).compareTo(forecast2.getTimestamp());
+						return Long.valueOf(forecast.getTimestamp()).compareTo(forecast2.getTimestamp());
 					}
 				})
 				.subscribe(new Action1<List<Forecast>>() {
@@ -337,7 +337,7 @@ public class MainActivity extends RoboActivity implements
 
 		@Override
 		public void call(Throwable throwable) {
-			Timber.e(throwable.getMessage());
+			Timber.e(throwable, throwable.getMessage());
 			Toast.makeText(MainActivity.this, throwable.getMessage(), Toast.LENGTH_LONG).show();
 		}
 

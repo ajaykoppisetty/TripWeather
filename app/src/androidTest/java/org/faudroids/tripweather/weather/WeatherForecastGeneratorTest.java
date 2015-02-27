@@ -32,7 +32,7 @@ public final class WeatherForecastGeneratorTest extends AndroidTestCase {
 				new Pair<>(new WayPoint(49.6539459, 11.1750675), 240l),
 				new Pair<>(new WayPoint(49.6539469, 11.1750675), 243l));
 
-		forecastGenerator.createForecast(wayPoints)
+		forecastGenerator.createForecast(System.currentTimeMillis() / 1000l, wayPoints)
 				.subscribe(new Action1<Forecast>() {
 					@Override
 					public void call(Forecast forecast) {

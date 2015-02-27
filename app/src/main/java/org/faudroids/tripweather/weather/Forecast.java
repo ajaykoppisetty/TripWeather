@@ -14,13 +14,13 @@ public final class Forecast {
 
 	private final WayPoint wayPoint;
 	private final double temperature;
-	private final int timestamp; // hours in the future
+	private final long timestamp; // minutes in the future
 
 	@JsonCreator
 	public Forecast(
 			@JsonProperty("wayPoint") WayPoint wayPoint,
 			@JsonProperty("temperature") double temperature,
-			@JsonProperty("timestamp") int timestamp) {
+			@JsonProperty("timestamp") long timestamp) {
 
 		this.wayPoint = wayPoint;
 		this.temperature = temperature;
@@ -38,7 +38,7 @@ public final class Forecast {
 	}
 
 
-	public int getTimestamp() {
+	public long getTimestamp() {
 		return timestamp;
 	}
 
@@ -64,7 +64,7 @@ public final class Forecast {
 
 		private WayPoint wayPoint;
 		private double temperature;
-		private int timestamp;
+		private long timestamp;
 
 		public Builder wayPoint(WayPoint wayPoint) {
 			this.wayPoint = wayPoint;
@@ -84,12 +84,12 @@ public final class Forecast {
 			return temperature;
 		}
 
-		public Builder  timestamp(int timestamp) {
+		public Builder timestamp(long timestamp) {
 			this.timestamp = timestamp;
 			return this;
 		}
 
-		public int timestamp() {
+		public long timestamp() {
 			return timestamp;
 		}
 

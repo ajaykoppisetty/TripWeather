@@ -20,6 +20,9 @@ import org.faudroids.tripweather.weather.Forecast;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.TreeMap;
+
+import javax.inject.Inject;
 
 import roboguice.activity.RoboActivity;
 import roboguice.inject.ContentView;
@@ -42,6 +45,7 @@ public class GraphActivity extends RoboActivity {
 
 
 	@InjectView(R.id.graph) LineChart lineChart;
+	@Inject GraphUtils graphUtils;
 
 	@Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,22 +60,24 @@ public class GraphActivity extends RoboActivity {
 			return;
 		}
 
+		long startTimestamp = forecasts.get(0).getTimestamp();
+		long endTimestamp = forecasts.get(forecasts.size() - 1).getTimestamp();
+
 		// all possible x values
-		ArrayList<String> xValues = new ArrayList<>();
-		int maxHour = forecasts.get(forecasts.size() - 1).getTimestamp();
-		for (int hour = 0; hour <= maxHour; ++hour) {
-			xValues.add(String.valueOf(hour));
-		}
+		ArrayList<String> xValues = graphUtils.createXLabelsFromTimestamps(startTimestamp, endTimestamp);
+		for (String xValue : xValues) Timber.d("xValue " + xValue);
 
 		// actual data entries
-		ArrayList<Entry> entries = new ArrayList<>();
+		TreeMap<Integer, Entry> entries = new TreeMap<>();
+		// ArrayList<Entry> entries = new ArrayList<>();
 		for (Forecast forecast : forecasts) {
-			Timber.d("adding " + (float) forecast.getTemperature() + ", " + forecast.getTimestamp());
-			entries.add(new Entry((float) forecast.getTemperature(), forecast.getTimestamp()));
+			Timber.d("adding " + (float) forecast.getTemperature() + ", " + graphUtils.createIndexFromTimestamp(startTimestamp, forecast.getTimestamp()) + " (" + forecast.getTimestamp() + ")");
+			int xValue = graphUtils.createIndexFromTimestamp(startTimestamp, forecast.getTimestamp());
+			entries.put(xValue, new Entry((float) forecast.getTemperature(), xValue));
 		}
 
 		// put lines onto the graph!
-		LineDataSet dataSet = new LineDataSet(entries, getString(R.string.graph_temp_legend));
+		LineDataSet dataSet = new LineDataSet(new ArrayList<>(entries.values()), getString(R.string.graph_temp_legend));
 		styleTemperatureLine(dataSet);
 		LineData lineData = new LineData(xValues, dataSet);
 		lineChart.setData(lineData);
