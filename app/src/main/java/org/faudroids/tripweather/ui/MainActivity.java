@@ -28,17 +28,23 @@ import org.faudroids.tripweather.geo.DirectionsService;
 import org.faudroids.tripweather.geo.GeoCodingService;
 import org.faudroids.tripweather.geo.Location;
 import org.faudroids.tripweather.geo.RouteParser;
+import org.faudroids.tripweather.geo.WayPoint;
+import org.faudroids.tripweather.weather.Forecast;
+import org.faudroids.tripweather.weather.WeatherForecastGenerator;
 
 import java.util.List;
 
 import javax.inject.Inject;
 
-import retrofit.Callback;
-import retrofit.RetrofitError;
-import retrofit.client.Response;
 import roboguice.activity.RoboActivity;
 import roboguice.inject.ContentView;
 import roboguice.inject.InjectView;
+import rx.Observable;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.Action1;
+import rx.functions.Func1;
+import rx.schedulers.Schedulers;
+import rx.subscriptions.CompositeSubscription;
 import timber.log.Timber;
 
 
@@ -59,6 +65,9 @@ public class MainActivity extends RoboActivity implements
 	@Inject DirectionsService directionsService;
 	private GoogleApiClient googleApiClient;
 	@Inject RouteParser routeParser;
+	@Inject WeatherForecastGenerator forecastGenerator;
+
+	private CompositeSubscription compositeSubscription = new CompositeSubscription();
 
 	private Location locationFrom, locationTo; // contain the actual lat / lon
 
@@ -100,6 +109,7 @@ public class MainActivity extends RoboActivity implements
 	public void onDestroy() {
 		mapView.onDestroy();
 		googleApiClient.disconnect();
+		compositeSubscription.unsubscribe();
 		super.onDestroy();
 	}
 
@@ -140,12 +150,16 @@ public class MainActivity extends RoboActivity implements
 				else textTo.setText(locationDescription);
 
 				if (selectedLocation == null) {
-					geoCodingService.getGeoCodeForAddress(locationDescription, new AbstractCallback() {
-						@Override
-						public void success(ObjectNode objectNode, Response response) {
-							updateSelectedLocation(parseLocation(objectNode), fromInput);
-						}
-					});
+					compositeSubscription.add(geoCodingService.getGeoCodeForAddress(locationDescription)
+							.subscribeOn(Schedulers.io())
+							.observeOn(AndroidSchedulers.mainThread())
+							.subscribe(new Action1<ObjectNode>() {
+								@Override
+								public void call(ObjectNode objectNode) {
+									updateSelectedLocation(parseLocation(objectNode), fromInput);
+
+								}
+							}, new ErrorHandler()));
 				} else {
 					updateSelectedLocation(selectedLocation, fromInput);
 				}
@@ -177,7 +191,7 @@ public class MainActivity extends RoboActivity implements
 		if (locationTo != null) updateMarker(map, locationTo);
 		if (locationFrom != null && locationTo != null) {
 			moveCameraToRoute(map);
-			showRoutePolyLine();
+			loadRoute();
 		}
 		else if (locationFrom != null) moveCameraToMarker(locationFrom, map);
 		else if (locationTo != null) moveCameraToMarker(locationFrom, map);
@@ -201,33 +215,59 @@ public class MainActivity extends RoboActivity implements
 
 
 	private void moveCameraToMarker(Location location, GoogleMap map) {
-		Timber.d("Moving camera to " + location.getLat() + " " + location.getLon());
 		map.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location.getLat(), location.getLon()), 14));
 	}
 
 
-	private void showRoutePolyLine() {
+	private void loadRoute() {
 		String start = locationFrom.getLat() + "," + locationFrom.getLon();
 		String end = locationTo.getLat() + "," + locationTo.getLon();
-		Timber.d("Starting directions request");
-		directionsService.getRoute(start, end, new AbstractCallback() {
-			@Override
-			public void success(ObjectNode objectNode, Response response) {
-				String encodedRoute = objectNode.path("routes").path(0).path("overview_polyline").path("points").asText();
-				if (encodedRoute == null || "".equals(encodedRoute)) {
-					Timber.w("failed to find polyline for route");
-					return;
-				}
 
-				List<LatLng> points = PolyUtil.decode(encodedRoute);
-				GoogleMap map = mapView.getMap();
-				if (map == null) return;
-				Timber.d("adding polyline");
-				map.addPolyline(new PolylineOptions()
-						.addAll(points)
-						.color(R.color.green_dark));
-			}
-		});
+		Observable<ObjectNode> directionsObservable = directionsService.getRoute(start, end)
+				.subscribeOn(Schedulers.io())
+				.observeOn(AndroidSchedulers.mainThread());
+
+		// intermediate subscription to update route on map
+		compositeSubscription.add(directionsObservable
+				.subscribe(new Action1<ObjectNode>() {
+					@Override
+					public void call(ObjectNode objectNode) {
+						String encodedRoute = objectNode.path("routes").path(0).path("overview_polyline").path("points").asText();
+						if (encodedRoute == null || "".equals(encodedRoute)) {
+							Timber.w("failed to find poly line for route");
+							return;
+						}
+
+						List<LatLng> points = PolyUtil.decode(encodedRoute);
+						GoogleMap map = mapView.getMap();
+						if (map == null) return;
+						map.addPolyline(new PolylineOptions()
+								.addAll(points)
+								.color(R.color.green_dark));
+
+					}
+				}, new ErrorHandler()));
+
+		// final subscription to receive weather forecast
+		compositeSubscription.add(directionsObservable
+				.map(new Func1<ObjectNode, List<WayPoint>>() {
+					@Override
+					public List<WayPoint> call(ObjectNode objectNode) {
+						return routeParser.parse(objectNode).get(0).interpolate();
+					}
+				})
+				.flatMap(new Func1<List<WayPoint>, Observable<Forecast>>() {
+					@Override
+					public Observable<Forecast> call(List<WayPoint> wayPoints) {
+						return forecastGenerator.createForecast(wayPoints);
+					}
+				})
+				.subscribe(new Action1<Forecast>() {
+					@Override
+					public void call(Forecast forecast) {
+						Timber.d("found forecast with temperature " + forecast.getTemperature());
+					}
+				}, new ErrorHandler()));
 	}
 
 
@@ -279,12 +319,13 @@ public class MainActivity extends RoboActivity implements
 	}
 
 
-	private abstract class AbstractCallback implements Callback<ObjectNode> {
+
+	private final class ErrorHandler implements Action1<Throwable> {
 
 		@Override
-		public void failure(RetrofitError error) {
-			Timber.e(error.getMessage());
-			Toast.makeText(MainActivity.this, error.getMessage(), Toast.LENGTH_LONG).show();
+		public void call(Throwable throwable) {
+			Timber.e(throwable.getMessage());
+			Toast.makeText(MainActivity.this, throwable.getMessage(), Toast.LENGTH_LONG).show();
 		}
 
 	}

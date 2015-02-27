@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import retrofit.Callback;
 import retrofit.http.GET;
 import retrofit.http.Query;
+import rx.Observable;
 
 public interface WeatherService {
 
@@ -40,7 +41,8 @@ public interface WeatherService {
 			@Query("lon") double longitude,
 			Callback<ObjectNode> callback);
 
-	public ObjectNode getForecast(
+	@GET(FORECAST_URL)
+	public Observable<ObjectNode> getForecast(
 			@Query("lat") double latitude,
 			@Query("lon") double longitude);
 

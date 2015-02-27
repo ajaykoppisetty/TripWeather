@@ -1,5 +1,7 @@
 package org.faudroids.tripweather.geo;
 
+import org.roboguice.shaded.goole.common.base.Objects;
+
 public class WayPoint {
 
     //Latitude and longitude in degrees
@@ -100,4 +102,21 @@ public class WayPoint {
     public double getDuration(double lat, double lng, double meanTravelSpeed) {
         return getDistance(lat, lng)/meanTravelSpeed;
     }
+
+
+	@Override
+	public boolean equals(Object other) {
+		if (other == null || !(other instanceof WayPoint)) return false;
+		if (other == this) return true;
+		WayPoint wayPoint = (WayPoint) other;
+		return Objects.equal(lat, wayPoint.lat)
+				&& Objects.equal(lng, wayPoint.lng);
+	}
+
+
+	@Override
+	public int hashCode() {
+		return Objects.hashCode(lat, lng);
+	}
+
 }
