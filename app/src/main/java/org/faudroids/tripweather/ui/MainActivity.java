@@ -43,6 +43,7 @@ import rx.Observable;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
 import rx.functions.Func1;
+import rx.observables.ConnectableObservable;
 import rx.schedulers.Schedulers;
 import rx.subscriptions.CompositeSubscription;
 import timber.log.Timber;
@@ -223,26 +224,28 @@ public class MainActivity extends RoboActivity implements
 		String start = locationFrom.getLat() + "," + locationFrom.getLon();
 		String end = locationTo.getLat() + "," + locationTo.getLon();
 
-		Observable<ObjectNode> directionsObservable = directionsService.getRoute(start, end)
+		ConnectableObservable<ObjectNode> directionsObservable = directionsService.getRoute(start, end)
 				.subscribeOn(Schedulers.io())
-				.observeOn(AndroidSchedulers.mainThread());
+				.observeOn(AndroidSchedulers.mainThread())
+				.publish();
 
 		// intermediate subscription to update route on map
 		compositeSubscription.add(directionsObservable
-				.subscribe(new Action1<ObjectNode>() {
+				.map(new Func1<ObjectNode, List<LatLng>>() {
 					@Override
-					public void call(ObjectNode objectNode) {
+					public List<LatLng> call(ObjectNode objectNode) {
 						String encodedRoute = objectNode.path("routes").path(0).path("overview_polyline").path("points").asText();
-						if (encodedRoute == null || "".equals(encodedRoute)) {
-							Timber.w("failed to find poly line for route");
-							return;
-						}
-
-						List<LatLng> points = PolyUtil.decode(encodedRoute);
+						if (encodedRoute == null || "".equals(encodedRoute)) throw new IllegalStateException("no route found");
+						return PolyUtil.decode(encodedRoute);
+					}
+				})
+				.subscribe(new Action1<List<LatLng>>() {
+					@Override
+					public void call(List<LatLng> route) {
 						GoogleMap map = mapView.getMap();
 						if (map == null) return;
 						map.addPolyline(new PolylineOptions()
-								.addAll(points)
+								.addAll(route)
 								.color(R.color.green_dark));
 
 					}
@@ -268,6 +271,8 @@ public class MainActivity extends RoboActivity implements
 						Timber.d("found forecast with temperature " + forecast.getTemperature());
 					}
 				}, new ErrorHandler()));
+
+		directionsObservable.connect();
 	}
 
 
