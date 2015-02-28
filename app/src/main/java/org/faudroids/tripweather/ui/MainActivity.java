@@ -237,7 +237,8 @@ public class MainActivity extends RoboActivity implements
 					@Override
 					public List<LatLng> call(ObjectNode objectNode) {
 						String encodedRoute = objectNode.path("routes").path(0).path("overview_polyline").path("points").asText();
-						if (encodedRoute == null || "".equals(encodedRoute)) throw new IllegalStateException("no route found");
+						if (encodedRoute == null || "".equals(encodedRoute))
+							throw new IllegalStateException("no route found");
 						return PolyUtil.decode(encodedRoute);
 					}
 				})
@@ -248,7 +249,7 @@ public class MainActivity extends RoboActivity implements
 						if (map == null) return;
 						map.addPolyline(new PolylineOptions()
 								.addAll(route)
-								.color(R.color.green_dark));
+								.color(R.color.green_dark1));
 
 					}
 				}, new ErrorHandler()));

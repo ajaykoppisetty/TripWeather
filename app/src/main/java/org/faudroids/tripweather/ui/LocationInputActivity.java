@@ -40,6 +40,8 @@ public class LocationInputActivity extends RoboActivity implements LocationListe
         super.onCreate(savedInstanceState);
 		currentLocation = getIntent().getStringExtra(EXTRA_LOCATION);
 		chooseFrom = getIntent().getBooleanExtra(EXTRA_FROM, false);
+		if (chooseFrom) getActionBar().setTitle(getString(R.string.title_start_location));
+		else getActionBar().setTitle(getString(R.string.title_destination));
 
 		RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
 		list.setHasFixedSize(true);

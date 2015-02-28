@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="299.88"
+   height="299.88"
+   id="svg2"
+   version="1.1"
+   inkscape:version="0.48.4 r9939"
+   inkscape:export-filename="/home/maddoc/android/TripWeather/app/src/main/res/drawable-xxxhdpi/ic_settings.png"
+   inkscape:export-xdpi="38.415367"
+   inkscape:export-ydpi="38.415367"
+   sodipodi:docname="ic_settings.svg">
+  <defs
+     id="defs4" />
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="0.7"
+     inkscape:cx="153.8488"
+     inkscape:cy="292.63486"
+     inkscape:document-units="px"
+     inkscape:current-layer="layer1"
+     showgrid="true"
+     inkscape:snap-bbox="true"
+     fit-margin-top="0"
+     fit-margin-left="0"
+     fit-margin-right="0"
+     fit-margin-bottom="0"
+     inkscape:window-width="1916"
+     inkscape:window-height="1161"
+     inkscape:window-x="1680"
+     inkscape:window-y="18"
+     inkscape:window-maximized="0"
+     inkscape:bbox-nodes="false"
+     inkscape:bbox-paths="true"
+     inkscape:snap-nodes="true"
+     inkscape:snap-bbox-midpoints="true"
+     inkscape:snap-object-midpoints="true">
+    <inkscape:grid
+       type="xygrid"
+       id="grid2985"
+       empspacing="5"
+       visible="true"
+       enabled="true"
+       snapvisiblegridlinesonly="true"
+       spacingx="10px"
+       spacingy="10px"
+       originx="-100.06px"
+       originy="-150.06406px" />
+  </sodipodi:namedview>
+  <metadata
+     id="metadata7">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(-230.82952,-522.41811)">
+    <path
+       style="fill:#ffffff;fill-opacity:1;fill-rule:nonzero;stroke:#ffffff;stroke-width:5.88000011;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       d="m 108.5,-14 -6.75,33.59375 C 92.25894,22.20225 83.27521,25.98425 74.90625,30.75 l -28.5,-19.03125 -34.6875,34.6875 19.03125,28.5 c -4.76576,8.36897 -8.54775,17.38394 -11.15625,26.875 L -14,108.5 l 0,49 33.59375,6.75 c 2.6085,9.49105 6.39049,18.47479 11.15625,26.84375 l -19.03125,28.53125 34.6875,34.65625 28.5,-19.03125 c 8.36896,4.76576 17.35269,8.54776 26.84375,11.15625 L 108.5,280 l 49,0 6.75,-33.59375 c 9.49105,-2.60849 18.47479,-6.39049 26.84375,-11.15625 l 28.5,19.03125 L 254.28125,219.625 235.25,191.09375 c 4.76576,-8.36896 8.54776,-17.3527 11.15625,-26.84375 L 280,157.5 l 0,-49 -33.59375,-6.71875 c -2.6085,-9.49106 -6.39049,-18.50603 -11.15625,-26.875 l 19.03125,-28.5 -34.6875,-34.6875 -28.5,19.03125 C 182.72479,25.98425 173.74105,22.20225 164.25,19.59375 L 157.5,-14 l -49,0 z M 133,59.5 c 40.59293,0 73.5,32.907071 73.5,73.5 0,40.59293 -32.90707,73.5 -73.5,73.5 -40.592929,0 -73.5,-32.90707 -73.5,-73.5 0,-40.592929 32.907071,-73.5 73.5,-73.5 z"
+       transform="translate(247.76952,539.35811)"
+       id="path3804"
+       inkscape:connector-curvature="0" />
+  </g>
+</svg>

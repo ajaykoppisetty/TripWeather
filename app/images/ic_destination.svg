@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="239.23048"
+   height="330"
+   id="svg2"
+   version="1.1"
+   inkscape:version="0.48.4 r9939"
+   inkscape:export-filename="/home/maddoc/android/TripWeather/app/src/main/res/drawable-xxxhdpi/ic_destination.png"
+   inkscape:export-xdpi="34.987179"
+   inkscape:export-ydpi="34.987179"
+   sodipodi:docname="ic_destination.svg">
+  <defs
+     id="defs4" />
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="1"
+     inkscape:cx="-128.88646"
+     inkscape:cy="86.302164"
+     inkscape:document-units="px"
+     inkscape:current-layer="layer1"
+     showgrid="true"
+     inkscape:snap-bbox="true"
+     fit-margin-top="0"
+     fit-margin-left="0"
+     fit-margin-right="0"
+     fit-margin-bottom="0"
+     inkscape:window-width="1916"
+     inkscape:window-height="1107"
+     inkscape:window-x="1680"
+     inkscape:window-y="72"
+     inkscape:window-maximized="0">
+    <inkscape:grid
+       type="xygrid"
+       id="grid2985"
+       empspacing="5"
+       visible="true"
+       enabled="true"
+       snapvisiblegridlinesonly="true"
+       spacingx="10px"
+       spacingy="10px"
+       originx="-200px"
+       originy="590.00004px" />
+  </sodipodi:namedview>
+  <metadata
+     id="metadata7">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(-200,-1312.3622)">
+    <path
+       style="fill:#ffffff;fill-opacity:1;stroke:none"
+       d="m 319.61524,1312.3622 c -100,0 -150,100 -100,200 50,100 100,130 100,130 0,0 50,-30 100,-130 50,-100 0,-200 -100,-200 z m -4.3125,30 9.40625,0 0,11.5937 c 34.1192,2.3173 61.40147,29.5683 63.71875,63.6875 l 11.5625,0 0,9.4375 -11.5625,0 c -2.31728,34.1192 -29.59955,61.3702 -63.71875,63.6875 l 0,11.5938 -9.40625,0 0,-11.5938 c -34.11704,-2.3173 -61.37238,-29.5683 -63.6875,-63.6875 l -11.625,0 0,-9.4375 11.625,0 c 2.31512,-34.1192 29.57046,-61.3702 63.6875,-63.6875 l 0,-11.5937 z m 0,28.4375 c -24.835,2.2371 -44.63786,22.0087 -46.875,46.8437 l 28.03125,0 0,9.4375 -28.03125,0 c 2.23714,24.835 22.04,44.6066 46.875,46.8438 l 0,-28.0313 9.40625,0 0,28.0313 c 24.835,-2.2372 44.60661,-22.0088 46.84375,-46.8438 l -28.03125,0 0,-9.4375 28.03125,0 c -2.23714,-24.835 -22.00875,-44.6066 -46.84375,-46.8437 l 0,28.0312 -9.40625,0 0,-28.0312 z"
+       id="path2987-7"
+       inkscape:connector-curvature="0" />
+  </g>
+</svg>

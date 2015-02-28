@@ -1,0 +1,212 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:orientation="vertical"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              >
+
+    <LinearLayout
+        android:id="@+id/origin"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:paddingTop="@dimen/padding_small"
+        android:paddingBottom="@dimen/padding_small"
+        android:paddingLeft="@dimen/padding_default"
+        android:paddingRight="@dimen/padding_default"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:background="@drawable/selector_main_menu"
+        android:clickable="true"
+        >
+
+        <ImageView
+            android:id="@+id/origin_icon"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_marginRight="20dp"
+            android:src="@drawable/ic_location"
+            android:layout_gravity="center"
+            />
+
+        <LinearLayout
+            android:layout_gravity="center"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            >
+
+            <TextView
+                android:id="@+id/origin_description"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:text="@string/input_from"
+                style="@style/MainMenuFontLarge"
+                />
+
+            <org.faudroids.tripweather.ui.AutoResizeTextView
+                android:id="@+id/origin_value"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:text="@string/input_from_example"
+                style="@style/MainMenuFontSmall"
+                />
+
+            </LinearLayout>
+
+    </LinearLayout>
+
+
+    <include layout="@layout/separator_line"/>
+
+
+    <LinearLayout
+        android:id="@+id/destination"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:paddingTop="@dimen/padding_small"
+        android:paddingBottom="@dimen/padding_small"
+        android:paddingLeft="@dimen/padding_default"
+        android:paddingRight="@dimen/padding_default"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:background="@drawable/selector_main_menu"
+        android:clickable="true"
+        >
+
+        <ImageView
+            android:id="@+id/destination_icon"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_marginRight="20dp"
+            android:src="@drawable/ic_destination"
+            android:layout_gravity="center"
+            />
+
+        <LinearLayout
+            android:layout_gravity="center"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            >
+
+            <TextView
+                android:id="@+id/destination_description"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:text="@string/input_to"
+                style="@style/MainMenuFontLarge"
+                />
+
+            <org.faudroids.tripweather.ui.AutoResizeTextView
+                android:id="@+id/destination_value"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:text="@string/input_to_example"
+                style="@style/MainMenuFontSmall"
+                />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+
+    <include layout="@layout/separator_line"/>
+
+
+    <LinearLayout
+        android:id="@+id/time"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:paddingTop="@dimen/padding_small"
+        android:paddingBottom="@dimen/padding_small"
+        android:paddingLeft="@dimen/padding_default"
+        android:paddingRight="@dimen/padding_default"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:background="@drawable/selector_main_menu"
+        android:clickable="true"
+        >
+
+        <ImageView
+            android:id="@+id/time_icon"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_marginRight="20dp"
+            android:src="@drawable/ic_time"
+            android:layout_gravity="center"
+            />
+
+        <LinearLayout
+            android:layout_gravity="center"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            >
+
+            <TextView
+                android:id="@+id/time_description"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:text="@string/input_time"
+                style="@style/MainMenuFontLarge"
+                />
+
+            <org.faudroids.tripweather.ui.AutoResizeTextView
+                android:id="@+id/time_value"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:text="@string/input_time_example"
+                style="@style/MainMenuFontSmall"
+                />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="10dp"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:background="@drawable/selector_settings"
+        android:clickable="true"
+        >
+
+        <LinearLayout
+            android:layout_gravity="center_horizontal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            >
+            <ImageView
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_marginRight="20dp"
+                android:src="@drawable/ic_settings"
+                android:layout_gravity="center_vertical"
+                />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                style="@style/InputTextStyle"
+                android:text="Settings"
+                android:textSize="20dp"
+                android:textStyle="bold"
+                />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</LinearLayout>
