@@ -57,6 +57,8 @@ public class StartActivity extends RoboActivity implements
 	@InjectView(R.id.time_value) AutoResizeTextView timeValueView;
 	@InjectView(R.id.time_icon) ImageView timeIcon;
 
+	@InjectView(R.id.settings) View settingsView;
+
 	private String locationFrom, locationTo;
 	private Calendar startTime;
 
@@ -100,7 +102,13 @@ public class StartActivity extends RoboActivity implements
 			}
 		});
 
-
+		settingsView.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				Intent intent = new Intent(StartActivity.this, DetailsActivity.class);
+				startActivity(intent);
+			}
+		});
 	}
 
 

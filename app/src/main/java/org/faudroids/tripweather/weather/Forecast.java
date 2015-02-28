@@ -1,8 +1,8 @@
 package org.faudroids.tripweather.weather;
 
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
+import android.os.Parcel;
+import android.os.Parcelable;
 
 import org.faudroids.tripweather.geo.WayPoint;
 import org.roboguice.shaded.goole.common.base.Objects;
@@ -10,17 +10,16 @@ import org.roboguice.shaded.goole.common.base.Objects;
 /**
  * Collection of data items that characterize a forecast for a single location.
  */
-public final class Forecast {
+public final class Forecast implements Parcelable {
 
 	private final WayPoint wayPoint;
 	private final double temperature;
 	private final long timestamp; // minutes in the future
 
-	@JsonCreator
 	public Forecast(
-			@JsonProperty("wayPoint") WayPoint wayPoint,
-			@JsonProperty("temperature") double temperature,
-			@JsonProperty("timestamp") long timestamp) {
+			WayPoint wayPoint,
+			double temperature,
+			long timestamp) {
 
 		this.wayPoint = wayPoint;
 		this.temperature = temperature;
@@ -58,6 +57,40 @@ public final class Forecast {
 	public int hashCode() {
 		return Objects.hashCode(wayPoint, temperature, timestamp);
 	}
+
+
+	@Override
+	public int describeContents() {
+		return 0;
+	}
+
+
+	@Override
+	public void writeToParcel(Parcel dest, int flags) {
+		dest.writeDoubleArray(new double[] { wayPoint.getLat(), wayPoint.getLng(), temperature });
+		dest.writeLong(timestamp);
+	}
+
+
+	public static final Parcelable.Creator<Forecast> CREATOR = new Parcelable.Creator<Forecast>() {
+
+		@Override
+		public Forecast createFromParcel(Parcel in) {
+			double[] data = new double[3];
+			in.readDoubleArray(data);
+			return new Forecast(
+					new WayPoint(data[0], data[1]),
+					data[2],
+					in.readLong());
+		}
+
+
+		@Override
+		public Forecast[] newArray(int size) {
+			return new Forecast[size];
+		}
+
+	};
 
 
 	public static final class Builder {
