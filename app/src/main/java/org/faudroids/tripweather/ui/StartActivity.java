@@ -139,7 +139,7 @@ public class StartActivity extends RoboActivity implements
 		settingsView.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				Intent intent = new Intent(StartActivity.this, DetailsActivity.class);
+				Intent intent = new Intent(StartActivity.this, SettingsActivity.class);
 				startActivity(intent);
 			}
 		});

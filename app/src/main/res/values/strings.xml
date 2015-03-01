@@ -47,6 +47,56 @@
         <item quantity="other">Warnings!</item>
     </plurals>
 
+    <string name="settings_version">version</string>
+    <string name="settings_about">about</string>
+    <string name="settings_about_title">About</string>
+    <string name="settings_about_msg">
+        This app was developed as part of the Android Challenge: one app every month for one year
+        (think of it as a New Year\'s resolution). TripWeather was our project for February.&lt;br/&gt;
+        &lt;br/&gt;
+        If you want to know more be sure to check out our &lt;a href=&quot;http://faudroids.org&quot;&gt;website&lt;/a&gt;.
+        This app is &lt;b&gt;open source&lt;/b&gt; and you can find everything on &lt;a href=&quot;https://github.com/FauDroids/TripWeather&quot;&gt;GitHub&lt;/a&gt;.&lt;br/&gt;
+        &lt;br/&gt;
+        We would love to hear from you! Send us an &lt;a href=&quot;mailto:ideas@faudroids.org&quot;&gt;email&lt;/a&gt; and let us know what you think!&lt;br/&gt;
+        &lt;br/&gt;
+        The developers are&lt;br/&gt;
+        &lt;br/&gt;
+        Philipp Eichhorn&lt;br/&gt;
+        Simon Hofmann&lt;br/&gt;
+        &lt;br/&gt;
+        Happy coding!
+    </string>
+    <string name="settings_credits">credits</string>
+    <string name="settings_credits_title">Credits</string>
+    <string name="settings_credits_msg">
+        This app is being powered by a number of small and large &lt;b&gt;open source projects&lt;/b&gt;
+        which all together have made this project happen. We couldn\'t have done this with out them.
+        You guys are awesome, keep on rocking!&lt;br&gt;
+        &lt;br&gt;
+        The libraries in use are:&lt;br&gt;
+        &lt;br&gt;
+        &lt;a href=&quot;https://square.github.io/retrofit/&quot;&gt;Retrofit&lt;/a&gt; by Square, Inc.&lt;br&gt;
+        &lt;a href=&quot;https://github.com/JakeWharton/timber&quot;&gt;Timber&lt;/a&gt; by Jake Wharton&lt;br&gt;
+        &lt;a href=&quot;https://github.com/PhilJay/MPAndroidChart&quot;&gt;MPAndroidChart&lt;/a&gt; by Philipp Jahoda&lt;br&gt;
+        &lt;a href=&quot;https://github.com/ReactiveX/RxJava/wiki&quot;&gt;RxJava&lt;/a&gt; by Netflix, Inc.&lt;br&gt;
+        &lt;a href=&quot;https://github.com/CiTuX/datetimepicker&quot;&gt;DateTimePicker&lt;/a&gt; by Paul St&#246;hr&lt;br&gt;
+        &lt;a href=&quot;http://www.ocpsoft.org/prettytime/&quot;&gt;prettytime&lt;/a&gt; by ocpsoft&lt;br&gt;
+        &lt;a href=&quot;https://github.com/jpardogo/PagerSlidingTabStrip&quot;&gt;PagerSlidingTabStrip&lt;/a&gt; by Andreas Stuetz&lt;br&gt;
+        &lt;a href=&quot;https://github.com/roboguice/roboguice&quot;&gt;RoboGuice&lt;/a&gt;&lt;br&gt;
+        &lt;a href=&quot;https://developers.google.com/maps/documentation/android/&quot;&gt;Google Maps Android API v2&lt;/a&gt; by Google Inc.&lt;br&gt;
+        &lt;a href=&quot;https://developer.android.com/google/play-services/index.html&quot;&gt;Google Play Services&lt;/a&gt; by Google Inc.&lt;br&gt;
+        &lt;a href=&quot;https://source.android.com/&quot;&gt;Android Open Source Project&lt;/a&gt; by Google Inc. and the Open Handset Alliance&lt;br&gt;
+        &lt;br&gt;
+        Besides those we are tapping into the following sources for constructing route and forecast data:&lt;br&gt;
+        &lt;br&gt;
+        &lt;a href=&quot;https://developers.google.com/maps/documentation/directions/&quot;&gt;Google Directions API&lt;/a&gt; by Google Inc.&lt;br&gt;
+        &lt;a href=&quot;https://developers.google.com/places/documentation/&quot;&gt;Google Places API&lt;/a&gt; by Google Inc.&lt;br&gt;
+        &lt;a href=&quot;https://developers.google.com/maps/documentation/geocoding/&quot;&gt;Google Geocoding API&lt;/a&gt; by Google Inc.&lt;br&gt;
+        &lt;a href=&quot;http://openweathermap.org/api&quot;&gt;openweathermap.org&lt;/a&gt; by OpenWeatherMap&lt;br&gt;
+        &lt;br&gt;
+        Thanks everyone!
+    </string>
+
     <string name="places_api_auth_error">REQUEST_DENIED</string>
     <string name="places_base_url">https://maps.googleapis.com/maps/api/place</string>
     <string name="places_request_type">/autocomplete</string>

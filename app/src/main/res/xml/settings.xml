@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <Preference
+        android:key="@string/settings_version"
+        android:title="Version"
+        />
+
+    <Preference
+        android:key="@string/settings_about"
+        android:title="About"
+        />
+
+    <Preference
+        android:key="@string/settings_credits"
+        android:title="Credits"
+        />
+
+</PreferenceScreen>
