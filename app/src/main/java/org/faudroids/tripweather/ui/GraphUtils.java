@@ -25,7 +25,7 @@ final class GraphUtils {
 
 
 	public int createIndexFromTimestamp(long startTimestamp, long timestamp) {
-		return (int) (roundToQuarterHour(timestamp - startTimestamp) / quarterHour);
+		return (int) ((roundToQuarterHour(timestamp) - roundToQuarterHour(startTimestamp)) / quarterHour);
 	}
 
 

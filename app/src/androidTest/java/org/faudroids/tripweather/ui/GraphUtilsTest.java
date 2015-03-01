@@ -32,6 +32,9 @@ public class GraphUtilsTest extends TestCase {
 		long currentTime = System.currentTimeMillis() / 1000l;
 		Assert.assertEquals(0, graphUtils.createIndexFromTimestamp(currentTime, currentTime + 1));
 		Assert.assertEquals(1, graphUtils.createIndexFromTimestamp(currentTime, currentTime + 60 * 15 + 2));
+
+		Assert.assertEquals(0, graphUtils.createIndexFromTimestamp(1425220743, 1425220743));
+		Assert.assertEquals(0, graphUtils.createIndexFromTimestamp(1425220743, 1425221343));
 	}
 
 }
