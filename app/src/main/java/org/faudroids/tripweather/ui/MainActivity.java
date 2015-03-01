@@ -203,28 +203,28 @@ public class MainActivity extends RoboActivity implements
 
 	private void updateMarker(GoogleMap map, Location location) {
 		map.addMarker(new MarkerOptions()
-				.position(new LatLng(location.getLat(), location.getLon()))
+				.position(new LatLng(location.getLat(), location.getLng()))
 				.title(location.getDescription()));
 	}
 
 
 	private void moveCameraToRoute(GoogleMap map) {
 		LatLngBounds bounds =new LatLngBounds.Builder()
-				.include(new LatLng(locationFrom.getLat(), locationFrom.getLon()))
-				.include(new LatLng(locationTo.getLat(), locationTo.getLon()))
+				.include(new LatLng(locationFrom.getLat(), locationFrom.getLng()))
+				.include(new LatLng(locationTo.getLat(), locationTo.getLng()))
 				.build();
 		map.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, 100));
 	}
 
 
 	private void moveCameraToMarker(Location location, GoogleMap map) {
-		map.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location.getLat(), location.getLon()), 14));
+		map.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location.getLat(), location.getLng()), 14));
 	}
 
 
 	private void loadRoute() {
-		String start = locationFrom.getLat() + "," + locationFrom.getLon();
-		String end = locationTo.getLat() + "," + locationTo.getLon();
+		String start = locationFrom.getLat() + "," + locationFrom.getLng();
+		String end = locationTo.getLat() + "," + locationTo.getLng();
 
 		ConnectableObservable<ObjectNode> directionsObservable = directionsService.getRoute(start, end)
 				.subscribeOn(Schedulers.io())

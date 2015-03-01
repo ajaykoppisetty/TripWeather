@@ -1,33 +1,52 @@
 package org.faudroids.tripweather.ui;
 
+import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentSender;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.TypedValue;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.android.datetimepicker.date.DatePickerDialog;
 import com.android.datetimepicker.time.RadialPickerLayout;
 import com.android.datetimepicker.time.TimePickerDialog;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GooglePlayServicesUtil;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.LocationServices;
 
 import org.faudroids.tripweather.R;
+import org.faudroids.tripweather.network.DataManager;
+import org.faudroids.tripweather.network.TripData;
 import org.ocpsoft.prettytime.PrettyTime;
 
 import java.util.Calendar;
 import java.util.Date;
 
+import javax.inject.Inject;
+
 import roboguice.activity.RoboActivity;
 import roboguice.inject.ContentView;
 import roboguice.inject.InjectView;
+import rx.Subscription;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.Action1;
+import rx.schedulers.Schedulers;
+import timber.log.Timber;
 
 
 @ContentView(R.layout.activity_start)
 public class StartActivity extends RoboActivity implements
 		TimePickerDialog.OnTimeSetListener,
-		DatePickerDialog.OnDateSetListener {
+		DatePickerDialog.OnDateSetListener,
+		GoogleApiClient.OnConnectionFailedListener {
 
 	private static final PrettyTime prettyTime = new PrettyTime();
 
@@ -40,7 +59,8 @@ public class StartActivity extends RoboActivity implements
 			STATE_TIME_ICON = "timeIcon";
 
 	private static final int
-			LOCATION_REQUEST = 42;
+			LOCATION_REQUEST = 42,
+			GOOGLE_API_CLIENT_REQUEST = 43;
 
 	@InjectView(R.id.origin) View originView;
 	@InjectView(R.id.origin_description) TextView originDescriptionView;
@@ -62,9 +82,18 @@ public class StartActivity extends RoboActivity implements
 	private String locationFrom, locationTo;
 	private Calendar startTime;
 
+	private GoogleApiClient googleApiClient;
+
+	@Inject DataManager dataManager;
+	private Subscription tripDataDownload;
+	private ProgressDialog progressDialog;
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+
+		googleApiClient = createGoogleApiClient();
+		googleApiClient.connect();
 
 		updateInputViews();
 		originView.setOnClickListener(new View.OnClickListener() {
@@ -113,6 +142,14 @@ public class StartActivity extends RoboActivity implements
 
 
 	@Override
+	public void onDestroy() {
+		googleApiClient.disconnect();
+		if (tripDataDownload != null) tripDataDownload.unsubscribe();
+		super.onDestroy();
+	}
+
+
+	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		if (resultCode != RESULT_OK) return;
 		switch(requestCode) {
@@ -123,8 +160,16 @@ public class StartActivity extends RoboActivity implements
 				if (isFromLocation) locationFrom = location;
 				else locationTo = location;
 				updateInputViews();
+				checkInputAndShowDetailsActivity();
 				if (isFromLocation) showDoneAnimation(originIcon);
 				else showDoneAnimation(destinationIcon);
+				break;
+
+			// resolved google api client connection?
+			case GOOGLE_API_CLIENT_REQUEST:
+				if (!googleApiClient.isConnected() && !googleApiClient.isConnecting()) {
+					googleApiClient.connect();
+				}
 				break;
 		}
 	}
@@ -197,6 +242,7 @@ public class StartActivity extends RoboActivity implements
 		startTime.set(Calendar.HOUR_OF_DAY, hourOfDay);
 		startTime.set(Calendar.MINUTE, minute);
 		updateInputViews();
+		checkInputAndShowDetailsActivity();
 		showDoneAnimation(timeIcon);
 	}
 
@@ -246,4 +292,76 @@ public class StartActivity extends RoboActivity implements
 
 		super.onSaveInstanceState(savedInstanceState);
 	}
+
+
+	@Override
+	public void onConnectionFailed(ConnectionResult connectionResult) {
+		Timber.w("Google Api Client connection failed, " + connectionResult.getErrorCode());
+		if (connectionResult.hasResolution()) {
+			try {
+				connectionResult.startResolutionForResult(this, GOOGLE_API_CLIENT_REQUEST);
+			} catch (IntentSender.SendIntentException e) {
+				Timber.e(e, "failed to start google client api resolution");
+				googleApiClient.connect();
+			}
+		} else {
+			GooglePlayServicesUtil.getErrorDialog(connectionResult.getErrorCode(), this, GOOGLE_API_CLIENT_REQUEST).show();
+		}
+	}
+
+
+	private void checkInputAndShowDetailsActivity() {
+		if (locationFrom == null || locationTo == null || startTime == null) return;
+		if (!googleApiClient.isConnected()) return;
+
+		Handler handler = new Handler();
+		handler.postDelayed(new Runnable() {
+			@Override
+			public void run() {
+				progressDialog = ProgressDialog.show(StartActivity.this, getString(R.string.loading_title), getString(R.string.loading_message), true, true);
+				progressDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
+					@Override
+					public void onCancel(DialogInterface dialog) {
+						tripDataDownload.unsubscribe();
+						tripDataDownload = null;
+					}
+				});
+
+				tripDataDownload = dataManager
+						.getData(googleApiClient, locationFrom, locationTo, startTime.getTimeInMillis() / 1000)
+						.subscribeOn(Schedulers.io())
+						.observeOn(AndroidSchedulers.mainThread())
+						.subscribe(new Action1<TripData>() {
+							@Override
+							public void call(TripData tripData) {
+								dismissProgressDialog();
+								Intent intent = DetailsActivity.createIntent(StartActivity.this, tripData);
+								startActivity(intent);
+							}
+						}, new Action1<Throwable>() {
+							@Override
+							public void call(Throwable throwable) {
+								dismissProgressDialog();
+								Toast.makeText(StartActivity.this, "Up's something went wrong!", Toast.LENGTH_LONG).show();
+								Timber.e(throwable, "failed to run data manager");
+							}
+						});
+			}
+		}, 1000);
+	}
+
+
+	private void dismissProgressDialog() {
+		progressDialog.dismiss();
+		progressDialog = null;
+	}
+
+
+	private GoogleApiClient createGoogleApiClient() {
+		return new GoogleApiClient.Builder(this)
+				.addOnConnectionFailedListener(this)
+				.addApi(LocationServices.API)
+				.build();
+	}
+
 }

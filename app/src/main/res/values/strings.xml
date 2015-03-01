@@ -21,6 +21,9 @@
     <string name="tab_map">Map</string>
     <string name="tab_temperature">Temperature</string>
 
+    <string name="loading_title">Crunching data</string>
+    <string name="loading_message">Getting the latest weather data, please wait …</string>
+
     <string name="places_api_auth_error">REQUEST_DENIED</string>
     <string name="places_base_url">https://maps.googleapis.com/maps/api/place</string>
     <string name="places_request_type">/autocomplete</string>
