@@ -1,51 +1,47 @@
 package org.faudroids.tripweather.ui;
 
+import android.app.AlertDialog;
+import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.os.Bundle;
-import android.util.Pair;
+import android.util.TypedValue;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
+import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.android.datetimepicker.date.DatePickerDialog;
+import com.android.datetimepicker.time.RadialPickerLayout;
+import com.android.datetimepicker.time.TimePickerDialog;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.maps.CameraUpdateFactory;
-import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.MapView;
-import com.google.android.gms.maps.MapsInitializer;
-import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.LatLngBounds;
-import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.gms.maps.model.PolylineOptions;
-import com.google.maps.android.PolyUtil;
 
 import org.faudroids.tripweather.R;
-import org.faudroids.tripweather.geo.DirectionsService;
-import org.faudroids.tripweather.geo.DirectionsUtils;
-import org.faudroids.tripweather.geo.GeoCodingService;
-import org.faudroids.tripweather.geo.Location;
-import org.faudroids.tripweather.geo.WayPoint;
-import org.faudroids.tripweather.weather.Forecast;
-import org.faudroids.tripweather.weather.WeatherUtils;
+import org.faudroids.tripweather.geo.DirectionsException;
+import org.faudroids.tripweather.geo.GeoCodingException;
+import org.faudroids.tripweather.network.DataManager;
+import org.faudroids.tripweather.network.TripData;
+import org.faudroids.tripweather.weather.WeatherException;
+import org.ocpsoft.prettytime.PrettyTime;
 
-import java.util.List;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
 
+import retrofit.RetrofitError;
 import roboguice.activity.RoboActivity;
 import roboguice.inject.ContentView;
 import roboguice.inject.InjectView;
 import rx.Observable;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
-import rx.functions.Func1;
-import rx.functions.Func2;
-import rx.observables.ConnectableObservable;
 import rx.schedulers.Schedulers;
 import rx.subscriptions.CompositeSubscription;
 import timber.log.Timber;
@@ -53,78 +49,108 @@ import timber.log.Timber;
 
 @ContentView(R.layout.activity_main)
 public class MainActivity extends RoboActivity implements
-		View.OnClickListener,
-		GoogleApiClient.ConnectionCallbacks,
+		TimePickerDialog.OnTimeSetListener,
+		DatePickerDialog.OnDateSetListener,
 		GoogleApiClient.OnConnectionFailedListener {
+
+	private static final PrettyTime prettyTime = new PrettyTime();
+
+	private static final String
+			STATE_FROM = "from",
+			STATE_FROM_ICON = "fromIcon",
+			STATE_TO = "to",
+			STATE_TO_ICON = "toIcon",
+			STATE_TIME = "time",
+			STATE_TIME_ICON = "timeIcon";
 
 	private static final int
 			LOCATION_REQUEST = 42,
 			GOOGLE_API_CLIENT_REQUEST = 43;
 
-	@InjectView(R.id.input_from) TextView textFrom;
-	@InjectView(R.id.input_to) TextView textTo;
-	@InjectView(R.id.map) MapView mapView;
-	@Inject GeoCodingService geoCodingService;
-	@Inject DirectionsService directionsService;
+	@InjectView(R.id.origin) View originView;
+	@InjectView(R.id.origin_description) TextView originDescriptionView;
+	@InjectView(R.id.origin_value) AutoResizeTextView originValueView;
+	@InjectView(R.id.origin_icon) ImageView originIcon;
+
+	@InjectView(R.id.destination) View destinationView;
+	@InjectView(R.id.destination_description) TextView destinationDescriptionView;
+	@InjectView(R.id.destination_value) AutoResizeTextView destinationValueView;
+	@InjectView(R.id.destination_icon) ImageView destinationIcon;
+
+	@InjectView(R.id.time) View timeView;
+	@InjectView(R.id.time_description) TextView timeDescriptionView;
+	@InjectView(R.id.time_value) AutoResizeTextView timeValueView;
+	@InjectView(R.id.time_icon) ImageView timeIcon;
+
+	@InjectView(R.id.settings) View settingsView;
+
+	private String locationFrom, locationTo;
+	private Calendar startTime;
+
 	private GoogleApiClient googleApiClient;
-	@Inject
-	DirectionsUtils directionsUtils;
-	@Inject
-	WeatherUtils forecastGenerator;
 
-	private CompositeSubscription compositeSubscription = new CompositeSubscription();
+	@Inject DataManager dataManager;
+	private CompositeSubscription tripDataDownload = new CompositeSubscription();
+	private ProgressDialog progressDialog;
 
-	private Location locationFrom, locationTo; // contain the actual lat / lon
+	@Override
+	public void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
 
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
 		googleApiClient = createGoogleApiClient();
 		googleApiClient.connect();
 
-		mapView.onCreate(savedInstanceState);
-		textFrom.setOnClickListener(this);
-		textTo.setOnClickListener(this);
-    }
+		updateInputViews();
+		originView.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				Intent intent = new Intent(MainActivity.this, LocationInputActivity.class);
+				intent.putExtra(LocationInputActivity.EXTRA_FROM, true);
+				intent.putExtra(LocationInputActivity.EXTRA_LOCATION, locationFrom);
+				startActivityForResult(intent, LOCATION_REQUEST);
+			}
+		});
 
+		destinationView.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				Intent intent = new Intent(MainActivity.this, LocationInputActivity.class);
+				intent.putExtra(LocationInputActivity.EXTRA_FROM, false);
+				intent.putExtra(LocationInputActivity.EXTRA_LOCATION, locationTo);
+				startActivityForResult(intent, LOCATION_REQUEST);
+			}
+		});
 
-	@Override
-	public void onResume() {
-		super.onResume();
-		mapView.onResume();
+		timeView.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				Calendar time = startTime;
+				if (time == null) time = Calendar.getInstance();
+				DatePickerDialog dateDialog = DatePickerDialog.newInstance(MainActivity.this, time.get(Calendar.YEAR), time.get(Calendar.MONTH), time.get(Calendar.DAY_OF_MONTH));
+				dateDialog.setMinDate(Calendar.getInstance());
+				dateDialog.setMinDate(Calendar.getInstance());
+				Calendar maxDate = Calendar.getInstance();
+				maxDate.add(Calendar.DATE, 14);
+				dateDialog.setMaxDate(maxDate);
+				dateDialog.show(getFragmentManager(), "date picker");
+			}
+		});
 
-		GoogleMap map = mapView.getMap();
-		if (map != null) {
-			map.setMyLocationEnabled(true);
-			map.getUiSettings().setMyLocationButtonEnabled(true);
-			MapsInitializer.initialize(this);
-		}
-	}
-
-
-	@Override
-	public void onPause() {
-		mapView.onPause();
-		super.onPause();
+		settingsView.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				Intent intent = new Intent(MainActivity.this, SettingsActivity.class);
+				startActivity(intent);
+			}
+		});
 	}
 
 
 	@Override
 	public void onDestroy() {
-		mapView.onDestroy();
 		googleApiClient.disconnect();
-		compositeSubscription.unsubscribe();
+		tripDataDownload.unsubscribe();
 		super.onDestroy();
-	}
-
-
-	@Override
-	public void onClick(View view) {
-		String currentLocation = ((TextView) view).getText().toString();
-		boolean fromInput = (R.id.input_from == view.getId());
-		Intent intent = LocationInputActivity.createIntent(this, currentLocation, fromInput);
-		startActivityForResult(intent, LOCATION_REQUEST);
 	}
 
 
@@ -134,40 +160,14 @@ public class MainActivity extends RoboActivity implements
 		switch(requestCode) {
 			// user has selected location
 			case LOCATION_REQUEST:
-				final String locationDescription = data.getExtras().getString(LocationInputActivity.EXTRA_LOCATION);
-				final boolean fromInput = data.getBooleanExtra(LocationInputActivity.EXTRA_FROM, false);
-				Location selectedLocation = null;
-
-				// handle current user location
-				if (getString(R.string.input_your_location).equals(locationDescription)) {
-					android.location.Location location = LocationServices.FusedLocationApi.getLastLocation(googleApiClient);
-					if (location != null) {
-						selectedLocation = new Location(getString(R.string.input_your_location), location.getLatitude(), location.getLongitude());
-					} else {
-						Toast.makeText(this, getString(R.string.input_your_location_unavailable), Toast.LENGTH_LONG).show();
-						Timber.i("Current location unavailable");
-						return;
-					}
-				}
-
-				// handle location query
-				if (fromInput) textFrom.setText(locationDescription);
-				else textTo.setText(locationDescription);
-
-				if (selectedLocation == null) {
-					compositeSubscription.add(geoCodingService.getGeoCodeForAddress(locationDescription)
-							.subscribeOn(Schedulers.io())
-							.observeOn(AndroidSchedulers.mainThread())
-							.subscribe(new Action1<ObjectNode>() {
-								@Override
-								public void call(ObjectNode objectNode) {
-									updateSelectedLocation(parseLocation(objectNode), fromInput);
-
-								}
-							}, new ErrorHandler()));
-				} else {
-					updateSelectedLocation(selectedLocation, fromInput);
-				}
+				String location = data.getExtras().getString(LocationInputActivity.EXTRA_LOCATION);
+				boolean isFromLocation = data.getBooleanExtra(LocationInputActivity.EXTRA_FROM, false);
+				if (isFromLocation) locationFrom = location;
+				else locationTo = location;
+				updateInputViews();
+				checkInputAndShowDetailsActivity();
+				if (isFromLocation) showDoneAnimation(originIcon);
+				else showDoneAnimation(destinationIcon);
 				break;
 
 			// resolved google api client connection?
@@ -176,148 +176,126 @@ public class MainActivity extends RoboActivity implements
 					googleApiClient.connect();
 				}
 				break;
-
 		}
 	}
 
 
-	private void updateSelectedLocation(Location selectedLocation, boolean fromInput) {
-		if (fromInput) locationFrom = selectedLocation;
-		else locationTo = selectedLocation;
-		updateMarkers();
+	private void showDoneAnimation(final ImageView imageView) {
+		if (((Integer) R.drawable.ic_done).equals(imageView.getTag())) return;
+		imageView.setTag(R.drawable.ic_done);
+		Animation shrinkAnim = AnimationUtils.loadAnimation(this, R.anim.scale_hide);
+		final Animation growAnim = AnimationUtils.loadAnimation(this, R.anim.scale_show);
+		imageView.setAnimation(shrinkAnim);
+		shrinkAnim.setStartOffset(300);
+		shrinkAnim.start();
+		shrinkAnim.setAnimationListener(new Animation.AnimationListener() {
+			@Override
+			public void onAnimationStart(Animation animation) { }
+
+			@Override
+			public void onAnimationRepeat(Animation animation) { }
+
+			@Override
+			public void onAnimationEnd(Animation animation) {
+				imageView.setImageResource(R.drawable.ic_done);
+				imageView.setAnimation(growAnim);
+				growAnim.start();
+			}
+		});
 	}
 
 
-	private void updateMarkers() {
-		GoogleMap map = mapView.getMap();
-		map.clear();
-		Timber.d("Clearing map");
-		if (locationFrom != null) updateMarker(map, locationFrom);
-		if (locationTo != null) updateMarker(map, locationTo);
-		if (locationFrom != null && locationTo != null) {
-			moveCameraToRoute(map);
-			loadRoute();
+	private void updateInputViews() {
+		updateInputView(locationFrom, originDescriptionView, originValueView, R.string.input_from, R.string.input_from_example);
+		updateInputView(locationTo, destinationDescriptionView, destinationValueView, R.string.input_to, R.string.input_to_example);
+		String formattedTime = (startTime == null) ? null : prettyTime.format(startTime.getTime());
+		if ("moments ago".equals(formattedTime)) formattedTime = "now";
+		updateInputView(formattedTime, timeDescriptionView, timeValueView, R.string.input_time, R.string.input_time_example);
+	}
+
+
+	private void updateInputView(String location, TextView descriptionView, AutoResizeTextView valueView, int descriptionResource, int valueResource) {
+		if (location == null || location.equals("")) {
+			descriptionView.setText(getString(descriptionResource, getString(R.string.where)));
+			descriptionView.setTextAppearance(this, R.style.MainMenuFontLarge);
+			valueView.setText(getString(valueResource));
+			valueView.setTextAppearance(this, R.style.MainMenuFontSmall);
+			valueView.setTextSize(TypedValue.COMPLEX_UNIT_PX, getResources().getDimension(R.dimen.main_menu_font_small));
+
+		} else {
+			descriptionView.setText(getString(descriptionResource, ""));
+			descriptionView.setTextAppearance(this, R.style.MainMenuFontSmall);
+			valueView.setText(location);
+			valueView.setTextAppearance(this, R.style.MainMenuFontLarge);
+			valueView.setTextSize(TypedValue.COMPLEX_UNIT_PX, getResources().getDimension(R.dimen.main_menu_font_large));
 		}
-		else if (locationFrom != null) moveCameraToMarker(locationFrom, map);
-		else if (locationTo != null) moveCameraToMarker(locationFrom, map);
-	}
-
-
-	private void updateMarker(GoogleMap map, Location location) {
-		map.addMarker(new MarkerOptions()
-				.position(new LatLng(location.getLat(), location.getLng()))
-				.title(location.getDescription()));
-	}
-
-
-	private void moveCameraToRoute(GoogleMap map) {
-		LatLngBounds bounds =new LatLngBounds.Builder()
-				.include(new LatLng(locationFrom.getLat(), locationFrom.getLng()))
-				.include(new LatLng(locationTo.getLat(), locationTo.getLng()))
-				.build();
-		map.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, 100));
-	}
-
-
-	private void moveCameraToMarker(Location location, GoogleMap map) {
-		map.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location.getLat(), location.getLng()), 14));
-	}
-
-
-	private void loadRoute() {
-		String start = locationFrom.getLat() + "," + locationFrom.getLng();
-		String end = locationTo.getLat() + "," + locationTo.getLng();
-
-		ConnectableObservable<ObjectNode> directionsObservable = directionsService.getRoute(start, end)
-				.subscribeOn(Schedulers.io())
-				.observeOn(AndroidSchedulers.mainThread())
-				.publish();
-
-		// intermediate subscription to update route on map
-		compositeSubscription.add(directionsObservable
-				.map(new Func1<ObjectNode, List<LatLng>>() {
-					@Override
-					public List<LatLng> call(ObjectNode objectNode) {
-						String encodedRoute = objectNode.path("routes").path(0).path("overview_polyline").path("points").asText();
-						if (encodedRoute == null || "".equals(encodedRoute))
-							throw new IllegalStateException("no route found");
-						return PolyUtil.decode(encodedRoute);
-					}
-				})
-				.subscribe(new Action1<List<LatLng>>() {
-					@Override
-					public void call(List<LatLng> route) {
-						GoogleMap map = mapView.getMap();
-						if (map == null) return;
-						map.addPolyline(new PolylineOptions()
-								.addAll(route)
-								.color(R.color.green_dark1));
-
-					}
-				}, new ErrorHandler()));
-
-		// final subscription to receive weather forecast
-		compositeSubscription.add(directionsObservable
-				.map(new Func1<ObjectNode, List<Pair<WayPoint, Long>>>() {
-					@Override
-					public List<Pair<WayPoint, Long>> call(ObjectNode objectNode) {
-						// return directionsUtils.parse(objectNode).get(0).interpolate();
-						return null;
-					}
-				})
-				.flatMap(new Func1<List<Pair<WayPoint, Long>>, Observable<Forecast>>() {
-					@Override
-					public Observable<Forecast> call(List<Pair<WayPoint, Long>> wayPoints) {
-						return forecastGenerator.createForecast(System.currentTimeMillis() / 1000l, wayPoints);
-					}
-				})
-				.toSortedList(new Func2<Forecast, Forecast, Integer>() {
-					@Override
-					public Integer call(Forecast forecast, Forecast forecast2) {
-						return Long.valueOf(forecast.getTimestamp()).compareTo(forecast2.getTimestamp());
-					}
-				})
-				.subscribe(new Action1<List<Forecast>>() {
-					@Override
-					public void call(List<Forecast> forecasts) {
-						Intent intent = GraphActivity.createIntent(MainActivity.this, forecasts);
-						startActivity(intent);
-					}
-				}, new ErrorHandler()));
-
-		directionsObservable.connect();
-	}
-
-
-	private Location parseLocation(ObjectNode data) {
-		Timber.d(data.toString());
-		JsonNode result = data.path("results").path(0);
-		String description = result.path("formatted_address").asText();
-		JsonNode locationResult = result.path("geometry").path("location");
-		double lat = locationResult.path("lat").asDouble();
-		double lon = locationResult.path("lng").asDouble();
-		return new Location(description, lat, lon);
-	}
-
-
-	private GoogleApiClient createGoogleApiClient() {
-		return new GoogleApiClient.Builder(this)
-				.addConnectionCallbacks(this)
-				.addOnConnectionFailedListener(this)
-				.addApi(LocationServices.API)
-				.build();
+		valueView.resetTextSize();
 	}
 
 
 	@Override
-	public void onConnected(Bundle bundle) {
-		Timber.d("Google Api Client connected");
+	public void onDateSet(DatePickerDialog datePickerDialog, int year, int monthOfYear, int dayOfMonth) {
+		if (startTime == null) startTime = Calendar.getInstance();
+		startTime.set(year, monthOfYear, dayOfMonth);
+		TimePickerDialog dialog = TimePickerDialog.newInstance(MainActivity.this, startTime.get(Calendar.HOUR_OF_DAY), startTime.get(Calendar.MINUTE), true);
+		dialog.show(getFragmentManager(), "time picker");
 	}
 
 
 	@Override
-	public void onConnectionSuspended(int i) {
-		Timber.d("Google Api Client connection suspended (" + i + ")");
+	public void onTimeSet(RadialPickerLayout radialPickerLayout, int hourOfDay, int minute) {
+		startTime.set(Calendar.HOUR_OF_DAY, hourOfDay);
+		startTime.set(Calendar.MINUTE, minute);
+		updateInputViews();
+		checkInputAndShowDetailsActivity();
+		showDoneAnimation(timeIcon);
+	}
+
+
+	@Override
+	public void onRestoreInstanceState(Bundle savedInstanceState) {
+		super.onRestoreInstanceState(savedInstanceState);
+
+		locationFrom = savedInstanceState.getString(STATE_FROM);
+		int fromIconId = savedInstanceState.getInt(STATE_FROM_ICON);
+		if (fromIconId != 0) {
+			originIcon.setTag(fromIconId);
+			originIcon.setImageResource(R.drawable.ic_done);
+		}
+
+		locationTo = savedInstanceState.getString(STATE_TO);
+		int toIconId = savedInstanceState.getInt(STATE_TO_ICON);
+		if (toIconId != 0) {
+			destinationIcon.setTag(fromIconId);
+			destinationIcon.setImageResource(R.drawable.ic_done);
+		}
+
+		if (savedInstanceState.containsKey(STATE_TIME)) {
+			startTime = Calendar.getInstance();
+			startTime.setTime(new Date(savedInstanceState.getLong(STATE_TIME)));
+		}
+		int timeIconId = savedInstanceState.getInt(STATE_TIME_ICON);
+		if (timeIconId != 0) {
+			timeIcon.setTag(timeIconId);
+			timeIcon.setImageResource(R.drawable.ic_done);
+		}
+
+		updateInputViews();
+	}
+
+
+	@Override
+	public void onSaveInstanceState(Bundle savedInstanceState) {
+		savedInstanceState.putString(STATE_FROM, locationFrom);
+		if (originIcon.getTag() != null) savedInstanceState.putInt(STATE_FROM_ICON, (int) originIcon.getTag());
+
+		savedInstanceState.putString(STATE_TO, locationTo);
+		if (destinationIcon.getTag() != null) savedInstanceState.putInt(STATE_TO_ICON, (int) destinationIcon.getTag());
+
+		if (startTime != null) savedInstanceState.putLong(STATE_TIME, startTime.getTime().getTime());
+		if (timeIcon.getTag() != null) savedInstanceState.putInt(STATE_TIME_ICON, (int) timeIcon.getTag());
+
+		super.onSaveInstanceState(savedInstanceState);
 	}
 
 
@@ -337,14 +315,127 @@ public class MainActivity extends RoboActivity implements
 	}
 
 
-	private final class ErrorHandler implements Action1<Throwable> {
+	private void checkInputAndShowDetailsActivity() {
+		if (locationFrom == null || locationTo == null || startTime == null) return;
+		if (!googleApiClient.isConnected()) return;
 
-		@Override
-		public void call(Throwable throwable) {
-			Timber.e(throwable, throwable.getMessage());
-			Toast.makeText(MainActivity.this, throwable.getMessage(), Toast.LENGTH_LONG).show();
+		tripDataDownload.add(Observable
+				.just(null)
+				.delay(1, TimeUnit.SECONDS)
+				.subscribeOn(Schedulers.io())
+				.observeOn(AndroidSchedulers.mainThread())
+				.subscribe(new Action1<Object>() {
+					@Override
+					public void call(Object o) {
+						progressDialog = ProgressDialog.show(MainActivity.this, getString(R.string.loading_title), getString(R.string.loading_message), true, true);
+						progressDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
+							@Override
+							public void onCancel(DialogInterface dialog) {
+								tripDataDownload.unsubscribe();
+								tripDataDownload = new CompositeSubscription();
+							}
+						});
+
+						tripDataDownload.add(dataManager
+								.getData(googleApiClient, locationFrom, locationTo, startTime.getTimeInMillis() / 1000)
+								.subscribeOn(Schedulers.io())
+								.observeOn(AndroidSchedulers.mainThread())
+								.subscribe(new Action1<TripData>() {
+									@Override
+									public void call(TripData tripData) {
+										dismissProgressAndResetSubscription();
+										Intent intent = DetailsActivity.createIntent(MainActivity.this, tripData);
+										startActivity(intent);
+									}
+								}, new Action1<Throwable>() {
+									@Override
+									public void call(Throwable throwable) {
+										Timber.i(throwable, "failed to run data manager");
+										dismissProgressAndResetSubscription();
+										handleDataDownloadError(throwable);
+									}
+								}));
+					}
+				}));
+	}
+
+
+	private void dismissProgressAndResetSubscription() {
+		progressDialog.dismiss();
+		progressDialog = null;
+
+		tripDataDownload.unsubscribe();
+		tripDataDownload = new CompositeSubscription();
+	}
+
+
+	private GoogleApiClient createGoogleApiClient() {
+		return new GoogleApiClient.Builder(this)
+				.addOnConnectionFailedListener(this)
+				.addApi(LocationServices.API)
+				.build();
+	}
+
+
+	private void handleDataDownloadError(Throwable throwable) {
+		int titleResource;
+		String msg = null;
+
+		if (throwable instanceof GeoCodingException) {
+			GeoCodingException e = (GeoCodingException) throwable;
+			titleResource = R.string.error_location_title;
+			switch(e.getType()) {
+				case ZERO_RESULTS:
+					msg = getString(R.string.error_location_nonexistent, e.getLocation());
+					break;
+
+				case INTERNAL_ERROR:
+					msg = getString(R.string.error_location_internal, e.getLocation());
+					break;
+
+				case USER_LOCATION_UNAVAILABLE:
+					msg = getString(R.string.error_location_user);
+					break;
+			}
+
+		} else if (throwable instanceof DirectionsException) {
+			DirectionsException e = (DirectionsException) throwable;
+			titleResource = R.string.error_route_title;
+			switch(e.getType()) {
+				case ZERO_RESULTS:
+					msg = getString(R.string.error_route_nonexistent);
+					break;
+
+				case INTERNAL_ERROR:
+					msg = getString(R.string.error_route_internal);
+					break;
+			}
+
+		} else if (throwable instanceof WeatherException) {
+			WeatherException e = (WeatherException) throwable;
+			titleResource = R.string.error_route_title;
+			switch (e.getType()) {
+				case TOO_DISTANT_DATE:
+					msg = getString(R.string.error_weather_data_too_distant);
+					break;
+			}
+
+		} else if (throwable instanceof RetrofitError) {
+			titleResource = R.string.error_network_title;
+			msg = getString(R.string.error_network_msg);
+
+		} else {
+			Timber.e(throwable, "unknown error in DataManager");
+			titleResource = R.string.error_unknown_title;
+			msg = getString(R.string.error_unknown_msg);
 		}
 
+		new AlertDialog.Builder(this)
+				.setTitle(titleResource)
+				.setMessage(msg)
+				.setIcon(R.drawable.ic_action_warning)
+				.setPositiveButton(android.R.string.ok, null)
+				.show();
 	}
 
 }

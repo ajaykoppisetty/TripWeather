@@ -27,7 +27,7 @@ import roboguice.inject.InjectView;
 import timber.log.Timber;
 
 
-@ContentView(R.layout.activity_graph)
+@ContentView(R.layout.fragment_graph)
 public class GraphFragment extends RoboFragment {
 
 	private static final String EXTRA_FORECASTS = "EXTRA_FORECASTS";
