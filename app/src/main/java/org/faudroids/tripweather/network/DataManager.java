@@ -93,7 +93,12 @@ public final class DataManager {
 				.flatMap(new Func1<TripData.Builder, Observable<TripData.Builder>>() {
 					@Override
 					public Observable<TripData.Builder> call(final TripData.Builder builder) {
-						List<Pair<WayPoint, Long>> wayPoints = directionsUtils.parse(builder.route()).get(0).interpolate();
+						List<Pair<WayPoint, Long>> wayPoints = directionsUtils.parse(
+								builder.fromLocation().getDescription(),
+								builder.toLocation().getDescription(),
+								builder.route())
+								.get(0).interpolate();
+
 						Timber.d("about to fetch weather");
 						return forecastGenerator
 								.createForecast(timestamp, wayPoints)
@@ -107,7 +112,7 @@ public final class DataManager {
 								.map(new Func1<List<Forecast>, TripData.Builder>() {
 									@Override
 									public TripData.Builder call(List<Forecast> forecasts) {
-										if (forecasts.isEmpty()) throw new WeatherException(WeatherException.Type.TOO_DISTANT_DATE);
+										if (forecasts.isEmpty()) throw WeatherException.createTooDistanteDateException(timestamp);
 										Timber.d("adding forecasts");
 										return builder.forecasts(forecasts);
 									}
@@ -133,7 +138,7 @@ public final class DataManager {
 							if (location != null) {
 								return new Location(locationDescription, location.getLatitude(), location.getLongitude());
 							} else {
-								throw new GeoCodingException(GeoCodingException.Type.USER_LOCATION_UNAVAILABLE);
+								throw GeoCodingException.createUserLocationUnavailableException();
 							}
 						}
 					});
@@ -144,7 +149,7 @@ public final class DataManager {
 					.map(new Func1<ObjectNode, Location>() {
 						@Override
 						public Location call(ObjectNode objectNode) {
-							return geoCodingUtils.parseLocation(objectNode);
+							return geoCodingUtils.parseLocation(locationDescription, objectNode);
 						}
 					});
 		}

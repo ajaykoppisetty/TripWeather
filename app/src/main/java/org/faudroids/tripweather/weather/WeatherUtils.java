@@ -44,7 +44,7 @@ public final class WeatherUtils {
 		long sixteenDaysTimestamp = currentTimestamp + ForecastMode.SIXTEEN_DAYS.getDaysOfForecast() * 24 * 60 * 60;
 
 		// too far into the future?
-		if (startTimestamp > sixteenDaysTimestamp) throw new WeatherException(WeatherException.Type.TOO_DISTANT_DATE);
+		if (startTimestamp > sixteenDaysTimestamp) throw WeatherException.createTooDistanteDateException(startTimestamp);
 
 		// determine forecast mode
 		final ForecastMode forecastMode;

@@ -8,15 +8,27 @@ public final class WeatherException extends RuntimeException {
 	}
 
 
-	private final Type type;
+	public static WeatherException createTooDistanteDateException(long startTimestamp) {
+		return new WeatherException(Type.TOO_DISTANT_DATE, startTimestamp);
+	}
 
-	public WeatherException(Type type) {
+
+	private final Type type;
+	private final long startTimestamp;
+
+	private WeatherException(Type type, long startTimestamp) {
 		this.type = type;
+		this.startTimestamp = startTimestamp;
 	}
 
 
 	public Type getType() {
 		return type;
+	}
+
+
+	public long getStartTimestamp() {
+		return startTimestamp;
 	}
 
 }

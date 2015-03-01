@@ -1,5 +1,6 @@
 package org.faudroids.tripweather.ui;
 
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -11,7 +12,6 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.android.datetimepicker.date.DatePickerDialog;
 import com.android.datetimepicker.time.RadialPickerLayout;
@@ -22,9 +22,11 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
 
 import org.faudroids.tripweather.R;
+import org.faudroids.tripweather.geo.DirectionsException;
 import org.faudroids.tripweather.geo.GeoCodingException;
 import org.faudroids.tripweather.network.DataManager;
 import org.faudroids.tripweather.network.TripData;
+import org.faudroids.tripweather.weather.WeatherException;
 import org.ocpsoft.prettytime.PrettyTime;
 
 import java.util.Calendar;
@@ -33,6 +35,7 @@ import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
 
+import retrofit.RetrofitError;
 import roboguice.activity.RoboActivity;
 import roboguice.inject.ContentView;
 import roboguice.inject.InjectView;
@@ -127,7 +130,7 @@ public class StartActivity extends RoboActivity implements
 				dateDialog.setMinDate(Calendar.getInstance());
 				dateDialog.setMinDate(Calendar.getInstance());
 				Calendar maxDate = Calendar.getInstance();
-				maxDate.add(Calendar.DATE, 16);
+				maxDate.add(Calendar.DATE, 14);
 				dateDialog.setMaxDate(maxDate);
 				dateDialog.show(getFragmentManager(), "date picker");
 			}
@@ -347,16 +350,9 @@ public class StartActivity extends RoboActivity implements
 								}, new Action1<Throwable>() {
 									@Override
 									public void call(Throwable throwable) {
+										Timber.i(throwable, "failed to run data manager");
 										dismissProgressAndResetSubscription();
-										Timber.e(throwable, "failed to run data manager");
-
-										if (throwable instanceof GeoCodingException) {
-											GeoCodingException e = (GeoCodingException) throwable;
-											Toast.makeText(StartActivity.this, "GeoCodingException " + e.getType().name(), Toast.LENGTH_LONG).show();
-										} else {
-											Toast.makeText(StartActivity.this, "No GeoCodingException", Toast.LENGTH_LONG).show();
-										}
-
+										handleDataDownloadError(throwable);
 									}
 								}));
 					}
@@ -378,6 +374,68 @@ public class StartActivity extends RoboActivity implements
 				.addOnConnectionFailedListener(this)
 				.addApi(LocationServices.API)
 				.build();
+	}
+
+
+	private void handleDataDownloadError(Throwable throwable) {
+		int titleResource;
+		String msg = null;
+
+		if (throwable instanceof GeoCodingException) {
+			GeoCodingException e = (GeoCodingException) throwable;
+			titleResource = R.string.error_location_title;
+			switch(e.getType()) {
+				case ZERO_RESULTS:
+					msg = getString(R.string.error_location_nonexistent, e.getLocation());
+					break;
+
+				case INTERNAL_ERROR:
+					msg = getString(R.string.error_location_internal, e.getLocation());
+					break;
+
+				case USER_LOCATION_UNAVAILABLE:
+					msg = getString(R.string.error_location_user);
+					break;
+			}
+
+		} else if (throwable instanceof DirectionsException) {
+			DirectionsException e = (DirectionsException) throwable;
+			titleResource = R.string.error_route_title;
+			switch(e.getType()) {
+				case ZERO_RESULTS:
+					msg = getString(R.string.error_route_nonexistent);
+					break;
+
+				case INTERNAL_ERROR:
+					msg = getString(R.string.error_route_internal);
+					break;
+			}
+
+		} else if (throwable instanceof WeatherException) {
+			WeatherException e = (WeatherException) throwable;
+			titleResource = R.string.error_route_title;
+			switch (e.getType()) {
+				case TOO_DISTANT_DATE:
+					msg = getString(R.string.error_weather_data_too_distant);
+					break;
+			}
+
+		} else if (throwable instanceof RetrofitError) {
+			titleResource = R.string.error_network_title;
+			msg = getString(R.string.error_network_msg);
+
+		} else {
+			Timber.e(throwable, "unknown error in DataManager");
+			titleResource = R.string.error_unknown_title;
+			msg = getString(R.string.error_unknown_msg);
+		}
+
+		new AlertDialog.Builder(this)
+				.setTitle(titleResource)
+				.setMessage(msg)
+				.setIcon(R.drawable.ic_action_warning)
+				.setPositiveButton(android.R.string.ok, null)
+				.show();
 	}
 
 }

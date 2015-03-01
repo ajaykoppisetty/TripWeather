@@ -14,8 +14,12 @@ public final class DirectionsUtils {
 	@Inject
 	DirectionsUtils() { }
 
-    public ArrayList<Route> parse(ObjectNode routeJson) throws DirectionsException {
-		assertIsValidDirectionsData(routeJson);
+    public ArrayList<Route> parse(
+			String fromLocationDescription,
+			String toLocationDescription,
+			ObjectNode routeJson) throws DirectionsException {
+
+		assertIsValidDirectionsData(fromLocationDescription, toLocationDescription, routeJson);
 
         ArrayList<Route> routeList = new ArrayList<>();
         String copyright, warnings;
@@ -81,10 +85,14 @@ public final class DirectionsUtils {
     }
 
 
-	private void assertIsValidDirectionsData(ObjectNode data) throws DirectionsException {
+	private void assertIsValidDirectionsData(
+			String fromLocationDescription,
+			String toLocationDescription,
+			ObjectNode data) throws DirectionsException {
+
 		if ("OK".equals(data.path("status").asText())) return;
-		if ("ZERO_RESULTS".equals(data.path("status").asText())) throw new DirectionsException(DirectionsException.Type.ZERO_RESULTS);
-		throw new DirectionsException(DirectionsException.Type.INTERNAL_ERROR);
+		if ("ZERO_RESULTS".equals(data.path("status").asText())) throw DirectionsException.createZeroResultsException(fromLocationDescription, toLocationDescription);
+		throw DirectionsException.createInteralException();
 	}
 
 }

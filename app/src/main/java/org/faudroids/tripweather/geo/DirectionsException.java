@@ -8,10 +8,24 @@ public final class DirectionsException extends RuntimeException {
 	}
 
 
-	private final Type type;
+	public static DirectionsException createZeroResultsException(String fromLocation, String toLocation) {
+		return new DirectionsException(Type.ZERO_RESULTS, fromLocation, toLocation);
+	}
 
-	public DirectionsException(Type type) {
+
+	public static DirectionsException createInteralException() {
+		return new DirectionsException(Type.INTERNAL_ERROR, null, null);
+	}
+
+
+
+	private final Type type;
+	private final String fromLocation, toLocation;
+
+	private DirectionsException(Type type, String fromLocation , String toLocation) {
 		this.type = type;
+		this.fromLocation = fromLocation;
+		this.toLocation = toLocation;
 	}
 
 
@@ -19,4 +33,13 @@ public final class DirectionsException extends RuntimeException {
 		return type;
 	}
 
+
+	public String getFromLocation() {
+		return fromLocation;
+	}
+
+
+	public String getToLocation() {
+		return toLocation;
+	}
 }

@@ -14,8 +14,8 @@ public final class GeoCodingUtils {
 	@Inject
 	GeoCodingUtils() { }
 
-	public Location parseLocation(ObjectNode data) throws GeoCodingException {
-		assertValidGeoCodingData(data);
+	public Location parseLocation(String originalLocationDescription, ObjectNode data) throws GeoCodingException {
+		assertValidGeoCodingData(originalLocationDescription, data);
 
 		Timber.d(data.toString());
 		JsonNode result = data.path("results").path(0);
@@ -27,10 +27,10 @@ public final class GeoCodingUtils {
 	}
 
 
-	private void assertValidGeoCodingData(ObjectNode data) throws GeoCodingException {
+	private void assertValidGeoCodingData(String originalLocationDescription, ObjectNode data) throws GeoCodingException {
 		if ("OK".equals(data.path("status").asText())) return;
-		if ("ZERO_RESULTS".equals(data.path("status").asText())) throw new GeoCodingException(GeoCodingException.Type.ZERO_RESULTS);
-		throw new GeoCodingException(GeoCodingException.Type.INTERNAL_ERROR);
+		if ("ZERO_RESULTS".equals(data.path("status").asText())) throw GeoCodingException.createZeroResultsException(originalLocationDescription);
+		throw GeoCodingException.createInteralException();
 	}
 
 }

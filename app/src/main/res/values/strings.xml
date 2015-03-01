@@ -24,6 +24,24 @@
     <string name="loading_title">Crunching data</string>
     <string name="loading_message">Getting the latest weather data, please wait …</string>
 
+    <string name="error_location_title">Unable to find location</string>
+    <string name="error_location_nonexistent">We were unable to find \"%1$s\". Please try a different location.</string>
+    <string name="error_location_internal">There was an unexpected error while looking for \"%1$s\". Please try again later.</string>
+    <string name="error_location_user">We were unable to determine your location. Is GPS turned off?</string>
+
+    <string name="error_route_title">Unable to find route</string>
+    <string name="error_route_nonexistent">There does not seem to be a route between these two points.</string>
+    <string name="error_route_internal">There was an unexpected error while loading the route. Please try again later.</string>
+
+    <string name="error_weather_title">Forecast not available</string>
+    <string name="error_weather_data_too_distant">Unfortunately there are not yet any forecasts available for the %1$s.</string>
+
+    <string name="error_network_title">No internet connection</string>
+    <string name="error_network_msg">We were unable to fetch any forecasts due to a missing internet connection.</string>
+
+    <string name="error_unknown_title">Something went wrong</string>
+    <string name="error_unknown_msg">Sorry, this wasn\'t supposed to happen. Please try again later.</string>
+
     <string name="places_api_auth_error">REQUEST_DENIED</string>
     <string name="places_base_url">https://maps.googleapis.com/maps/api/place</string>
     <string name="places_request_type">/autocomplete</string>

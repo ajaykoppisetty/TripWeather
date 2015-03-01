@@ -261,7 +261,8 @@ public class MainActivity extends RoboActivity implements
 				.map(new Func1<ObjectNode, List<Pair<WayPoint, Long>>>() {
 					@Override
 					public List<Pair<WayPoint, Long>> call(ObjectNode objectNode) {
-						return directionsUtils.parse(objectNode).get(0).interpolate();
+						// return directionsUtils.parse(objectNode).get(0).interpolate();
+						return null;
 					}
 				})
 				.flatMap(new Func1<List<Pair<WayPoint, Long>>, Observable<Forecast>>() {
