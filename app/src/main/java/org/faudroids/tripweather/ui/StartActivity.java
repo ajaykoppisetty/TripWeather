@@ -5,7 +5,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.os.Bundle;
-import android.os.Handler;
 import android.util.TypedValue;
 import android.view.View;
 import android.view.animation.Animation;
@@ -29,16 +28,18 @@ import org.ocpsoft.prettytime.PrettyTime;
 
 import java.util.Calendar;
 import java.util.Date;
+import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
 
 import roboguice.activity.RoboActivity;
 import roboguice.inject.ContentView;
 import roboguice.inject.InjectView;
-import rx.Subscription;
+import rx.Observable;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
 import rx.schedulers.Schedulers;
+import rx.subscriptions.CompositeSubscription;
 import timber.log.Timber;
 
 
@@ -85,7 +86,7 @@ public class StartActivity extends RoboActivity implements
 	private GoogleApiClient googleApiClient;
 
 	@Inject DataManager dataManager;
-	private Subscription tripDataDownload;
+	private CompositeSubscription tripDataDownload = new CompositeSubscription();
 	private ProgressDialog progressDialog;
 
 	@Override
@@ -144,7 +145,7 @@ public class StartActivity extends RoboActivity implements
 	@Override
 	public void onDestroy() {
 		googleApiClient.disconnect();
-		if (tripDataDownload != null) tripDataDownload.unsubscribe();
+		tripDataDownload.unsubscribe();
 		super.onDestroy();
 	}
 
@@ -314,46 +315,53 @@ public class StartActivity extends RoboActivity implements
 		if (locationFrom == null || locationTo == null || startTime == null) return;
 		if (!googleApiClient.isConnected()) return;
 
-		Handler handler = new Handler();
-		handler.postDelayed(new Runnable() {
-			@Override
-			public void run() {
-				progressDialog = ProgressDialog.show(StartActivity.this, getString(R.string.loading_title), getString(R.string.loading_message), true, true);
-				progressDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
+		tripDataDownload.add(Observable
+				.just(null)
+				.delay(1, TimeUnit.SECONDS)
+				.subscribeOn(Schedulers.io())
+				.observeOn(AndroidSchedulers.mainThread())
+				.subscribe(new Action1<Object>() {
 					@Override
-					public void onCancel(DialogInterface dialog) {
-						tripDataDownload.unsubscribe();
-						tripDataDownload = null;
-					}
-				});
-
-				tripDataDownload = dataManager
-						.getData(googleApiClient, locationFrom, locationTo, startTime.getTimeInMillis() / 1000)
-						.subscribeOn(Schedulers.io())
-						.observeOn(AndroidSchedulers.mainThread())
-						.subscribe(new Action1<TripData>() {
+					public void call(Object o) {
+						progressDialog = ProgressDialog.show(StartActivity.this, getString(R.string.loading_title), getString(R.string.loading_message), true, true);
+						progressDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
 							@Override
-							public void call(TripData tripData) {
-								dismissProgressDialog();
-								Intent intent = DetailsActivity.createIntent(StartActivity.this, tripData);
-								startActivity(intent);
-							}
-						}, new Action1<Throwable>() {
-							@Override
-							public void call(Throwable throwable) {
-								dismissProgressDialog();
-								Toast.makeText(StartActivity.this, "Up's something went wrong!", Toast.LENGTH_LONG).show();
-								Timber.e(throwable, "failed to run data manager");
+							public void onCancel(DialogInterface dialog) {
+								tripDataDownload.unsubscribe();
+								tripDataDownload = new CompositeSubscription();
 							}
 						});
-			}
-		}, 1000);
+
+						tripDataDownload.add(dataManager
+								.getData(googleApiClient, locationFrom, locationTo, startTime.getTimeInMillis() / 1000)
+								.subscribeOn(Schedulers.io())
+								.observeOn(AndroidSchedulers.mainThread())
+								.subscribe(new Action1<TripData>() {
+									@Override
+									public void call(TripData tripData) {
+										dismissProgressAndResetSubscription();
+										Intent intent = DetailsActivity.createIntent(StartActivity.this, tripData);
+										startActivity(intent);
+									}
+								}, new Action1<Throwable>() {
+									@Override
+									public void call(Throwable throwable) {
+										dismissProgressAndResetSubscription();
+										Toast.makeText(StartActivity.this, "Up's something went wrong!", Toast.LENGTH_LONG).show();
+										Timber.e(throwable, "failed to run data manager");
+									}
+								}));
+					}
+				}));
 	}
 
 
-	private void dismissProgressDialog() {
+	private void dismissProgressAndResetSubscription() {
 		progressDialog.dismiss();
 		progressDialog = null;
+
+		tripDataDownload.unsubscribe();
+		tripDataDownload = new CompositeSubscription();
 	}
 
 
