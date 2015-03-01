@@ -9,12 +9,14 @@ import java.util.ArrayList;
 
 import javax.inject.Inject;
 
-public class RouteParser {
+public final class DirectionsUtils {
 
 	@Inject
-	RouteParser() { }
+	DirectionsUtils() { }
 
-    public ArrayList<Route> parse(ObjectNode routeJson) {
+    public ArrayList<Route> parse(ObjectNode routeJson) throws DirectionsException {
+		assertIsValidDirectionsData(routeJson);
+
         ArrayList<Route> routeList = new ArrayList<>();
         String copyright, warnings;
         WayPoint origin, destination;
@@ -77,5 +79,12 @@ public class RouteParser {
 
         return routeList;
     }
+
+
+	private void assertIsValidDirectionsData(ObjectNode data) throws DirectionsException {
+		if ("OK".equals(data.path("status").asText())) return;
+		if ("ZERO_RESULTS".equals(data.path("status").asText())) throw new DirectionsException(DirectionsException.Type.ZERO_RESULTS);
+		throw new DirectionsException(DirectionsException.Type.INTERNAL_ERROR);
+	}
 
 }

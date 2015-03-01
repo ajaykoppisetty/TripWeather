@@ -20,14 +20,14 @@ import timber.log.Timber;
 /**
  * Builds the weather forecast for a given route.
  */
-public final class WeatherForecastGenerator {
+public final class WeatherUtils {
 
 	private static final float KELVIN_BASE = 273.15f;
 
 	private final WeatherService weatherService;
 
 	@Inject
-	WeatherForecastGenerator(WeatherService weatherService) {
+	WeatherUtils(WeatherService weatherService) {
 		this.weatherService = weatherService;
 	}
 
@@ -37,13 +37,23 @@ public final class WeatherForecastGenerator {
 	 * @param startTimestamp unix start time for this trip
 	 * @param wayPoints way points of this tripped paired with their estimated timestamp in minutes (starts from zero!)
 	 */
-	public Observable<Forecast> createForecast(final long startTimestamp, List<Pair<WayPoint, Long>> wayPoints) {
-		// keep only every nth way point based on accuracy for forecast
-		int hoursCount = wayPoints.size();
+	public Observable<Forecast> createForecast(final long startTimestamp, List<Pair<WayPoint, Long>> wayPoints) throws WeatherException {
+		long currentTimestamp = System.currentTimeMillis() / 1000;
+		long endTimestamp = startTimestamp + wayPoints.size() * 60 * 60;
+		long fiveDaysTimestamp = currentTimestamp + ForecastMode.FIVE_DAYS.getDaysOfForecast() * 24 * 60 * 60;
+		long sixteenDaysTimestamp = currentTimestamp + ForecastMode.SIXTEEN_DAYS.getDaysOfForecast() * 24 * 60 * 60;
+
+		// too far into the future?
+		if (startTimestamp > sixteenDaysTimestamp) throw new WeatherException(WeatherException.Type.TOO_DISTANT_DATE);
+
+		// determine forecast mode
 		final ForecastMode forecastMode;
-		if (hoursCount < ForecastMode.FIVE_DAYS.getDaysOfForecast() * 24) forecastMode = ForecastMode.FIVE_DAYS;
-		else if (hoursCount < ForecastMode.SIXTEEN_DAYS.getDaysOfForecast() * 24) forecastMode = ForecastMode.SIXTEEN_DAYS;
-		else throw new RuntimeException("too many way points");
+
+		// 16 days?
+		if (endTimestamp > sixteenDaysTimestamp || startTimestamp > fiveDaysTimestamp) forecastMode = ForecastMode.SIXTEEN_DAYS;
+		else forecastMode = ForecastMode.FIVE_DAYS;
+
+		// keep only every nth way point based on accuracy for forecast
 		final LinkedList<Forecast.Builder> forecastBuilders = retainEveryNthElement(startTimestamp, wayPoints, forecastMode.getHourInterval());
 
 		// always add last way point to avoid forecasts with one element only
@@ -63,8 +73,7 @@ public final class WeatherForecastGenerator {
 								observable = weatherService.getForecast(builder.wayPoint().getLat(), builder.wayPoint().getLng());
 								break;
 							case SIXTEEN_DAYS:
-								int daysCount = Math.min(forecastBuilders.size(), forecastMode.getMaxForecastItems());
-								observable = weatherService.getDailyForecast(builder.wayPoint().getLat(), builder.wayPoint().getLat(), daysCount);
+								observable = weatherService.getDailyForecast(builder.wayPoint().getLat(), builder.wayPoint().getLat(), 16);
 						}
 						Timber.d("fetching weather data for time " + builder.timestamp());
 						return observable
@@ -72,6 +81,12 @@ public final class WeatherForecastGenerator {
 									@Override
 									public Forecast call(ObjectNode objectNode) {
 										return parseWeatherData(builder, objectNode, forecastMode);
+									}
+								})
+								.filter(new Func1<Forecast, Boolean>() {
+									@Override
+									public Boolean call(Forecast forecast) {
+										return forecast != null;
 									}
 								});
 					}
@@ -109,7 +124,13 @@ public final class WeatherForecastGenerator {
 			nextWeather = forecastEntries.path(entryIdx + 1);
 			if (entryIdx % 10 == 0) Timber.d("in loop with idx " + entryIdx);
 			++entryIdx;
-		} while (parseTimestamp(nextWeather) < builder.timestamp());
+		} while (parseTimestamp(nextWeather) < builder.timestamp() && entryIdx < forecastEntries.size());
+
+		// found a result?
+		if (entryIdx == forecastEntries.size()) {
+			Timber.d("returning null after " + forecastEntries.size() + " tries");
+			return null;
+		}
 
 		long previousTimestamp = parseTimestamp(previousWeather);
 		long nextTimestamp = parseTimestamp(nextWeather);

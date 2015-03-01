@@ -26,12 +26,12 @@ import com.google.maps.android.PolyUtil;
 
 import org.faudroids.tripweather.R;
 import org.faudroids.tripweather.geo.DirectionsService;
+import org.faudroids.tripweather.geo.DirectionsUtils;
 import org.faudroids.tripweather.geo.GeoCodingService;
 import org.faudroids.tripweather.geo.Location;
-import org.faudroids.tripweather.geo.RouteParser;
 import org.faudroids.tripweather.geo.WayPoint;
 import org.faudroids.tripweather.weather.Forecast;
-import org.faudroids.tripweather.weather.WeatherForecastGenerator;
+import org.faudroids.tripweather.weather.WeatherUtils;
 
 import java.util.List;
 
@@ -67,8 +67,10 @@ public class MainActivity extends RoboActivity implements
 	@Inject GeoCodingService geoCodingService;
 	@Inject DirectionsService directionsService;
 	private GoogleApiClient googleApiClient;
-	@Inject RouteParser routeParser;
-	@Inject WeatherForecastGenerator forecastGenerator;
+	@Inject
+	DirectionsUtils directionsUtils;
+	@Inject
+	WeatherUtils forecastGenerator;
 
 	private CompositeSubscription compositeSubscription = new CompositeSubscription();
 
@@ -259,7 +261,7 @@ public class MainActivity extends RoboActivity implements
 				.map(new Func1<ObjectNode, List<Pair<WayPoint, Long>>>() {
 					@Override
 					public List<Pair<WayPoint, Long>> call(ObjectNode objectNode) {
-						return routeParser.parse(objectNode).get(0).interpolate();
+						return directionsUtils.parse(objectNode).get(0).interpolate();
 					}
 				})
 				.flatMap(new Func1<List<Pair<WayPoint, Long>>, Observable<Forecast>>() {

@@ -11,15 +11,15 @@ import java.util.List;
 
 import rx.functions.Action1;
 
-public final class WeatherForecastGeneratorTest extends AndroidTestCase {
+public final class WeatherUtilsTest extends AndroidTestCase {
 
-	private WeatherForecastGenerator forecastGenerator;
+	private WeatherUtils forecastGenerator;
 
 	@Override
 	public void setUp() throws Exception {
 		super.setUp();
 		WeatherService weatherService = new WeatherModule().provideWeatherService(getContext());
-		this.forecastGenerator = new WeatherForecastGenerator(weatherService);
+		this.forecastGenerator = new WeatherUtils(weatherService);
 	}
 
 

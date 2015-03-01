@@ -22,6 +22,7 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
 
 import org.faudroids.tripweather.R;
+import org.faudroids.tripweather.geo.GeoCodingException;
 import org.faudroids.tripweather.network.DataManager;
 import org.faudroids.tripweather.network.TripData;
 import org.ocpsoft.prettytime.PrettyTime;
@@ -347,8 +348,15 @@ public class StartActivity extends RoboActivity implements
 									@Override
 									public void call(Throwable throwable) {
 										dismissProgressAndResetSubscription();
-										Toast.makeText(StartActivity.this, "Up's something went wrong!", Toast.LENGTH_LONG).show();
 										Timber.e(throwable, "failed to run data manager");
+
+										if (throwable instanceof GeoCodingException) {
+											GeoCodingException e = (GeoCodingException) throwable;
+											Toast.makeText(StartActivity.this, "GeoCodingException " + e.getType().name(), Toast.LENGTH_LONG).show();
+										} else {
+											Toast.makeText(StartActivity.this, "No GeoCodingException", Toast.LENGTH_LONG).show();
+										}
+
 									}
 								}));
 					}

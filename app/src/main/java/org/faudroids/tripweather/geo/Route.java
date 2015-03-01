@@ -5,8 +5,6 @@ import android.util.Pair;
 import java.util.ArrayList;
 import java.util.List;
 
-import timber.log.Timber;
-
 public class Route {
 
 	private static final WayPointInterpolator wayPointInterpolator = new WayPointInterpolator();
@@ -125,7 +123,6 @@ public class Route {
                 double deltaLength = currentSpeed * deltaTime;
 				totalTravelTime += 60;
 
-                Timber.d("Adding new way point!");
 				WayPoint newWayPoint = wayPointInterpolator.getIntermediatePoint(startPoint, currentWayPoint, deltaLength);
                 interpolatedRoute.add(new Pair<>(
 						newWayPoint,
