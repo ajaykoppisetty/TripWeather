@@ -1,4 +1,4 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
               android:orientation="vertical"
               android:layout_width="match_parent"
               android:layout_height="match_parent"
@@ -10,4 +10,23 @@
         android:layout_width="match_parent"
         />
 
-</LinearLayout>
+
+    <TextView
+        android:id="@+id/copyrights"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentBottom="true"
+        style="@style/CopyrightsFont"
+        />
+
+    <TextView
+        android:id="@+id/warnings"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_above="@id/copyrights"
+        style="@style/CopyrightsFont"
+        />
+
+</RelativeLayout>

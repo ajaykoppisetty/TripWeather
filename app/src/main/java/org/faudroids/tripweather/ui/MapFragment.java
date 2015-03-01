@@ -1,10 +1,13 @@
 package org.faudroids.tripweather.ui;
 
+import android.app.AlertDialog;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
@@ -17,36 +20,36 @@ import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.maps.android.PolyUtil;
 
 import org.faudroids.tripweather.R;
+import org.faudroids.tripweather.geo.Location;
+import org.faudroids.tripweather.network.TripData;
 
+import java.util.LinkedList;
 import java.util.List;
 
 import roboguice.fragment.RoboFragment;
 import roboguice.inject.InjectView;
+import timber.log.Timber;
 
 
 public class MapFragment extends RoboFragment implements OnMapReadyCallback {
 
 	private static final String
-			EXTRA_FROM = "EXTRA_FROM",
-			EXTRA_FROM_TITLE = "EXTRA_FROM_TITLE",
-			EXTRA_TO = "EXTRA_TO",
-			EXTRA_TO_TITLE = "EXTRA_TO_TITLE",
-			EXTRA_ROUTE = "EXTRA_ROUTE";
+			EXTRA_TRIP_DATA = "EXTRA_TRIP_DATA";
 
-	public static MapFragment createInstance(LatLng fromLocation, String fromTitle, LatLng toLocation, String toTitle, String encodedRoute) {
+	public static MapFragment createInstance(TripData tripData) {
 		Bundle bundle = new Bundle();
-		bundle.putParcelable(EXTRA_FROM, fromLocation);
-		bundle.putString(EXTRA_FROM_TITLE, fromTitle);
-		bundle.putParcelable(EXTRA_TO, toLocation);
-		bundle.putString(EXTRA_TO_TITLE, toTitle);
-		bundle.putString(EXTRA_ROUTE, encodedRoute);
+		bundle.putParcelable(EXTRA_TRIP_DATA, tripData);
 
 		MapFragment fragment = new MapFragment();
 		fragment.setArguments(bundle);
 		return fragment;
 	}
 
+
 	@InjectView(R.id.map) MapView mapView;
+	@InjectView(R.id.copyrights) TextView copyrightsView;
+	@InjectView(R.id.warnings) TextView warningsView;
+
 	private LatLng fromLocation, toLocation;
 	private String fromTitle, toTitle;
 	private String encodedRoute;
@@ -64,11 +67,39 @@ public class MapFragment extends RoboFragment implements OnMapReadyCallback {
 		mapView.onCreate(savedInstanceState);
 		mapView.getMapAsync(this);
 
-		this.fromLocation = getArguments().getParcelable(EXTRA_FROM);
-		this.fromTitle = getArguments().getString(EXTRA_FROM_TITLE);
-		this.toLocation = getArguments().getParcelable(EXTRA_TO);
-		this.toTitle = getArguments().getString(EXTRA_TO_TITLE);
-		this.encodedRoute = getArguments().getString(EXTRA_ROUTE);
+		TripData tripData = getArguments().getParcelable(EXTRA_TRIP_DATA);
+		JsonNode routeData = tripData.getRoute().path("routes").path(0);
+
+		this.fromLocation = convertLocationToLatLng(tripData.getFromLocation());
+		this.fromTitle = tripData.getFromLocation().getDescription();
+		this.toLocation = convertLocationToLatLng(tripData.getToLocation());
+		this.toTitle = tripData.getToLocation().getDescription();
+		this.encodedRoute = routeData.path("overview_polyline").path("points").asText();
+
+		copyrightsView.setText(routeData.path("copyrights").asText());
+
+		List<String> warnings = new LinkedList<>();
+		for (JsonNode warning : routeData.path("warnings")) warnings.add(warning.asText());
+
+		if (warnings.size() > 0) {
+			final String warningTitle = getResources().getQuantityText(R.plurals.warnings, warnings.size()).toString();
+			final StringBuilder warningMsg = new StringBuilder();
+			for (String warning : warnings) warningMsg.append(warning).append("\n");
+
+			warningsView.setText(warningTitle);
+			warningsView.setOnClickListener(new View.OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					new AlertDialog.Builder(MapFragment.this.getActivity())
+							.setTitle(warningTitle)
+							.setMessage(warningMsg.toString())
+							.setPositiveButton(android.R.string.ok, null)
+							.show();
+				}
+			});
+		}
+
+		Timber.d("set copyright to " + copyrightsView.getText());
     }
 
 
@@ -118,4 +149,8 @@ public class MapFragment extends RoboFragment implements OnMapReadyCallback {
 		googleMap.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, 100));
 	}
 
+
+	private LatLng convertLocationToLatLng(Location location) {
+		return new LatLng(location.getLat(), location.getLng());
+	}
 }

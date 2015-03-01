@@ -9,4 +9,6 @@
 
     <dimen name="main_menu_font_large">30sp</dimen>
     <dimen name="main_menu_font_small">13sp</dimen>
+
+    <dimen name="copyrights_front">10sp</dimen>
 </resources>

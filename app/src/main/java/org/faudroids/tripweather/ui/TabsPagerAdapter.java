@@ -6,8 +6,6 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 
-import com.google.android.gms.maps.model.LatLng;
-
 import org.faudroids.tripweather.R;
 import org.faudroids.tripweather.network.TripData;
 import org.faudroids.tripweather.weather.Forecast;
@@ -27,13 +25,7 @@ final class TabsPagerAdapter extends FragmentPagerAdapter {
 	@Override
 	public Fragment getItem(int position) {
 		switch(position) {
-			case 0: return MapFragment.createInstance(
-					new LatLng(tripData.getFromLocation().getLat(), tripData.getFromLocation().getLng()),
-					tripData.getFromLocation().getDescription(),
-					new LatLng(tripData.getToLocation().getLat(), tripData.getToLocation().getLng()),
-					tripData.getToLocation().getDescription(),
-					tripData.getRoute().path("routes").path(0).path("overview_polyline").path("points").asText());
-
+			case 0: return MapFragment.createInstance(tripData);
 			case 1: return GraphFragment.createInstance(
 					tripData.getForecasts().toArray(new Forecast[tripData.getForecasts().size()]));
 		}

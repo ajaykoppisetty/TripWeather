@@ -42,6 +42,11 @@
     <string name="error_unknown_title">Something went wrong</string>
     <string name="error_unknown_msg">Sorry, this wasn\'t supposed to happen. Please try again later.</string>
 
+    <plurals name="warnings">
+        <item quantity="one">Warning!</item>
+        <item quantity="other">Warnings!</item>
+    </plurals>
+
     <string name="places_api_auth_error">REQUEST_DENIED</string>
     <string name="places_base_url">https://maps.googleapis.com/maps/api/place</string>
     <string name="places_request_type">/autocomplete</string>

@@ -48,4 +48,11 @@
         <item name="android:textColor">@color/gray_light</item>
     </style>
 
+    <style name="CopyrightsFont" parent="@android:style/TextAppearance">
+        <item name="android:background">@android:color/transparent</item>
+        <item name="android:textSize">@dimen/copyrights_front</item>
+        <item name="android:textColor">@color/gray</item>
+        <item name="android:paddingRight">1dp</item>
+    </style>
+
 </resources>
