@@ -26,20 +26,20 @@
         >
 
         <Button
-            android:id="@+id/select"
-            android:layout_width="0dp"
-            android:layout_weight="1"
-            android:layout_height="wrap_content"
-            android:text="@string/input_map_select"
-            style="@style/DefaultButton"
-            />
-
-        <Button
             android:id="@+id/cancel"
             android:layout_width="0dp"
             android:layout_weight="1"
             android:layout_height="wrap_content"
             android:text="@string/input_map_cancel"
+            style="@style/DefaultButton"
+            />
+
+        <Button
+            android:id="@+id/select"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:text="@string/input_map_select"
             style="@style/DefaultButton"
             />
 
