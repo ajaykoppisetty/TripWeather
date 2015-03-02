@@ -44,9 +44,16 @@ public class MapInputActivity extends RoboActivity implements OnMapReadyCallback
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
+		getActionBar().setSubtitle(getString(R.string.input_map_hint));
+
 		boolean isDestination = getIntent().getBooleanExtra(EXTRA_IS_DESTINATION, false);
-		if (isDestination) markerIconView.setImageResource(R.drawable.ic_destination_colored);
-		else markerIconView.setImageResource(R.drawable.ic_location_colored);
+		if (isDestination) {
+			getActionBar().setTitle(getString(R.string.input_choose_destination));
+			markerIconView.setImageResource(R.drawable.ic_destination_colored);
+		} else {
+			getActionBar().setTitle(getString(R.string.input_choose_origin));
+			markerIconView.setImageResource(R.drawable.ic_location_colored);
+		}
 
 		mapView.onCreate(savedInstanceState);
 		mapView.getMapAsync(this);
