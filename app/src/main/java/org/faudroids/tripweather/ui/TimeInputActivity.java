@@ -82,6 +82,7 @@ public class TimeInputActivity extends AbstractBackActivity implements TimeListe
 	public boolean onCreateOptionsMenu(Menu menu) {
 		MenuInflater inflater = getMenuInflater();
 		inflater.inflate(R.menu.menu_input, menu);
+		menu.findItem(R.id.done).getIcon().setAlpha(255);
 		return true;
 	}
 
