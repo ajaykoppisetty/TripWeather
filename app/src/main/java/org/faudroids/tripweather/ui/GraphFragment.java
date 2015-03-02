@@ -9,13 +9,14 @@ import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
-import com.github.mikephil.charting.utils.Legend;
+import com.github.mikephil.charting.utils.ValueFormatter;
 import com.github.mikephil.charting.utils.XLabels;
 import com.github.mikephil.charting.utils.YLabels;
 
 import org.faudroids.tripweather.R;
 import org.faudroids.tripweather.weather.Forecast;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.TreeMap;
 
@@ -31,6 +32,8 @@ import timber.log.Timber;
 public class GraphFragment extends RoboFragment {
 
 	private static final String EXTRA_FORECASTS = "EXTRA_FORECASTS";
+
+	private static final DecimalFormat yLabelsFormat = new DecimalFormat("##.#");
 
 
 	public static GraphFragment createInstance(Forecast[] forecasts) {
@@ -86,15 +89,19 @@ public class GraphFragment extends RoboFragment {
 	private void styleGraph(LineChart lineChart) {
 		lineChart.setDescription("");
 		lineChart.setDrawYValues(false);
-
-		Legend legend = lineChart.getLegend();
-		legend.setForm(Legend.LegendForm.CIRCLE);
+		lineChart.setDrawLegend(false);
 
 		XLabels xLabels = lineChart.getXLabels();
 		xLabels.setPosition(XLabels.XLabelPosition.BOTTOM);
 
 		YLabels yLabels = lineChart.getYLabels();
 		yLabels.setPosition(YLabels.YLabelPosition.LEFT);
+		yLabels.setFormatter(new ValueFormatter() {
+			@Override
+			public String getFormattedValue(float v) {
+				return yLabelsFormat.format(v) + " " + (char) 0x00B0 + "C";
+			}
+		});
 	}
 
 
