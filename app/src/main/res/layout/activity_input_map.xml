@@ -8,6 +8,7 @@
         android:id="@+id/map"
         android:layout_height="match_parent"
         android:layout_width="match_parent"
+        android:background="@color/green"
         />
 
     <ImageView
@@ -30,6 +31,7 @@
             android:layout_weight="1"
             android:layout_height="wrap_content"
             android:text="@string/input_map_select"
+            style="@style/DefaultButton"
             />
 
         <Button
@@ -38,6 +40,7 @@
             android:layout_weight="1"
             android:layout_height="wrap_content"
             android:text="@string/input_map_cancel"
+            style="@style/DefaultButton"
             />
 
         </LinearLayout>
