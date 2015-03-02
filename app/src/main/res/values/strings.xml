@@ -113,4 +113,6 @@
     <string name="input_map_cancel">Cancel</string>
     <string name="input_map_hint">Use zoom &amp; pan to center location</string>
 
+    <string name="menu_done">Done</string>
+
 </resources>

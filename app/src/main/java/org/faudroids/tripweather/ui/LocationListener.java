@@ -3,6 +3,7 @@ package org.faudroids.tripweather.ui;
 
 public interface LocationListener {
 
-	public void onLocationSelected(String location);
+	public void onLocationSelected();
+	public void onLocationChanged(String location);
 
 }

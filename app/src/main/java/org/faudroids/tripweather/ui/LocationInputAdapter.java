@@ -3,6 +3,8 @@ package org.faudroids.tripweather.ui;
 import android.app.Activity;
 import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -124,11 +126,24 @@ public final class LocationInputAdapter extends RecyclerView.Adapter<LocationInp
 				@Override
 				public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
 					if (EditorInfo.IME_ACTION_SEARCH == actionId) {
-						locationListener.onLocationSelected(autocompleteTextView.getText().toString());
+						locationListener.onLocationSelected();
 						return true;
 					}
 					return false;
 				}
+			});
+			autocompleteTextView.addTextChangedListener(new TextWatcher() {
+				@Override
+				public void beforeTextChanged(CharSequence s, int start, int count, int after) {  }
+
+				@Override
+				public void onTextChanged(CharSequence s, int start, int before, int count) {
+					locationListener.onLocationChanged(autocompleteTextView.getText().toString());
+				}
+
+
+				@Override
+				public void afterTextChanged(Editable s) {  }
 			});
 		}
 
@@ -154,7 +169,8 @@ public final class LocationInputAdapter extends RecyclerView.Adapter<LocationInp
 			yourLocation.setOnClickListener(new View.OnClickListener() {
 				@Override
 				public void onClick(View view) {
-					locationListener.onLocationSelected(context.getString(R.string.input_your_location));
+					locationListener.onLocationChanged(context.getString(R.string.input_your_location));
+					locationListener.onLocationSelected();
 				}
 			});
 			mapLocation.setOnClickListener(new View.OnClickListener() {

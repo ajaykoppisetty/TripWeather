@@ -104,9 +104,7 @@ public class MainActivity extends RoboActivity implements
 		originView.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				Intent intent = new Intent(MainActivity.this, LocationInputActivity.class);
-				intent.putExtra(LocationInputActivity.EXTRA_FROM, true);
-				intent.putExtra(LocationInputActivity.EXTRA_LOCATION, locationFrom);
+				Intent intent = LocationInputActivity.createIntent(MainActivity.this, locationFrom, true);
 				startActivityForResult(intent, LOCATION_REQUEST);
 			}
 		});
@@ -114,9 +112,7 @@ public class MainActivity extends RoboActivity implements
 		destinationView.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				Intent intent = new Intent(MainActivity.this, LocationInputActivity.class);
-				intent.putExtra(LocationInputActivity.EXTRA_FROM, false);
-				intent.putExtra(LocationInputActivity.EXTRA_LOCATION, locationTo);
+				Intent intent = LocationInputActivity.createIntent(MainActivity.this, locationTo, false);
 				startActivityForResult(intent, LOCATION_REQUEST);
 			}
 		});
