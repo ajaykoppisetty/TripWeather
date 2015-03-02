@@ -10,7 +10,6 @@
         android:showAsAction="always"
         android:icon="@drawable/ic_action_accept"
         android:title="@string/menu_done"
-        android:enabled="false"
         />
 
 </menu>

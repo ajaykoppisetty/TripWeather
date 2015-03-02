@@ -107,11 +107,14 @@
     <string name="input_choose_origin">Choose start</string>
     <string name="input_choose_destination">Choose destination</string>
     <string name="input_choose_location">Choose location</string>
-    <string name="input_your_location">Your location</string>
     <string name="input_choose_from_map">Choose from map</string>
+    <string name="input_choose_time">Choose starting time</string>
+    <string name="input_your_location">Your location</string>
     <string name="input_map_select">Select</string>
     <string name="input_map_cancel">Cancel</string>
     <string name="input_map_hint">Use zoom &amp; pan to center location</string>
+    <string name="input_now">Now</string>
+    <string name="input_tomorrow">Tomorrow</string>
 
     <string name="menu_done">Done</string>
 

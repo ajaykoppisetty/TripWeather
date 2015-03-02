@@ -13,9 +13,6 @@ import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.android.datetimepicker.date.DatePickerDialog;
-import com.android.datetimepicker.time.RadialPickerLayout;
-import com.android.datetimepicker.time.TimePickerDialog;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -29,7 +26,6 @@ import org.faudroids.tripweather.network.TripData;
 import org.faudroids.tripweather.weather.WeatherException;
 import org.ocpsoft.prettytime.PrettyTime;
 
-import java.util.Calendar;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
@@ -48,10 +44,7 @@ import timber.log.Timber;
 
 
 @ContentView(R.layout.activity_main)
-public class MainActivity extends RoboActivity implements
-		TimePickerDialog.OnTimeSetListener,
-		DatePickerDialog.OnDateSetListener,
-		GoogleApiClient.OnConnectionFailedListener {
+public class MainActivity extends RoboActivity implements GoogleApiClient.OnConnectionFailedListener {
 
 	private static final PrettyTime prettyTime = new PrettyTime();
 
@@ -65,7 +58,8 @@ public class MainActivity extends RoboActivity implements
 
 	private static final int
 			LOCATION_REQUEST = 42,
-			GOOGLE_API_CLIENT_REQUEST = 43;
+			TIME_REQUEST = 43,
+			GOOGLE_API_CLIENT_REQUEST = 44;
 
 	@InjectView(R.id.origin) View originView;
 	@InjectView(R.id.origin_description) TextView originDescriptionView;
@@ -85,7 +79,7 @@ public class MainActivity extends RoboActivity implements
 	@InjectView(R.id.settings) View settingsView;
 
 	private String locationFrom, locationTo;
-	private Calendar startTime;
+	private long startTime = 0;
 
 	private GoogleApiClient googleApiClient;
 
@@ -120,15 +114,8 @@ public class MainActivity extends RoboActivity implements
 		timeView.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				Calendar time = startTime;
-				if (time == null) time = Calendar.getInstance();
-				DatePickerDialog dateDialog = DatePickerDialog.newInstance(MainActivity.this, time.get(Calendar.YEAR), time.get(Calendar.MONTH), time.get(Calendar.DAY_OF_MONTH));
-				dateDialog.setMinDate(Calendar.getInstance());
-				dateDialog.setMinDate(Calendar.getInstance());
-				Calendar maxDate = Calendar.getInstance();
-				maxDate.add(Calendar.DATE, 14);
-				dateDialog.setMaxDate(maxDate);
-				dateDialog.show(getFragmentManager(), "date picker");
+				Intent intent = TimeInputActivity.createIntent(MainActivity.this, startTime);
+				startActivityForResult(intent, TIME_REQUEST);
 			}
 		});
 
@@ -164,6 +151,13 @@ public class MainActivity extends RoboActivity implements
 				checkInputAndShowDetailsActivity();
 				if (isFromLocation) showDoneAnimation(originIcon);
 				else showDoneAnimation(destinationIcon);
+				break;
+
+			case TIME_REQUEST:
+				startTime = data.getLongExtra(TimeInputActivity.EXTRA_TIME, 0);
+				updateInputViews();
+				checkInputAndShowDetailsActivity();
+				showDoneAnimation(timeIcon);
 				break;
 
 			// resolved google api client connection?
@@ -204,7 +198,7 @@ public class MainActivity extends RoboActivity implements
 	private void updateInputViews() {
 		updateInputView(locationFrom, originDescriptionView, originValueView, R.string.input_from, R.string.input_from_example);
 		updateInputView(locationTo, destinationDescriptionView, destinationValueView, R.string.input_to, R.string.input_to_example);
-		String formattedTime = (startTime == null) ? null : prettyTime.format(startTime.getTime());
+		String formattedTime = (startTime == 0) ? null : prettyTime.format(new Date(startTime * 1000));
 		if ("moments ago".equals(formattedTime)) formattedTime = "now";
 		updateInputView(formattedTime, timeDescriptionView, timeValueView, R.string.input_time, R.string.input_time_example);
 	}
@@ -230,25 +224,6 @@ public class MainActivity extends RoboActivity implements
 
 
 	@Override
-	public void onDateSet(DatePickerDialog datePickerDialog, int year, int monthOfYear, int dayOfMonth) {
-		if (startTime == null) startTime = Calendar.getInstance();
-		startTime.set(year, monthOfYear, dayOfMonth);
-		TimePickerDialog dialog = TimePickerDialog.newInstance(MainActivity.this, startTime.get(Calendar.HOUR_OF_DAY), startTime.get(Calendar.MINUTE), true);
-		dialog.show(getFragmentManager(), "time picker");
-	}
-
-
-	@Override
-	public void onTimeSet(RadialPickerLayout radialPickerLayout, int hourOfDay, int minute) {
-		startTime.set(Calendar.HOUR_OF_DAY, hourOfDay);
-		startTime.set(Calendar.MINUTE, minute);
-		updateInputViews();
-		checkInputAndShowDetailsActivity();
-		showDoneAnimation(timeIcon);
-	}
-
-
-	@Override
 	public void onRestoreInstanceState(Bundle savedInstanceState) {
 		super.onRestoreInstanceState(savedInstanceState);
 
@@ -267,8 +242,7 @@ public class MainActivity extends RoboActivity implements
 		}
 
 		if (savedInstanceState.containsKey(STATE_TIME)) {
-			startTime = Calendar.getInstance();
-			startTime.setTime(new Date(savedInstanceState.getLong(STATE_TIME)));
+			startTime = savedInstanceState.getLong(STATE_TIME, 0);
 		}
 		int timeIconId = savedInstanceState.getInt(STATE_TIME_ICON);
 		if (timeIconId != 0) {
@@ -288,7 +262,7 @@ public class MainActivity extends RoboActivity implements
 		savedInstanceState.putString(STATE_TO, locationTo);
 		if (destinationIcon.getTag() != null) savedInstanceState.putInt(STATE_TO_ICON, (int) destinationIcon.getTag());
 
-		if (startTime != null) savedInstanceState.putLong(STATE_TIME, startTime.getTime().getTime());
+		if (startTime != 0) savedInstanceState.putLong(STATE_TIME, startTime);
 		if (timeIcon.getTag() != null) savedInstanceState.putInt(STATE_TIME_ICON, (int) timeIcon.getTag());
 
 		super.onSaveInstanceState(savedInstanceState);
@@ -312,7 +286,7 @@ public class MainActivity extends RoboActivity implements
 
 
 	private void checkInputAndShowDetailsActivity() {
-		if (locationFrom == null || locationTo == null || startTime == null) return;
+		if (locationFrom == null || locationTo == null || startTime == 0) return;
 		if (!googleApiClient.isConnected()) return;
 
 		tripDataDownload.add(Observable
@@ -333,7 +307,7 @@ public class MainActivity extends RoboActivity implements
 						});
 
 						tripDataDownload.add(dataManager
-								.getData(googleApiClient, locationFrom, locationTo, startTime.getTimeInMillis() / 1000)
+								.getData(googleApiClient, locationFrom, locationTo, startTime)
 								.subscribeOn(Schedulers.io())
 								.observeOn(AndroidSchedulers.mainThread())
 								.subscribe(new Action1<TripData>() {

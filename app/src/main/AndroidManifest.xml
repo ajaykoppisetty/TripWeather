@@ -41,6 +41,10 @@
             android:label="@string/app_name"
             />
         <activity
+            android:name=".ui.TimeInputActivity"
+            android:label="@string/app_name"
+            />
+        <activity
             android:name=".ui.DetailsActivity"
             android:label="@string/app_name"
             />

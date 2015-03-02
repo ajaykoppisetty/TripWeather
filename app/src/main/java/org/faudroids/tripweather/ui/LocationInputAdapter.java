@@ -46,9 +46,9 @@ public final class LocationInputAdapter extends RecyclerView.Adapter<LocationInp
 				.from(viewGroup.getContext());
 		switch(viewType) {
 			case InputViewHolder.VIEW_TYPE:
-				return new InputViewHolder(context, inflater.inflate(R.layout.card_input, viewGroup, false));
+				return new InputViewHolder(context, inflater.inflate(R.layout.card_location_input, viewGroup, false));
 			case CommonLocationsViewHolder.VIEW_TYPE:
-				return new CommonLocationsViewHolder(context, inflater.inflate(R.layout.card_locations_common, viewGroup, false));
+				return new CommonLocationsViewHolder(context, inflater.inflate(R.layout.card_location_commons, viewGroup, false));
 		}
 		return null;
 	}
