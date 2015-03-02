@@ -135,6 +135,7 @@ public class MapFragment extends RoboFragment implements OnMapReadyCallback {
 	public void onMapReady(GoogleMap googleMap) {
 		MapsInitializer.initialize(getActivity()); // required for the CameraUpdateFactory to be initialized
 		googleMap.clear();
+		googleMap.setMyLocationEnabled(true);
 
 		googleMap.addMarker(new MarkerOptions().position(fromLocation).title(fromTitle));
 		googleMap.addMarker(new MarkerOptions().position(toLocation).title(toTitle));
