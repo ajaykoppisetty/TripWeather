@@ -7,6 +7,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 
+import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.MapsInitializer;
@@ -14,6 +15,9 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.LatLng;
 
 import org.faudroids.tripweather.R;
+import org.faudroids.tripweather.geo.LocationUtils;
+
+import javax.inject.Inject;
 
 import roboguice.activity.RoboActivity;
 import roboguice.inject.ContentView;
@@ -25,11 +29,14 @@ public class MapInputActivity extends RoboActivity implements OnMapReadyCallback
 
 	public static final String EXTRA_LOCATION = "EXTRA_LOCATION";
 
-	private static final String EXTRA_IS_DESTINATION = "EXTRA_IS_DESTINATION";
+	private static final String
+			EXTRA_IS_DESTINATION = "EXTRA_IS_DESTINATION",
+			EXTRA_INITIAL_LOCATION = "EXTRA_INITIAL_LOCATION";
 
-	public static Intent createIntent(Context context, boolean isDestination) {
+	public static Intent createIntent(Context context, boolean isDestination, String initialLocation) {
 		Intent intent = new Intent(context, MapInputActivity.class);
 		intent.putExtra(EXTRA_IS_DESTINATION, isDestination);
+		intent.putExtra(EXTRA_INITIAL_LOCATION, initialLocation);
 		return intent;
 	}
 
@@ -38,6 +45,8 @@ public class MapInputActivity extends RoboActivity implements OnMapReadyCallback
 	@InjectView(R.id.icon) ImageView markerIconView;
 	@InjectView(R.id.select) Button selectButton;
 	@InjectView(R.id.cancel) Button cancelButton;
+	@Inject LocationUtils locationUtils;
+	private String initialLocation;
 
 
     @Override
@@ -47,6 +56,8 @@ public class MapInputActivity extends RoboActivity implements OnMapReadyCallback
 		getActionBar().setSubtitle(getString(R.string.input_map_hint));
 
 		boolean isDestination = getIntent().getBooleanExtra(EXTRA_IS_DESTINATION, false);
+		initialLocation = getIntent().getStringExtra(EXTRA_INITIAL_LOCATION);
+
 		if (isDestination) {
 			getActionBar().setTitle(getString(R.string.input_choose_destination));
 			markerIconView.setImageResource(R.drawable.ic_destination_colored);
@@ -113,6 +124,14 @@ public class MapInputActivity extends RoboActivity implements OnMapReadyCallback
 		MapsInitializer.initialize(this);
 		googleMap.setMyLocationEnabled(true);
 		selectButton.setEnabled(true);
+
+		if (initialLocation != null && locationUtils.isEncodedLocation(initialLocation)) {
+			googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
+					new LatLng(
+							locationUtils.decodeLat(initialLocation),
+							locationUtils.decodeLng(initialLocation)),
+					10));
+		}
 	}
 
 }

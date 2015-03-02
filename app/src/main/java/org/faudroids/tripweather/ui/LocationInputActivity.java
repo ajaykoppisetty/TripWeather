@@ -9,6 +9,7 @@ import android.support.v7.widget.RecyclerView;
 import com.google.android.gms.maps.model.LatLng;
 
 import org.faudroids.tripweather.R;
+import org.faudroids.tripweather.geo.LocationUtils;
 import org.faudroids.tripweather.geo.PlacesService;
 
 import javax.inject.Inject;
@@ -36,6 +37,7 @@ public class LocationInputActivity extends RoboActivity implements LocationListe
 
 	@InjectView(R.id.list) RecyclerView list;
 	@Inject PlacesService placesService;
+	@Inject LocationUtils locationUtils;
 	private String currentLocation;
 	private boolean chooseFrom;
 
@@ -75,7 +77,7 @@ public class LocationInputActivity extends RoboActivity implements LocationListe
 		switch(requestCode) {
 			case REQUEST_LOCATION_FROM_MAP:
 				LatLng location = data.getParcelableExtra(MapInputActivity.EXTRA_LOCATION);
-				returnLocationResult(location.latitude + "," + location.longitude);
+				returnLocationResult(locationUtils.encodeCoordiantes(location.latitude, location.longitude));
 		}
 	}
 

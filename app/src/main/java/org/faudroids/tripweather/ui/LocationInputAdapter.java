@@ -160,7 +160,7 @@ public final class LocationInputAdapter extends RecyclerView.Adapter<LocationInp
 			mapLocation.setOnClickListener(new View.OnClickListener() {
 				@Override
 				public void onClick(View view) {
-					Intent intent = MapInputActivity.createIntent(context, !chooseFrom);
+					Intent intent = MapInputActivity.createIntent(context, !chooseFrom, currentLocation);
 					context.startActivityForResult(intent, LocationInputActivity.REQUEST_LOCATION_FROM_MAP);
 				}
 			});

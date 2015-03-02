@@ -15,14 +15,13 @@ import org.faudroids.tripweather.geo.GeoCodingException;
 import org.faudroids.tripweather.geo.GeoCodingService;
 import org.faudroids.tripweather.geo.GeoCodingUtils;
 import org.faudroids.tripweather.geo.Location;
+import org.faudroids.tripweather.geo.LocationUtils;
 import org.faudroids.tripweather.geo.WayPoint;
 import org.faudroids.tripweather.weather.Forecast;
 import org.faudroids.tripweather.weather.WeatherException;
 import org.faudroids.tripweather.weather.WeatherUtils;
 
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import javax.inject.Inject;
 
@@ -33,13 +32,12 @@ import timber.log.Timber;
 
 public final class DataManager {
 
-	private static final Pattern coordinatesLocationPattern = Pattern.compile("([0-9]{1,13}(\\.[0-9]*)?),([0-9]{1,13}(\\.[0-9]*)?)");
-
 	private final Context context;
 	private final GeoCodingService geoCodingService;
 	private final GeoCodingUtils geoCodingUtils;
 	private final DirectionsService directionsService;
 	private final DirectionsUtils directionsUtils;
+	private final LocationUtils locationUtils;
 	private final WeatherUtils forecastGenerator;
 
 	@Inject
@@ -49,6 +47,7 @@ public final class DataManager {
 			GeoCodingUtils geoCodingUtils,
 			DirectionsService directionsService,
 			DirectionsUtils directionsUtils,
+			LocationUtils locationUtils,
 			WeatherUtils forecastGenerator) {
 
 		this.context = context;
@@ -56,6 +55,7 @@ public final class DataManager {
 		this.geoCodingUtils = geoCodingUtils;
 		this.directionsService = directionsService;
 		this.directionsUtils = directionsUtils;
+		this.locationUtils = locationUtils;
 		this.forecastGenerator = forecastGenerator;
 	}
 
@@ -148,13 +148,11 @@ public final class DataManager {
 					});
 
 
-		} else if (coordinatesLocationPattern.matcher(locationDescription).matches()) {
-			Matcher matcher = coordinatesLocationPattern.matcher(locationDescription);
-			matcher.find();
+		} else if (locationUtils.isEncodedLocation(locationDescription)) {
 			return Observable.just(new Location(
 					locationDescription,
-					Double.valueOf(matcher.group(1)),
-					Double.valueOf(matcher.group(3))));
+					locationUtils.decodeLat(locationDescription),
+					locationUtils.decodeLng(locationDescription)));
 
 		} else {
 			return geoCodingService.getGeoCodeForAddress(locationDescription)
