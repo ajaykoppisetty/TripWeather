@@ -8,6 +8,7 @@
         <item name="android:background">@color/green_dark1</item>
         <item name="android:titleTextStyle">@style/ActionBarTextStyle</item>
         <item name="android:subtitleTextStyle">@style/ActionBarSubtitleStyle</item>
+        <item name="android:homeAsUpIndicator">@drawable/abc_ic_ab_back_mtrl_am_alpha</item>
         <item name="android:icon">@android:color/transparent</item>
     </style>
 

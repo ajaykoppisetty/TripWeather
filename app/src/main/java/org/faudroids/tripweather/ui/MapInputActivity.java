@@ -19,13 +19,12 @@ import org.faudroids.tripweather.geo.LocationUtils;
 
 import javax.inject.Inject;
 
-import roboguice.activity.RoboActivity;
 import roboguice.inject.ContentView;
 import roboguice.inject.InjectView;
 
 
 @ContentView(R.layout.activity_input_map)
-public class MapInputActivity extends RoboActivity implements OnMapReadyCallback {
+public class MapInputActivity extends AbstractBackActivity implements OnMapReadyCallback {
 
 	public static final String EXTRA_LOCATION = "EXTRA_LOCATION";
 

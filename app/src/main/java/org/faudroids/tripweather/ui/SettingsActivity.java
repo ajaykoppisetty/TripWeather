@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.preference.Preference;
 import android.text.Html;
 import android.text.method.LinkMovementMethod;
+import android.view.MenuItem;
 import android.widget.TextView;
 
 import org.faudroids.tripweather.R;
@@ -20,6 +21,8 @@ public final class SettingsActivity extends RoboPreferenceActivity {
 	@SuppressWarnings("deprecated")
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+
+		getActionBar().setDisplayHomeAsUpEnabled(true);
 		addPreferencesFromResource(R.xml.settings);
 
 		getPref(R.string.settings_version).setSummary(getVersion());
@@ -58,6 +61,17 @@ public final class SettingsActivity extends RoboPreferenceActivity {
 			Timber.e(nnfe, "failed to get version");
 			return null;
 		}
+	}
+
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		switch(item.getItemId()) {
+			case android.R.id.home:
+				finish();
+				return true;
+		}
+		return super.onOptionsItemSelected(item);
 	}
 
 }

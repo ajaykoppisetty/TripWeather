@@ -14,13 +14,12 @@ import org.faudroids.tripweather.geo.PlacesService;
 
 import javax.inject.Inject;
 
-import roboguice.activity.RoboActivity;
 import roboguice.inject.ContentView;
 import roboguice.inject.InjectView;
 
 
 @ContentView(R.layout.activity_input)
-public class LocationInputActivity extends RoboActivity implements LocationListener {
+public class LocationInputActivity extends AbstractBackActivity implements LocationListener {
 
 	static final int REQUEST_LOCATION_FROM_MAP = 42;
 
@@ -42,8 +41,9 @@ public class LocationInputActivity extends RoboActivity implements LocationListe
 	private boolean chooseFrom;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
 		currentLocation = getIntent().getStringExtra(EXTRA_LOCATION);
 		chooseFrom = getIntent().getBooleanExtra(EXTRA_FROM, false);
 		if (chooseFrom) getActionBar().setTitle(getString(R.string.input_choose_origin));
