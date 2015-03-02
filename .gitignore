@@ -12,6 +12,7 @@
 bin/
 gen/
 crashlytics-build.properties
+manifest-merger-release-report.txt
 
 # Gradle files
 .gradle/

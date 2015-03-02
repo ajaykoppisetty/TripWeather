@@ -56,6 +56,7 @@
         <meta-data
             android:name="com.crashlytics.ApiKey"
             android:value="d24b6175dc50a0705e30d49f9f580ca61cbddbed" />
+        <meta-data android:name="roboguice.annotations.packages" android:value="roboguice,org.faudroids.tripweather"/>
     </application>
 
 </manifest>
