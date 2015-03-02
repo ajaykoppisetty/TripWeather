@@ -1,6 +1,7 @@
 package org.faudroids.tripweather.ui;
 
-import android.content.Context;
+import android.app.Activity;
+import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -10,24 +11,26 @@ import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
 import android.widget.AutoCompleteTextView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import org.faudroids.tripweather.R;
 import org.faudroids.tripweather.geo.PlacesService;
 
 public final class LocationInputAdapter extends RecyclerView.Adapter<LocationInputAdapter.AbstractViewHolder> {
 
+	private final Activity context;
 	private final PlacesService placesService;
 	private final LocationListener locationListener;
 	private final String currentLocation;
 	private final boolean chooseFrom;
 
 	public LocationInputAdapter(
+			Activity context,
 			PlacesService placesService,
 			LocationListener locationListener,
 			String currentLocation,
 			boolean chooseFrom) {
 
+		this.context = context;
 		this.placesService = placesService;
 		this.locationListener = locationListener;
 		this.currentLocation = currentLocation;
@@ -41,9 +44,9 @@ public final class LocationInputAdapter extends RecyclerView.Adapter<LocationInp
 				.from(viewGroup.getContext());
 		switch(viewType) {
 			case InputViewHolder.VIEW_TYPE:
-				return new InputViewHolder(inflater.inflate(R.layout.card_input, viewGroup, false));
+				return new InputViewHolder(context, inflater.inflate(R.layout.card_input, viewGroup, false));
 			case CommonLocationsViewHolder.VIEW_TYPE:
-				return new CommonLocationsViewHolder(inflater.inflate(R.layout.card_locations_common, viewGroup, false));
+				return new CommonLocationsViewHolder(context, inflater.inflate(R.layout.card_locations_common, viewGroup, false));
 		}
 		return null;
 	}
@@ -74,11 +77,11 @@ public final class LocationInputAdapter extends RecyclerView.Adapter<LocationInp
 
 	abstract class AbstractViewHolder extends RecyclerView.ViewHolder {
 
-		protected final Context context;
+		protected final Activity context;
 
-		public AbstractViewHolder(View view) {
+		public AbstractViewHolder(Activity context, View view) {
 			super(view);
-			this.context = view.getContext();
+			this.context = context;
 		}
 
 		public abstract void onBindViewHolder();
@@ -91,8 +94,8 @@ public final class LocationInputAdapter extends RecyclerView.Adapter<LocationInp
 		private static final int VIEW_TYPE = 0;
 		private final AutoCompleteTextView autocompleteTextView;
 
-		public InputViewHolder(View view) {
-			super(view);
+		public InputViewHolder(Activity context, View view) {
+			super(context, view);
 			this.autocompleteTextView = (AutoCompleteTextView) view.findViewById(R.id.input);
 		}
 
@@ -115,8 +118,7 @@ public final class LocationInputAdapter extends RecyclerView.Adapter<LocationInp
 							return true;
 						}
 					}
-					return false;
-				}
+					return false; }
 			});
 			autocompleteTextView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
 				@Override
@@ -140,9 +142,8 @@ public final class LocationInputAdapter extends RecyclerView.Adapter<LocationInp
 		private final View yourLocation;
 		private final View mapLocation;
 
-		public CommonLocationsViewHolder(View view) {
-
-			super(view);
+		public CommonLocationsViewHolder(Activity context, View view) {
+			super(context, view);
 			this.yourLocation = view.findViewById(R.id.your_location);
 			this.mapLocation = view.findViewById(R.id.map_location);
 		}
@@ -159,8 +160,8 @@ public final class LocationInputAdapter extends RecyclerView.Adapter<LocationInp
 			mapLocation.setOnClickListener(new View.OnClickListener() {
 				@Override
 				public void onClick(View view) {
-					Toast.makeText(context, "Stub", Toast.LENGTH_SHORT).show();
-					// TODO
+					Intent intent = MapInputActivity.createIntent(context, !chooseFrom);
+					context.startActivityForResult(intent, LocationInputActivity.REQUEST_LOCATION_FROM_MAP);
 				}
 			});
 

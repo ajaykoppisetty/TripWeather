@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="249.21672"
+   height="339.9971"
+   id="svg2"
+   version="1.1"
+   inkscape:version="0.48.4 r9939"
+   inkscape:export-filename="/home/maddoc/android/TripWeather/app/src/main/res/drawable-mdpi/ic_destination_colored.png"
+   inkscape:export-xdpi="8.3060236"
+   inkscape:export-ydpi="8.3060236"
+   sodipodi:docname="ic_origin_colored.svg">
+  <defs
+     id="defs4">
+    <linearGradient
+       id="linearGradient7777">
+      <stop
+         style="stop-color:#23ff3a;stop-opacity:1;"
+         offset="0"
+         id="stop7779" />
+      <stop
+         style="stop-color:#009f10;stop-opacity:1;"
+         offset="1"
+         id="stop7781" />
+    </linearGradient>
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient7777"
+       id="linearGradient7783"
+       x1="250"
+       y1="642.36218"
+       x2="250"
+       y2="972.36218"
+       gradientUnits="userSpaceOnUse" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient7777"
+       id="linearGradient8683"
+       x1="320"
+       y1="1312.3622"
+       x2="320"
+       y2="1642.3622"
+       gradientUnits="userSpaceOnUse" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient7777"
+       id="linearGradient8685"
+       gradientUnits="userSpaceOnUse"
+       x1="320"
+       y1="1312.3622"
+       x2="320"
+       y2="1642.3622" />
+  </defs>
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="1.4"
+     inkscape:cx="148.13953"
+     inkscape:cy="89.466176"
+     inkscape:document-units="px"
+     inkscape:current-layer="layer1-5"
+     showgrid="true"
+     inkscape:snap-bbox="true"
+     fit-margin-top="0"
+     fit-margin-left="0"
+     fit-margin-right="0"
+     fit-margin-bottom="0"
+     inkscape:window-width="1916"
+     inkscape:window-height="1143"
+     inkscape:window-x="1680"
+     inkscape:window-y="36"
+     inkscape:window-maximized="0">
+    <inkscape:grid
+       type="xygrid"
+       id="grid2985"
+       empspacing="5"
+       visible="true"
+       enabled="true"
+       snapvisiblegridlinesonly="true"
+       spacingx="10px"
+       spacingy="10px"
+       originx="154.98336px"
+       originy="-94.990105px" />
+  </sodipodi:namedview>
+  <metadata
+     id="metadata7">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(154.98336,-617.37498)">
+    <path
+       style="fill:url(#linearGradient7783);fill-opacity:1;stroke:#137a00;stroke-width:10;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       d="m 250.38476,642.36218 c -100,0 -150,100 -100,200 50,100 100,130 100,130 0,0 50,-30 100,-130 50,-100 0,-200 -100,-200 z m 0,51.3125 c 32.41232,0 58.6875,26.27518 58.6875,58.6875 0,32.41232 -26.27518,58.6875 -58.6875,58.6875 -32.41232,0 -58.6875,-26.27518 -58.6875,-58.6875 0,-32.41232 26.27518,-58.6875 58.6875,-58.6875 z"
+       id="path2987"
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="zscszsssss"
+       inkscape:export-filename="/home/maddoc/android/TripWeather/app/src/main/res/drawable-mdpi/ic_location_colored.png"
+       inkscape:export-xdpi="8.3060484"
+       inkscape:export-ydpi="8.3060484" />
+    <g
+       transform="translate(-350,-690.00002)"
+       id="layer1-5"
+       inkscape:label="Layer 1"
+       style="fill:url(#linearGradient8683);fill-opacity:1;stroke:#137a00;stroke-width:10;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none">
+      <path
+         inkscape:connector-curvature="0"
+         id="path2987-7"
+         d="m 319.61524,1312.3622 c -100,0 -150,100 -100,200 50,100 100,130 100,130 0,0 50,-30 100,-130 50,-100 0,-200 -100,-200 z m -8.3125,30 17.40625,0 0,11.5937 c 34.1192,2.3173 57.40147,25.5683 59.71875,59.6875 l 11.5625,0 0,17.4375 -11.5625,0 c -2.31728,34.1192 -25.59955,57.3702 -59.71875,59.6875 l 0,11.5938 -17.40625,0 0,-11.5938 c -34.11704,-2.3173 -57.37238,-25.5683 -59.6875,-59.6875 l -11.625,0 0,-17.4375 11.625,0 c 2.31512,-34.1192 25.57046,-57.3702 59.6875,-59.6875 z m 0,28.4375 c -24.835,2.2371 -40.63786,18.0087 -42.875,42.8437 l 28.03125,0 0,17.4375 -28.03125,0 c 2.23714,24.835 18.04,40.6066 42.875,42.8438 l 0,-28.0313 17.40625,0 0,28.0313 c 24.835,-2.2372 40.60661,-18.0088 42.84375,-42.8438 l -28.03125,0 0,-17.4375 28.03125,0 c -2.23714,-24.835 -18.00875,-40.6066 -42.84375,-42.8437 l 0,28.0312 -17.40625,0 z"
+         style="fill:url(#linearGradient8685);fill-opacity:1;stroke:#137a00;stroke-width:10;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+         sodipodi:nodetypes="sscsscccccccccccccccccccccccccccccccccc"
+         inkscape:export-filename="/home/maddoc/android/TripWeather/app/src/main/res/drawable-xxxhdpi/ic_location_colored.png"
+         inkscape:export-xdpi="33"
+         inkscape:export-ydpi="33" />
+    </g>
+  </g>
+</svg>

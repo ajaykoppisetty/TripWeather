@@ -113,5 +113,7 @@
     <string name="input_choose_location">Choose location</string>
     <string name="input_your_location">Your location</string>
     <string name="input_choose_from_map">Choose from map</string>
+    <string name="input_map_select">Select</string>
+    <string name="input_map_cancel">Cancel</string>
 
 </resources>

@@ -6,6 +6,8 @@ import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 
+import com.google.android.gms.maps.model.LatLng;
+
 import org.faudroids.tripweather.R;
 import org.faudroids.tripweather.geo.PlacesService;
 
@@ -18,6 +20,8 @@ import roboguice.inject.InjectView;
 
 @ContentView(R.layout.activity_input)
 public class LocationInputActivity extends RoboActivity implements LocationListener {
+
+	static final int REQUEST_LOCATION_FROM_MAP = 42;
 
 	static final String EXTRA_LOCATION = "EXTRA_LOCATION";
 	static final String EXTRA_FROM = "EXTRA_FROM";
@@ -46,7 +50,7 @@ public class LocationInputActivity extends RoboActivity implements LocationListe
 		RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
 		list.setHasFixedSize(true);
 		list.setLayoutManager(layoutManager);
-		list.setAdapter(new LocationInputAdapter(placesService, this, currentLocation, chooseFrom));
+		list.setAdapter(new LocationInputAdapter(this, placesService, this, currentLocation, chooseFrom));
     }
 
 
@@ -61,6 +65,22 @@ public class LocationInputActivity extends RoboActivity implements LocationListe
 
 	@Override
 	public void onLocationSelected(String location) {
+		returnLocationResult(location);
+	}
+
+
+	@Override
+	public void onActivityResult(int requestCode, int resultCode, Intent data) {
+		if (resultCode == RESULT_CANCELED) return;
+		switch(requestCode) {
+			case REQUEST_LOCATION_FROM_MAP:
+				LatLng location = data.getParcelableExtra(MapInputActivity.EXTRA_LOCATION);
+				returnLocationResult(location.latitude + "," + location.longitude);
+		}
+	}
+
+
+	private void returnLocationResult(String location) {
 		Intent resultIntent = new Intent();
 		resultIntent.putExtra(EXTRA_LOCATION, location);
 		resultIntent.putExtra(EXTRA_FROM, chooseFrom);

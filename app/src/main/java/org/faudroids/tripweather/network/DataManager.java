@@ -21,6 +21,8 @@ import org.faudroids.tripweather.weather.WeatherException;
 import org.faudroids.tripweather.weather.WeatherUtils;
 
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.inject.Inject;
 
@@ -30,6 +32,8 @@ import rx.functions.Func2;
 import timber.log.Timber;
 
 public final class DataManager {
+
+	private static final Pattern coordinatesLocationPattern = Pattern.compile("([0-9]{1,13}(\\.[0-9]*)?),([0-9]{1,13}(\\.[0-9]*)?)");
 
 	private final Context context;
 	private final GeoCodingService geoCodingService;
@@ -143,6 +147,14 @@ public final class DataManager {
 						}
 					});
 
+
+		} else if (coordinatesLocationPattern.matcher(locationDescription).matches()) {
+			Matcher matcher = coordinatesLocationPattern.matcher(locationDescription);
+			matcher.find();
+			return Observable.just(new Location(
+					locationDescription,
+					Double.valueOf(matcher.group(1)),
+					Double.valueOf(matcher.group(3))));
 
 		} else {
 			return geoCodingService.getGeoCodeForAddress(locationDescription)
