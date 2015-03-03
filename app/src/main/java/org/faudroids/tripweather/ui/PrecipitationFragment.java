@@ -40,7 +40,7 @@ public class PrecipitationFragment extends RoboFragment {
 	private static final String EXTRA_FORECASTS = "EXTRA_FORECASTS";
 	private static final String STATE_SHOW_RAIN = "STATE_SHOW_RAIN";
 
-	private static final DecimalFormat yLabelsFormat = new DecimalFormat("####.##");
+	private static final DecimalFormat yLabelsFormat = new DecimalFormat("####.###");
 
 
 	public static PrecipitationFragment createInstance(Forecast[] forecasts) {
