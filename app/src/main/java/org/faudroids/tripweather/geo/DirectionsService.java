@@ -9,6 +9,6 @@ import rx.Observable;
 public interface DirectionsService {
 
     @GET("/json?sensor=true&units=metric")
-    public Observable<ObjectNode> getRoute(@Query("origin") String start, @Query("destination") String end);
+    public Observable<ObjectNode> getRoute(@Query("origin") String start, @Query("destination") String end, @Query("mode") String travelMode);
 
 }

@@ -6,6 +6,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.util.TypedValue;
 import android.view.View;
 import android.view.animation.Animation;
@@ -21,6 +22,7 @@ import com.google.android.gms.location.LocationServices;
 import org.faudroids.tripweather.R;
 import org.faudroids.tripweather.geo.DirectionsException;
 import org.faudroids.tripweather.geo.GeoCodingException;
+import org.faudroids.tripweather.geo.TravelMode;
 import org.faudroids.tripweather.network.DataManager;
 import org.faudroids.tripweather.network.TripData;
 import org.faudroids.tripweather.weather.WeatherException;
@@ -289,6 +291,11 @@ public class MainActivity extends RoboActivity implements GoogleApiClient.OnConn
 		if (locationFrom == null || locationTo == null || startTime == 0) return;
 		if (!googleApiClient.isConnected()) return;
 
+		final TravelMode travelMode = TravelMode.valueOf(
+				PreferenceManager
+						.getDefaultSharedPreferences(this)
+						.getString(getString(R.string.settings_travel_mode), null));
+
 		tripDataDownload.add(Observable
 				.just(null)
 				.delay(1, TimeUnit.SECONDS)
@@ -307,7 +314,7 @@ public class MainActivity extends RoboActivity implements GoogleApiClient.OnConn
 						});
 
 						tripDataDownload.add(dataManager
-								.getData(googleApiClient, locationFrom, locationTo, startTime)
+								.getData(googleApiClient, locationFrom, locationTo, travelMode, startTime)
 								.subscribeOn(Schedulers.io())
 								.observeOn(AndroidSchedulers.mainThread())
 								.subscribe(new Action1<TripData>() {

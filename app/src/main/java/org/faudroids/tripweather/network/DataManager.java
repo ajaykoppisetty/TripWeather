@@ -16,6 +16,7 @@ import org.faudroids.tripweather.geo.GeoCodingService;
 import org.faudroids.tripweather.geo.GeoCodingUtils;
 import org.faudroids.tripweather.geo.Location;
 import org.faudroids.tripweather.geo.LocationUtils;
+import org.faudroids.tripweather.geo.TravelMode;
 import org.faudroids.tripweather.geo.WayPoint;
 import org.faudroids.tripweather.weather.Forecast;
 import org.faudroids.tripweather.weather.WeatherException;
@@ -64,6 +65,7 @@ public final class DataManager {
 			GoogleApiClient googleApiClient,
 			String fromLocationDescription,
 			String toLocationDescription,
+			final TravelMode travelMode,
 			final long timestamp) {
 
 		return Observable
@@ -82,7 +84,7 @@ public final class DataManager {
 						String start = locations.first.getLat() + "," + locations.first.getLng();
 						String end = locations.second.getLat() + "," + locations.second.getLng();
 						return directionsService
-								.getRoute(start, end)
+								.getRoute(start, end, travelMode.toString())
 								.map(new Func1<ObjectNode, TripData.Builder>() {
 									@Override
 									public TripData.Builder call(ObjectNode objectNode) {

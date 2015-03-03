@@ -43,6 +43,17 @@
         <item quantity="other">Warnings!</item>
     </plurals>
 
+    <string name="settings_travel_mode">travel_mode</string>
+    <string-array name="settings_travel_mode_descriptions">
+        <item>Driving</item>
+        <item>Walking</item>
+        <item>Bicycling</item>
+    </string-array>
+    <string-array name="settings_travel_mode_values">
+        <item>DRIVING</item>
+        <item>WALKING</item>
+        <item>BICYCLING</item>
+    </string-array>
     <string name="settings_version">version</string>
     <string name="settings_about">about</string>
     <string name="settings_about_title">About</string>

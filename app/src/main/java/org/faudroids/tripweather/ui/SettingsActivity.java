@@ -4,6 +4,7 @@ package org.faudroids.tripweather.ui;
 import android.app.AlertDialog;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.preference.ListPreference;
 import android.preference.Preference;
 import android.text.Html;
 import android.text.method.LinkMovementMethod;
@@ -25,6 +26,8 @@ public final class SettingsActivity extends RoboPreferenceActivity {
 		getActionBar().setDisplayHomeAsUpEnabled(true);
 		addPreferencesFromResource(R.xml.settings);
 
+		ListPreference travelModePref = (ListPreference) getPref(R.string.settings_travel_mode);
+		travelModePref.setSummary(travelModePref.getEntry());
 		getPref(R.string.settings_version).setSummary(getVersion());
 		setOnClickDialogForPref(R.string.settings_about, R.string.settings_about_title, R.string.settings_about_msg);
 		setOnClickDialogForPref(R.string.settings_credits, R.string.settings_credits_title, R.string.settings_credits_msg);
