@@ -7,6 +7,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import com.github.mikephil.charting.charts.CombinedChart;
 import com.github.mikephil.charting.components.XAxis;
@@ -22,7 +23,6 @@ import com.github.mikephil.charting.utils.ValueFormatter;
 
 import org.faudroids.tripweather.R;
 import org.faudroids.tripweather.weather.Forecast;
-import org.faudroids.tripweather.weather.ForecastMode;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -54,6 +54,8 @@ public class PrecipitationFragment extends RoboFragment {
 
 
 	@InjectView(R.id.graph) CombinedChart combinedChart;
+	@InjectView(R.id.description)
+	TextView descriptionView;
 	@Inject GraphUtils graphUtils;
 	private boolean showRain = true;
 
@@ -110,18 +112,20 @@ public class PrecipitationFragment extends RoboFragment {
 
 		combinedChart.setData(combinedData);
 		combinedChart.invalidate();
-		styleGraph(forecasts[0].getForecastMode());
+		styleGraph();
+
+		// update title
+		int hoursOfForecast = forecasts[0].getForecastMode().getHourInterval();
+		String title = (showRain)
+				? getString(R.string.graph_rain_legend, hoursOfForecast)
+				: getString(R.string.graph_snow_legend, hoursOfForecast);
+		descriptionView.setText(title);
 	}
 
 
-	private void styleGraph(ForecastMode forecastMode) {
-		int hoursOfForecast = forecastMode.getHourInterval();
-		String description = (showRain)
-				? getString(R.string.graph_rain_legend, hoursOfForecast)
-				: getString(R.string.graph_snow_legend, hoursOfForecast);
+	private void styleGraph() {
 		combinedChart.getLegend().setEnabled(false);
-		combinedChart.setDescription(description);
-		combinedChart.setDescriptionTextSize(16);
+		combinedChart.setDescription("");
 
 		XAxis xAxis = combinedChart.getXAxis();
 		xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
