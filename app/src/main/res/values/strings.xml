@@ -108,6 +108,8 @@
     <string name="graph_snow_legend">Snow (measured over %1$d hours)</string>
     <string name="graph_show_rain">Show rain</string>
     <string name="graph_show_snow">Show snow</string>
+    <string name="graph_no_rain">No rain predicted!</string>
+    <string name="graph_no_snow">No snow predicted!</string>
 
     <string name="input_choose_origin">Choose start</string>
     <string name="input_choose_destination">Choose destination</string>

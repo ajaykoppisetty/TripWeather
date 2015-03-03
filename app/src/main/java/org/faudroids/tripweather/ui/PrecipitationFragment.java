@@ -53,9 +53,14 @@ public class PrecipitationFragment extends RoboFragment {
 	}
 
 
+	@InjectView(R.id.graph_layout) View graphLayout;
 	@InjectView(R.id.graph) CombinedChart combinedChart;
-	@InjectView(R.id.description)
-	TextView descriptionView;
+	@InjectView(R.id.description) TextView graphDescription;
+
+	@InjectView(R.id.empty_layout) View emptyLayout;
+	@InjectView(R.id.empty_description) TextView emptyDescription;
+
+
 	@Inject GraphUtils graphUtils;
 	private boolean showRain = true;
 
@@ -70,13 +75,36 @@ public class PrecipitationFragment extends RoboFragment {
 		super.onActivityCreated(savedInstanceState);
 
 		if (savedInstanceState != null) showRain = savedInstanceState.getBoolean(STATE_SHOW_RAIN);
-		updateGraph();
+		updateForecast();
 	}
 
 
-	private void updateGraph() {
+	private void updateForecast() {
 		Forecast[] forecasts = (Forecast[]) getArguments().getParcelableArray(EXTRA_FORECASTS);
 
+		boolean isEmpty = true;
+		for (Forecast forecast : forecasts) {
+			if ((showRain && forecast.getRain() > 0) || (!showRain && forecast.getSnow() > 0)) {
+				isEmpty = false;
+				break;
+			}
+		}
+
+		if (isEmpty) {
+			graphLayout.setVisibility(View.GONE);
+			emptyLayout.setVisibility(View.VISIBLE);
+			if (showRain) emptyDescription.setText(getString(R.string.graph_no_rain));
+			else emptyDescription.setText(getString(R.string.graph_no_snow));
+
+		} else {
+			graphLayout.setVisibility(View.VISIBLE);
+			emptyLayout.setVisibility(View.GONE);
+			updateGraph(forecasts);
+		}
+	}
+
+
+	private void updateGraph(Forecast[] forecasts) {
 		long startTimestamp = forecasts[0].getTimestamp();
 		long endTimestamp = forecasts[forecasts.length - 1].getTimestamp();
 
@@ -119,7 +147,7 @@ public class PrecipitationFragment extends RoboFragment {
 		String title = (showRain)
 				? getString(R.string.graph_rain_legend, hoursOfForecast)
 				: getString(R.string.graph_snow_legend, hoursOfForecast);
-		descriptionView.setText(title);
+		graphDescription.setText(title);
 	}
 
 
@@ -195,7 +223,7 @@ public class PrecipitationFragment extends RoboFragment {
 		switch (item.getItemId()) {
 			case R.id.toggle:
 				showRain = !showRain;
-				updateGraph();
+				updateForecast();
 				getActivity().invalidateOptionsMenu();
 				return true;
 		}

@@ -4,22 +4,57 @@
     android:layout_height="match_parent"
     android:layout_width="match_parent">
 
-    <TextView
-        android:id="@+id/description"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:padding="@dimen/padding_small"
-        android:textSize="@dimen/main_menu_font_small"
-        android:gravity="center"
-        style="@style/DefaultTextStyleBlack"
-        />
-
-    <com.github.mikephil.charting.charts.CombinedChart
-        android:id="@+id/graph"
+    <RelativeLayout
+        android:id="@+id/graph_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_above="@id/description"
-        />
+        >
+
+        <TextView
+            android:id="@+id/description"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:padding="@dimen/padding_small"
+            android:textSize="@dimen/main_menu_font_small"
+            android:gravity="center"
+            style="@style/DefaultTextStyleBlack"
+            />
+
+        <com.github.mikephil.charting.charts.CombinedChart
+            android:id="@+id/graph"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_above="@id/description"
+            />
+
+        </RelativeLayout>
+
+    <LinearLayout
+        android:id="@+id/empty_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        >
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="@dimen/padding_default"
+            android:src="@drawable/ic_weather"
+            style="@style/DefaultTextStyleBlack"
+            />
+
+        <TextView
+            android:id="@+id/empty_description"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="@dimen/padding_default"
+            android:text="@string/graph_no_rain"
+            style="@style/DefaultTextStyleBlack"
+            />
+
+        </LinearLayout>
+
 
     </RelativeLayout>
