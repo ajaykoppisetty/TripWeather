@@ -8,6 +8,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
 
 import org.faudroids.tripweather.R;
 
@@ -35,6 +36,7 @@ public class TimeInputActivity extends AbstractBackActivity implements TimeListe
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+		findViewById(R.id.google_logo).setVisibility(View.GONE);
 
 		if (savedInstanceState != null) currentTime = savedInstanceState.getLong(STATE_CURRENT_TIME);
 		else currentTime = getIntent().getLongExtra(EXTRA_TIME, 0);
