@@ -6,12 +6,12 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.github.mikephil.charting.charts.LineChart;
+import com.github.mikephil.charting.components.XAxis;
+import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
 import com.github.mikephil.charting.utils.ValueFormatter;
-import com.github.mikephil.charting.utils.XLabels;
-import com.github.mikephil.charting.utils.YLabels;
 
 import org.faudroids.tripweather.R;
 import org.faudroids.tripweather.weather.Forecast;
@@ -23,24 +23,22 @@ import java.util.TreeMap;
 import javax.inject.Inject;
 
 import roboguice.fragment.RoboFragment;
-import roboguice.inject.ContentView;
 import roboguice.inject.InjectView;
 import timber.log.Timber;
 
 
-@ContentView(R.layout.fragment_graph)
-public class GraphFragment extends RoboFragment {
+public class TemperatureFragment extends RoboFragment {
 
 	private static final String EXTRA_FORECASTS = "EXTRA_FORECASTS";
 
 	private static final DecimalFormat yLabelsFormat = new DecimalFormat("##.#");
 
 
-	public static GraphFragment createInstance(Forecast[] forecasts) {
+	public static TemperatureFragment createInstance(Forecast[] forecasts) {
 		Bundle bundle = new Bundle();
 		bundle.putParcelableArray(EXTRA_FORECASTS, forecasts);
 
-		GraphFragment fragment = new GraphFragment();
+		TemperatureFragment fragment = new TemperatureFragment();
 		fragment.setArguments(bundle);
 		return fragment;
 	}
@@ -51,7 +49,7 @@ public class GraphFragment extends RoboFragment {
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-		return inflater.inflate(R.layout.fragment_graph, container, false);
+		return inflater.inflate(R.layout.fragment_temperature, container, false);
 	}
 
 
@@ -81,27 +79,26 @@ public class GraphFragment extends RoboFragment {
 		styleTemperatureLine(dataSet);
 		LineData lineData = new LineData(xValues, dataSet);
 		lineChart.setData(lineData);
-		lineChart.setStartAtZero(false);
 		styleGraph(lineChart);
 	}
 
 
 	private void styleGraph(LineChart lineChart) {
 		lineChart.setDescription("");
-		lineChart.setDrawYValues(false);
-		lineChart.setDrawLegend(false);
+		lineChart.getLegend().setEnabled(false);
 
-		XLabels xLabels = lineChart.getXLabels();
-		xLabels.setPosition(XLabels.XLabelPosition.BOTTOM);
+		XAxis xAxis = lineChart.getXAxis();
+		xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
 
-		YLabels yLabels = lineChart.getYLabels();
-		yLabels.setPosition(YLabels.YLabelPosition.LEFT);
-		yLabels.setFormatter(new ValueFormatter() {
+		lineChart.getAxisRight().setEnabled(false);
+		YAxis yAxis = lineChart.getAxisLeft();
+		yAxis.setValueFormatter(new ValueFormatter() {
 			@Override
 			public String getFormattedValue(float v) {
 				return yLabelsFormat.format(v) + " " + (char) 0x00B0 + "C";
 			}
 		});
+		yAxis.setStartAtZero(false);
 	}
 
 

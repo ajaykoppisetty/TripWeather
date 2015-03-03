@@ -24,10 +24,11 @@ final class TabsPagerAdapter extends FragmentPagerAdapter {
 
 	@Override
 	public Fragment getItem(int position) {
+		Forecast[] forecasts = tripData.getForecasts().toArray(new Forecast[tripData.getForecasts().size()]);
 		switch(position) {
 			case 0: return MapFragment.createInstance(tripData);
-			case 1: return GraphFragment.createInstance(
-					tripData.getForecasts().toArray(new Forecast[tripData.getForecasts().size()]));
+			case 1: return TemperatureFragment.createInstance(forecasts);
+			case 2: return PrecipitationFragment.createInstance(forecasts);
 		}
 		return null;
 	}
@@ -35,7 +36,7 @@ final class TabsPagerAdapter extends FragmentPagerAdapter {
 
 	@Override
 	public int getCount() {
-		return 2;
+		return 3;
 	}
 
 
@@ -44,6 +45,7 @@ final class TabsPagerAdapter extends FragmentPagerAdapter {
 		switch(position) {
 			case 0: return context.getString(R.string.tab_map);
 			case 1: return context.getString(R.string.tab_temperature);
+			case 2: return context.getString(R.string.tab_precipitation);
 		}
 		return null;
 	}

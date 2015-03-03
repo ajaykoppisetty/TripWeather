@@ -134,14 +134,34 @@ public final class WeatherUtils {
 
 		long previousTimestamp = parseTimestamp(previousWeather);
 		long nextTimestamp = parseTimestamp(nextWeather);
-		double previousTemp = parseTemperature(previousWeather, forecastMode);
-		double nextTemp = parseTemperature(nextWeather, forecastMode);
 
-		double interpolationWeight = (builder.timestamp() - previousTimestamp) / ((double) nextTimestamp - previousTimestamp);
-		double temperature = previousTemp + interpolationWeight * (nextTemp - previousTemp);
-		Timber.d("builder time = " + builder.timestamp() + ", prev time = " + previousTimestamp + ", next time = " + nextTimestamp);
-		Timber.d("previous temp = " + previousTemp + ", next temp " + nextTemp + ", weight = " + interpolationWeight + ", temp = " + temperature);
-		return builder.temperature(temperature).build();
+		double temperature = interpolateValue(
+				builder.timestamp(),
+				previousTimestamp,
+				parseTemperature(previousWeather, forecastMode),
+				nextTimestamp,
+				parseTemperature(nextWeather, forecastMode));
+
+		double rain = interpolateValue(
+				builder.timestamp(),
+				previousTimestamp,
+				parseRain(previousWeather, forecastMode),
+				nextTimestamp,
+				parseRain(nextWeather, forecastMode));
+
+		double snow = interpolateValue(
+				builder.timestamp(),
+				previousTimestamp,
+				parseSnow(previousWeather, forecastMode),
+				nextTimestamp,
+				parseSnow(nextWeather, forecastMode));
+
+		return builder
+				.forecastMode(forecastMode)
+				.temperature(temperature)
+				.rain(rain)
+				.snow(snow)
+				.build();
 	}
 
 
@@ -151,8 +171,26 @@ public final class WeatherUtils {
 	}
 
 
+	private double parseRain(JsonNode data, ForecastMode mode) {
+		if (mode.equals(ForecastMode.SIXTEEN_DAYS)) return data.path("rain").asDouble();
+		else return data.path("rain").path("3h").asDouble();
+	}
+
+
+	private double parseSnow(JsonNode data, ForecastMode mode) {
+		if (mode.equals(ForecastMode.SIXTEEN_DAYS)) return data.path("snow").asDouble();
+		else return data.path("snow").path("3h").asDouble();
+	}
+
+
 	private long parseTimestamp(JsonNode weatherEntry) {
 		return weatherEntry.path("dt").asLong();
+	}
+
+
+	private double interpolateValue(long time, long prevTime, double prevValue, long nextTime, double nextValue) {
+		double interpolationWeight = (time - prevTime) / ((double) nextTime - prevTime);
+		return prevValue + interpolationWeight * (nextValue - prevValue);
 	}
 
 }

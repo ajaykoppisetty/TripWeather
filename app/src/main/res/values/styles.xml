@@ -2,6 +2,7 @@
 
     <style name="AppTheme" parent="android:Theme.Holo.Light">
         <item name="android:actionBarStyle">@style/DefaultActionBar</item>
+        <item name="android:actionMenuTextColor">@android:color/white</item>
     </style>
 
     <style name="DefaultActionBar" parent="android:style/Widget.Holo.Light.ActionBar">
