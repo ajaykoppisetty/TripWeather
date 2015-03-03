@@ -18,7 +18,7 @@
         app:pstsTextStyle="normal"
         app:pstsIndicatorColor="@color/green"
         app:pstsIndicatorHeight="8dp"
-        app:pstsShouldExpand="true"
+        app:pstsShouldExpand="@bool/tabs_expand"
         />
 
     <android.support.v4.view.ViewPager
