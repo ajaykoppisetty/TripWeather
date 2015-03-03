@@ -50,4 +50,5 @@
 -dontwarn sun.misc.Unsafe
 -dontwarn roboguice.**
 -dontwarn retrofit.**
+-dontwarn com.github.mikephil.**
 -dontwarn org.w3c.dom.bootstrap.DOMImplementationRegistry
