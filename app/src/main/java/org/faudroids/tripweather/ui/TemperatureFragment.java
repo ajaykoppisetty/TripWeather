@@ -104,6 +104,7 @@ public class TemperatureFragment extends RoboFragment {
 
 	private void styleTemperatureLine(LineDataSet dataSet) {
 		dataSet.setDrawCubic(true);
+		dataSet.setCubicIntensity(0.1f);
 		dataSet.setLineWidth(4f);
 		dataSet.setCircleSize(8f);
 	}

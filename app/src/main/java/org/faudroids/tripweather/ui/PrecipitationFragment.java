@@ -161,6 +161,7 @@ public class PrecipitationFragment extends RoboFragment {
 		int color = (showRain) ? R.color.blue : android.R.color.white;
 		dataSet.setColor(getResources().getColor(color));
 		dataSet.setDrawCubic(true);
+		dataSet.setCubicIntensity(0.1f);
 		dataSet.setLineWidth(4f);
 		dataSet.setCircleSize(0f);
 		dataSet.setDrawValues(false);
