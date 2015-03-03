@@ -112,21 +112,21 @@ public class MapFragment extends RoboFragment implements OnMapReadyCallback {
 
 	@Override
 	public void onPause() {
-		mapView.onPause();
+		if (mapView != null) mapView.onPause();
 		super.onPause();
 	}
 
 
 	@Override
 	public void onDestroy() {
-		mapView.onDestroy();
+		if (mapView != null) mapView.onDestroy();
 		super.onDestroy();
 	}
 
 
 	@Override
 	public void onSaveInstanceState(Bundle savedInstanceState) {
-		mapView.onSaveInstanceState(savedInstanceState);
+		if (mapView != null) mapView.onSaveInstanceState(savedInstanceState);
 		super.onSaveInstanceState(savedInstanceState);
 	}
 
