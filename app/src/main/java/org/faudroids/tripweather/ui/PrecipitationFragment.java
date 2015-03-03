@@ -12,9 +12,6 @@ import android.widget.TextView;
 import com.github.mikephil.charting.charts.CombinedChart;
 import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.components.YAxis;
-import com.github.mikephil.charting.data.BarData;
-import com.github.mikephil.charting.data.BarDataSet;
-import com.github.mikephil.charting.data.BarEntry;
 import com.github.mikephil.charting.data.CombinedData;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
@@ -113,29 +110,21 @@ public class PrecipitationFragment extends RoboFragment {
 		for (String xValue : xValues) Timber.d("xValue " + xValue);
 
 		// data entries
-		TreeMap<Integer, BarEntry> barEntries = new TreeMap<>();
 		TreeMap<Integer, Entry> lineEntries = new TreeMap<>();
 
 		for (Forecast forecast : forecasts) {
 			int xValue = graphUtils.createIndexFromTimestamp(startTimestamp, forecast.getTimestamp());
 			Timber.d("xValue = " + xValue);
 			float yValue = (showRain) ? (float) forecast.getRain() : (float) forecast.getSnow();
-			barEntries.put(xValue, new BarEntry(yValue, xValue));
 			lineEntries.put(xValue, new Entry(yValue, xValue));
 		}
 
 		// put data onto the graph!
-		Timber.d("there are " + barEntries.size() + " y values and " + xValues.size() + " x values");
-		BarData barData = new BarData();
-		barData.addDataSet(new BarDataSet(new ArrayList<>(barEntries.values()), ""));
-		styleDataSet(barData.getDataSetByIndex(0));
-
 		LineData lineData = new LineData();
 		lineData.addDataSet(new LineDataSet(new ArrayList<>(lineEntries.values()), ""));
 		styleDataSet(lineData.getDataSetByIndex(0));
 
 		CombinedData combinedData = new CombinedData(xValues);
-		combinedData.setData(barData);
 		combinedData.setData(lineData);
 
 		combinedChart.setData(combinedData);
@@ -171,20 +160,6 @@ public class PrecipitationFragment extends RoboFragment {
 	}
 
 
-	private void styleDataSet(BarDataSet dataSet) {
-		int color = (showRain) ? R.color.blue : android.R.color.white;
-		dataSet.setColor(getResources().getColor(color));
-		dataSet.setBarShadowColor(getResources().getColor(android.R.color.transparent));
-		dataSet.setValueFormatter(new ValueFormatter() {
-			@Override
-			public String getFormattedValue(float value) {
-				if (value < 0.001) return "";
-				else return yLabelsFormat.format(value);
-			}
-		});
-	}
-
-
 	private void styleDataSet(LineDataSet dataSet) {
 		int color = (showRain) ? R.color.blue : android.R.color.white;
 		dataSet.setColor(getResources().getColor(color));
@@ -192,8 +167,15 @@ public class PrecipitationFragment extends RoboFragment {
 		dataSet.setCubicIntensity(0.1f);
 		dataSet.setLineWidth(4f);
 		dataSet.setCircleSize(0f);
-		dataSet.setDrawValues(false);
 		dataSet.setDrawFilled(true);
+		dataSet.setDrawValues(true);
+		dataSet.setValueFormatter(new ValueFormatter() {
+			@Override
+			public String getFormattedValue(float value) {
+				if (value < 0.001) return "";
+				else return yLabelsFormat.format(value);
+			}
+		});
 	}
 
 
