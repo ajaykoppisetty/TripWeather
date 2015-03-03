@@ -8,6 +8,8 @@ import android.content.IntentSender;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.util.TypedValue;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
@@ -46,7 +48,9 @@ import timber.log.Timber;
 
 
 @ContentView(R.layout.activity_main)
-public class MainActivity extends RoboActivity implements GoogleApiClient.OnConnectionFailedListener {
+public class MainActivity extends RoboActivity implements
+		GoogleApiClient.OnConnectionFailedListener,
+		GoogleApiClient.ConnectionCallbacks {
 
 	private static final PrettyTime prettyTime = new PrettyTime();
 
@@ -89,9 +93,13 @@ public class MainActivity extends RoboActivity implements GoogleApiClient.OnConn
 	private CompositeSubscription tripDataDownload = new CompositeSubscription();
 	private ProgressDialog progressDialog;
 
+	private MenuItem goMenuItem;
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+
+		PreferenceManager.setDefaultValues(this, R.xml.settings, false);
 
 		googleApiClient = createGoogleApiClient();
 		googleApiClient.connect();
@@ -182,10 +190,12 @@ public class MainActivity extends RoboActivity implements GoogleApiClient.OnConn
 		shrinkAnim.start();
 		shrinkAnim.setAnimationListener(new Animation.AnimationListener() {
 			@Override
-			public void onAnimationStart(Animation animation) { }
+			public void onAnimationStart(Animation animation) {
+			}
 
 			@Override
-			public void onAnimationRepeat(Animation animation) { }
+			public void onAnimationRepeat(Animation animation) {
+			}
 
 			@Override
 			public void onAnimationEnd(Animation animation) {
@@ -253,6 +263,7 @@ public class MainActivity extends RoboActivity implements GoogleApiClient.OnConn
 		}
 
 		updateInputViews();
+		toggleGoMenuItem();
 	}
 
 
@@ -287,9 +298,26 @@ public class MainActivity extends RoboActivity implements GoogleApiClient.OnConn
 	}
 
 
+	@Override
+	public void onConnected(Bundle bundle) {
+		toggleGoMenuItem();
+	}
+
+
+	@Override
+	public void onConnectionSuspended(int i) {
+		toggleGoMenuItem();
+	}
+
+
+	private boolean isInputComplete() {
+		if (locationFrom == null || locationTo == null || startTime == 0) return false;
+		return googleApiClient.isConnected();
+	}
+
+
 	private void checkInputAndShowDetailsActivity() {
-		if (locationFrom == null || locationTo == null || startTime == 0) return;
-		if (!googleApiClient.isConnected()) return;
+		if (!isInputComplete()) return;
 
 		final TravelMode travelMode = TravelMode.valueOf(
 				PreferenceManager
@@ -298,7 +326,7 @@ public class MainActivity extends RoboActivity implements GoogleApiClient.OnConn
 
 		tripDataDownload.add(Observable
 				.just(null)
-				.delay(1, TimeUnit.SECONDS)
+				.delay(500, TimeUnit.MILLISECONDS)
 				.subscribeOn(Schedulers.io())
 				.observeOn(AndroidSchedulers.mainThread())
 				.subscribe(new Action1<Object>() {
@@ -320,9 +348,10 @@ public class MainActivity extends RoboActivity implements GoogleApiClient.OnConn
 								.subscribe(new Action1<TripData>() {
 									@Override
 									public void call(TripData tripData) {
-										dismissProgressAndResetSubscription();
 										Intent intent = DetailsActivity.createIntent(MainActivity.this, tripData);
 										startActivity(intent);
+										dismissProgressAndResetSubscription();
+										toggleGoMenuItem();
 									}
 								}, new Action1<Throwable>() {
 									@Override
@@ -348,9 +377,37 @@ public class MainActivity extends RoboActivity implements GoogleApiClient.OnConn
 
 	private GoogleApiClient createGoogleApiClient() {
 		return new GoogleApiClient.Builder(this)
+				.addConnectionCallbacks(this)
 				.addOnConnectionFailedListener(this)
 				.addApi(LocationServices.API)
 				.build();
+	}
+
+
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		getMenuInflater().inflate(R.menu.menu_main, menu);
+		goMenuItem = menu.findItem(R.id.go);
+		toggleGoMenuItem();
+		return true;
+	}
+
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		switch(item.getItemId()) {
+			case R.id.go:
+				checkInputAndShowDetailsActivity();
+				return true;
+		}
+		return super.onOptionsItemSelected(item);
+	}
+
+
+	private void toggleGoMenuItem() {
+		if (goMenuItem == null) return;
+		if (isInputComplete()) goMenuItem.setVisible(true);
+		else goMenuItem.setVisible(false);
 	}
 
 
