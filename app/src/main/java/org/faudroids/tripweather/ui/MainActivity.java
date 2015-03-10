@@ -24,6 +24,7 @@ import com.google.android.gms.location.LocationServices;
 import org.faudroids.tripweather.R;
 import org.faudroids.tripweather.geo.DirectionsException;
 import org.faudroids.tripweather.geo.GeoCodingException;
+import org.faudroids.tripweather.geo.LocationUtils;
 import org.faudroids.tripweather.geo.TravelMode;
 import org.faudroids.tripweather.network.DataManager;
 import org.faudroids.tripweather.network.TripData;
@@ -90,6 +91,7 @@ public class MainActivity extends RoboActivity implements
 	private GoogleApiClient googleApiClient;
 
 	@Inject DataManager dataManager;
+	@Inject LocationUtils locationUtils;
 	private CompositeSubscription tripDataDownload = new CompositeSubscription();
 	private ProgressDialog progressDialog;
 
@@ -227,7 +229,11 @@ public class MainActivity extends RoboActivity implements
 		} else {
 			descriptionView.setText(getString(descriptionResource, ""));
 			descriptionView.setTextAppearance(this, R.style.MainMenuFontSmall);
-			valueView.setText(location);
+			if (locationUtils.isEncodedLocation(location)) {
+				valueView.setText(getString(R.string.input_selected_from_map));
+			} else {
+				valueView.setText(location);
+			}
 			valueView.setTextAppearance(this, R.style.MainMenuFontLarge);
 			valueView.setTextSize(TypedValue.COMPLEX_UNIT_PX, getResources().getDimension(R.dimen.main_menu_font_large));
 		}

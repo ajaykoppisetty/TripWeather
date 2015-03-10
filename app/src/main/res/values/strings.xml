@@ -128,6 +128,7 @@
     <string name="input_choose_from_map">Choose from map</string>
     <string name="input_choose_time">Choose starting time</string>
     <string name="input_your_location">Your location</string>
+    <string name="input_selected_from_map">Location on map</string>
     <string name="input_map_select">Select</string>
     <string name="input_map_cancel">Cancel</string>
     <string name="input_map_hint">Use zoom &amp; pan to center location</string>
