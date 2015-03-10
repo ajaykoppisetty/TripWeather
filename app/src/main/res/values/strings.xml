@@ -5,10 +5,10 @@
     <string name="title_activity_start">Plan your trip!</string>
     <string name="action_settings">Settings</string>
 
-    <string name="input_from">From %1$s</string>
-    <string name="input_to">To %1$s</string>
+    <string name="input_from">From%1$s</string>
+    <string name="input_to">To%1$s</string>
     <string name="input_time">When?</string>
-    <string name="where">where?</string>
+    <string name="question_mark">\?</string>
     <string name="input_from_example">e.g. from Home</string>
     <string name="input_to_example">e.g. to London</string>
     <string name="input_time_example">e.g. starting now</string>

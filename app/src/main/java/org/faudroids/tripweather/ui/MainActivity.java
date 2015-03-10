@@ -218,7 +218,7 @@ public class MainActivity extends RoboActivity implements
 
 	private void updateInputView(String location, TextView descriptionView, AutoResizeTextView valueView, int descriptionResource, int valueResource) {
 		if (location == null || location.equals("")) {
-			descriptionView.setText(getString(descriptionResource, getString(R.string.where)));
+			descriptionView.setText(getString(descriptionResource, getString(R.string.question_mark)));
 			descriptionView.setTextAppearance(this, R.style.MainMenuFontLarge);
 			valueView.setText(getString(valueResource));
 			valueView.setTextAppearance(this, R.style.MainMenuFontSmall);
