@@ -2,17 +2,17 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
     <Preference
-        android:key="@string/settings_version"
+        android:key="@string/about_version"
         android:title="Version"
         />
 
     <Preference
-        android:key="@string/settings_about"
-        android:title="About"
+        android:key="@string/about_authors"
+        android:title="Authors"
         />
 
     <Preference
-        android:key="@string/settings_credits"
+        android:key="@string/about_credits"
         android:title="Credits"
         />
 

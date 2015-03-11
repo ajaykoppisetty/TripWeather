@@ -91,7 +91,7 @@ public class MainActivity extends RoboActivity implements
 	@InjectView(R.id.travel_mode_value) AutoResizeTextView travelModeValueView;
 	@InjectView(R.id.travel_mode_icon) ImageView travelModeIcon;
 
-	@InjectView(R.id.settings) View settingsView;
+	@InjectView(R.id.about) View aboutView;
 
 	private String locationFrom, locationTo;
 	private long startTime = 0;
@@ -110,7 +110,7 @@ public class MainActivity extends RoboActivity implements
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-		PreferenceManager.setDefaultValues(this, R.xml.settings, false);
+		PreferenceManager.setDefaultValues(this, R.xml.about, false);
 
 		googleApiClient = createGoogleApiClient();
 		googleApiClient.connect();
@@ -148,10 +148,10 @@ public class MainActivity extends RoboActivity implements
 			}
 		});
 
-		settingsView.setOnClickListener(new View.OnClickListener() {
+		aboutView.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				Intent intent = new Intent(MainActivity.this, SettingsActivity.class);
+				Intent intent = new Intent(MainActivity.this, AboutActivity.class);
 				startActivity(intent);
 			}
 		});

@@ -15,7 +15,7 @@ import org.faudroids.tripweather.R;
 import roboguice.activity.RoboPreferenceActivity;
 import timber.log.Timber;
 
-public final class SettingsActivity extends RoboPreferenceActivity {
+public final class AboutActivity extends RoboPreferenceActivity {
 
 	@Override
 	@SuppressWarnings("deprecated")
@@ -23,11 +23,11 @@ public final class SettingsActivity extends RoboPreferenceActivity {
 		super.onCreate(savedInstanceState);
 
 		getActionBar().setDisplayHomeAsUpEnabled(true);
-		addPreferencesFromResource(R.xml.settings);
+		addPreferencesFromResource(R.xml.about);
 
-		getPref(R.string.settings_version).setSummary(getVersion());
-		setOnClickDialogForPref(R.string.settings_about, R.string.settings_about_title, R.string.settings_about_msg);
-		setOnClickDialogForPref(R.string.settings_credits, R.string.settings_credits_title, R.string.settings_credits_msg);
+		getPref(R.string.about_version).setSummary(getVersion());
+		setOnClickDialogForPref(R.string.about_authors, R.string.about_authors_title, R.string.about_authors_msg);
+		setOnClickDialogForPref(R.string.about_credits, R.string.about_credits_title, R.string.about_credits_msg);
 	}
 
 
@@ -35,7 +35,7 @@ public final class SettingsActivity extends RoboPreferenceActivity {
 		getPref(prefResourceId).setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
 			@Override
 			public boolean onPreferenceClick(Preference preference) {
-				AlertDialog dialog = new AlertDialog.Builder(SettingsActivity.this)
+				AlertDialog dialog = new AlertDialog.Builder(AboutActivity.this)
 						.setTitle(titleResourceId)
 						.setMessage(Html.fromHtml(getString(msgResourceId)))
 						.setPositiveButton(android.R.string.ok, null)
