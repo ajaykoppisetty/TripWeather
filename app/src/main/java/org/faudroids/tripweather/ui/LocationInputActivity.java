@@ -8,6 +8,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
 
 import com.google.android.gms.maps.model.LatLng;
 
@@ -49,6 +50,7 @@ public class LocationInputActivity extends AbstractBackActivity implements Locat
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+		findViewById(R.id.google_logo).setVisibility(View.VISIBLE);
 
 		if (savedInstanceState != null) currentLocation = savedInstanceState.getString(STATE_CURRENT_LOCATION);
 		else currentLocation = getIntent().getStringExtra(EXTRA_LOCATION);

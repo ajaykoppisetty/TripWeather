@@ -1,14 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <org.faudroids.tripweather.ui.SummaryListPreference
-        android:key="@string/settings_travel_mode"
-        android:title="Travel Mode"
-        android:entries="@array/settings_travel_mode_descriptions"
-        android:entryValues="@array/settings_travel_mode_values"
-        android:defaultValue="DRIVING"
-        />
-
     <Preference
         android:key="@string/settings_version"
         android:title="Version"

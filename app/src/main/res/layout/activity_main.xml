@@ -172,11 +172,68 @@
     </LinearLayout>
 
 
+    <include layout="@layout/separator_line"/>
+
+
+    <LinearLayout
+        android:id="@+id/travel_mode"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:paddingTop="@dimen/padding_small"
+        android:paddingBottom="@dimen/padding_small"
+        android:paddingLeft="@dimen/padding_default"
+        android:paddingRight="@dimen/padding_default"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:background="@drawable/selector_main_menu"
+        android:clickable="true"
+        >
+
+        <ImageView
+            android:id="@+id/travel_mode_icon"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_marginRight="20dp"
+            android:src="@drawable/ic_directions_car_white_36dp"
+            android:layout_gravity="center"
+            />
+
+        <LinearLayout
+            android:layout_gravity="center"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            >
+
+            <TextView
+                android:id="@+id/travel_mode_description"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:text="@string/input_how"
+                style="@style/MainMenuFontLarge"
+                />
+
+            <org.faudroids.tripweather.ui.AutoResizeTextView
+                android:id="@+id/travel_mode_value"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:text="@string/input_how_example"
+                style="@style/MainMenuFontSmall"
+                />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+
     <LinearLayout
         android:id="@+id/settings"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="10dp"
+        android:padding="5dp"
         android:orientation="vertical"
         android:gravity="center"
         android:background="@drawable/selector_settings"

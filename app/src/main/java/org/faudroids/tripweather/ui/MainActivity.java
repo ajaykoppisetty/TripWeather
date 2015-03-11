@@ -61,12 +61,15 @@ public class MainActivity extends RoboActivity implements
 			STATE_TO = "to",
 			STATE_TO_ICON = "toIcon",
 			STATE_TIME = "time",
-			STATE_TIME_ICON = "timeIcon";
+			STATE_TIME_ICON = "timeIcon",
+			STATE_TRAVEL_MODE = "travelMode",
+			STATE_TRAVEL_MODE_ICON = "travelModeIcon";
 
 	private static final int
 			LOCATION_REQUEST = 42,
 			TIME_REQUEST = 43,
-			GOOGLE_API_CLIENT_REQUEST = 44;
+			TRAVEL_MODE_REQUEST = 44,
+			GOOGLE_API_CLIENT_REQUEST = 45;
 
 	@InjectView(R.id.origin) View originView;
 	@InjectView(R.id.origin_description) TextView originDescriptionView;
@@ -83,10 +86,16 @@ public class MainActivity extends RoboActivity implements
 	@InjectView(R.id.time_value) AutoResizeTextView timeValueView;
 	@InjectView(R.id.time_icon) ImageView timeIcon;
 
+	@InjectView(R.id.travel_mode) View travelModeView;
+	@InjectView(R.id.travel_mode_description) TextView travelModeDescriptionView;
+	@InjectView(R.id.travel_mode_value) AutoResizeTextView travelModeValueView;
+	@InjectView(R.id.travel_mode_icon) ImageView travelModeIcon;
+
 	@InjectView(R.id.settings) View settingsView;
 
 	private String locationFrom, locationTo;
 	private long startTime = 0;
+	private TravelMode travelMode;
 
 	private GoogleApiClient googleApiClient;
 
@@ -131,6 +140,14 @@ public class MainActivity extends RoboActivity implements
 			}
 		});
 
+		travelModeView.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				Intent intent = TravelModeInputActivity.createIntent(MainActivity.this);
+				startActivityForResult(intent, TRAVEL_MODE_REQUEST);
+			}
+		});
+
 		settingsView.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
@@ -172,6 +189,13 @@ public class MainActivity extends RoboActivity implements
 				showDoneAnimation(timeIcon);
 				break;
 
+			case TRAVEL_MODE_REQUEST:
+				travelMode = (TravelMode) data.getSerializableExtra(TravelModeInputActivity.EXTRA_TRAVEL_MODE);
+				updateInputViews();
+				checkInputAndShowDetailsActivity();
+				showDoneAnimation(travelModeIcon);
+				break;
+
 			// resolved google api client connection?
 			case GOOGLE_API_CLIENT_REQUEST:
 				if (!googleApiClient.isConnected() && !googleApiClient.isConnecting()) {
@@ -192,12 +216,10 @@ public class MainActivity extends RoboActivity implements
 		shrinkAnim.start();
 		shrinkAnim.setAnimationListener(new Animation.AnimationListener() {
 			@Override
-			public void onAnimationStart(Animation animation) {
-			}
+			public void onAnimationStart(Animation animation) { }
 
 			@Override
-			public void onAnimationRepeat(Animation animation) {
-			}
+			public void onAnimationRepeat(Animation animation) { }
 
 			@Override
 			public void onAnimationEnd(Animation animation) {
@@ -212,9 +234,14 @@ public class MainActivity extends RoboActivity implements
 	private void updateInputViews() {
 		updateInputView(locationFrom, originDescriptionView, originValueView, R.string.input_from, R.string.input_from_example);
 		updateInputView(locationTo, destinationDescriptionView, destinationValueView, R.string.input_to, R.string.input_to_example);
+
 		String formattedTime = (startTime == 0) ? null : prettyTime.format(new Date(startTime * 1000));
 		if ("moments ago".equals(formattedTime)) formattedTime = "now";
 		updateInputView(formattedTime, timeDescriptionView, timeValueView, R.string.input_time, R.string.input_time_example);
+
+		String formattedTravelMode = null;
+		if (travelMode != null) formattedTravelMode = getString(travelMode.getResourceId());
+		updateInputView(formattedTravelMode, travelModeDescriptionView, travelModeValueView, R.string.input_how, R.string.input_how_example);
 	}
 
 
@@ -245,31 +272,31 @@ public class MainActivity extends RoboActivity implements
 	public void onRestoreInstanceState(Bundle savedInstanceState) {
 		super.onRestoreInstanceState(savedInstanceState);
 
-		locationFrom = savedInstanceState.getString(STATE_FROM);
-		int fromIconId = savedInstanceState.getInt(STATE_FROM_ICON);
-		if (fromIconId != 0) {
-			originIcon.setTag(fromIconId);
-			originIcon.setImageResource(R.drawable.ic_done);
-		}
+		locationFrom = restoreInput(savedInstanceState, STATE_FROM, STATE_FROM_ICON, originIcon);
+		locationTo = restoreInput(savedInstanceState, STATE_TO, STATE_TO_ICON, destinationIcon);
 
-		locationTo = savedInstanceState.getString(STATE_TO);
-		int toIconId = savedInstanceState.getInt(STATE_TO_ICON);
-		if (toIconId != 0) {
-			destinationIcon.setTag(fromIconId);
-			destinationIcon.setImageResource(R.drawable.ic_done);
-		}
+		Long restoredTime = restoreInput(savedInstanceState, STATE_TIME, STATE_TIME_ICON, timeIcon);
+		if (restoredTime != null) startTime = restoredTime;
 
-		if (savedInstanceState.containsKey(STATE_TIME)) {
-			startTime = savedInstanceState.getLong(STATE_TIME, 0);
-		}
-		int timeIconId = savedInstanceState.getInt(STATE_TIME_ICON);
-		if (timeIconId != 0) {
-			timeIcon.setTag(timeIconId);
-			timeIcon.setImageResource(R.drawable.ic_done);
-		}
+		travelMode = restoreInput(savedInstanceState, STATE_TRAVEL_MODE, STATE_TRAVEL_MODE_ICON, travelModeIcon);
 
 		updateInputViews();
 		toggleGoMenuItem();
+	}
+
+
+	@SuppressWarnings("unchecked")
+	private <T> T restoreInput(Bundle savedInstanceState, String keyValue, String keyIconTag, ImageView icon) {
+		T value = null;
+		if (savedInstanceState.containsKey(keyValue)) {
+			value = (T) savedInstanceState.get(keyValue);
+		}
+		int iconId = savedInstanceState.getInt(keyIconTag);
+		if (iconId != 0) {
+			icon.setTag(iconId);
+			icon.setImageResource(R.drawable.ic_done);
+		}
+		return value;
 	}
 
 
@@ -283,6 +310,9 @@ public class MainActivity extends RoboActivity implements
 
 		if (startTime != 0) savedInstanceState.putLong(STATE_TIME, startTime);
 		if (timeIcon.getTag() != null) savedInstanceState.putInt(STATE_TIME_ICON, (int) timeIcon.getTag());
+
+		if (travelMode != null) savedInstanceState.putSerializable(STATE_TRAVEL_MODE, travelMode);
+		if (travelModeIcon.getTag() != null) savedInstanceState.putInt(STATE_TRAVEL_MODE_ICON, (int) travelModeIcon.getTag());
 
 		super.onSaveInstanceState(savedInstanceState);
 	}
@@ -317,18 +347,13 @@ public class MainActivity extends RoboActivity implements
 
 
 	private boolean isInputComplete() {
-		if (locationFrom == null || locationTo == null || startTime == 0) return false;
+		if (locationFrom == null || locationTo == null || startTime == 0 || travelMode == null) return false;
 		return googleApiClient.isConnected();
 	}
 
 
 	private void checkInputAndShowDetailsActivity() {
 		if (!isInputComplete()) return;
-
-		final TravelMode travelMode = TravelMode.valueOf(
-				PreferenceManager
-						.getDefaultSharedPreferences(this)
-						.getString(getString(R.string.settings_travel_mode), null));
 
 		tripDataDownload.add(Observable
 				.just(null)

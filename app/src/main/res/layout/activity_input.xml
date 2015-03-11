@@ -19,6 +19,8 @@
         android:layout_alignParentBottom="true"
         android:layout_alignParentRight="true"
         android:padding="@dimen/padding_default"
-        android:src="@drawable/powered_by_google_light"/>
+        android:src="@drawable/powered_by_google_light"
+        android:visibility="gone"
+        />
 
     </RelativeLayout>

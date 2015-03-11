@@ -8,10 +8,16 @@
     <string name="input_from">From%1$s</string>
     <string name="input_to">To%1$s</string>
     <string name="input_time">When?</string>
+    <string name="input_how">How?</string>
     <string name="question_mark">\?</string>
     <string name="input_from_example">e.g. from Home</string>
     <string name="input_to_example">e.g. to London</string>
     <string name="input_time_example">e.g. starting now</string>
+    <string name="input_how_example">e.g. by car</string>
+
+    <string name="travel_mode_driving">Driving</string>
+    <string name="travel_mode_walking">Walking</string>
+    <string name="travel_mode_bicycling">Bicycling</string>
 
     <string name="tab_map">Map</string>
     <string name="tab_temperature">Temperature</string>
@@ -43,17 +49,6 @@
         <item quantity="other">Warnings!</item>
     </plurals>
 
-    <string name="settings_travel_mode">travel_mode</string>
-    <string-array name="settings_travel_mode_descriptions">
-        <item>Driving</item>
-        <item>Walking</item>
-        <item>Bicycling</item>
-    </string-array>
-    <string-array name="settings_travel_mode_values">
-        <item>DRIVING</item>
-        <item>WALKING</item>
-        <item>BICYCLING</item>
-    </string-array>
     <string name="settings_version">version</string>
     <string name="settings_about">about</string>
     <string name="settings_about_title">About</string>
@@ -92,6 +87,7 @@
         &lt;a href=&quot;https://github.com/roboguice/roboguice&quot;&gt;RoboGuice&lt;/a&gt;&lt;br&gt;
         &lt;a href=&quot;https://developers.google.com/maps/documentation/android/&quot;&gt;Google Maps Android API v2&lt;/a&gt; by Google Inc.&lt;br&gt;
         &lt;a href=&quot;https://developer.android.com/google/play-services/index.html&quot;&gt;Google Play Services&lt;/a&gt; by Google Inc.&lt;br&gt;
+        &lt;a href=&quot;https://github.com/google/material-design-icons/&quot;&gt;Material Design Icons&lt;/a&gt; by Google Inc.&lt;br&gt;
         &lt;a href=&quot;https://source.android.com/&quot;&gt;Android Open Source Project&lt;/a&gt; by Google Inc. and the Open Handset Alliance&lt;br&gt;
         &lt;br&gt;
         Besides those we are tapping into the following sources for constructing route and forecast data:&lt;br&gt;
@@ -127,6 +123,7 @@
     <string name="input_choose_location">Choose location</string>
     <string name="input_choose_from_map">Choose from map</string>
     <string name="input_choose_time">Choose starting time</string>
+    <string name="input_choose_how">Choose travel mode</string>
     <string name="input_your_location">Your location</string>
     <string name="input_selected_from_map">Location on map</string>
     <string name="input_map_select">Select</string>
