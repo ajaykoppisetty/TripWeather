@@ -99,6 +99,20 @@
         &lt;br&gt;
         Thanks everyone!
     </string>
+    <string name="about_feedback">feedback</string>
+    <string name="about_feedback_title">Feedback</string>
+    <string name="about_feedback_msg">
+        We would love to hear from you!
+        &lt;br&gt;
+        &lt;br&gt;
+        TripWeather is still in a very early stage and we need your help to determine if this app has helped you plan
+        your trip or what we could do to make your life easier.
+        &lt;br&gt;
+        &lt;br&gt;
+        So please consider heading over to the PlayStore and let uns know what you think!
+    </string>
+    <string name="about_feedback_ok">Rate TripWeather</string>
+    <string name="about_feedback_cancel">No thanks</string>
 
     <string name="places_api_auth_error">REQUEST_DENIED</string>
     <string name="places_base_url">https://maps.googleapis.com/maps/api/place</string>

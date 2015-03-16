@@ -16,4 +16,9 @@
         android:title="Credits"
         />
 
+    <Preference
+        android:key="@string/about_feedback"
+        android:title="Feedback"
+        />
+
 </PreferenceScreen>
