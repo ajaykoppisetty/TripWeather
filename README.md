@@ -1,5 +1,7 @@
 # TripWeather
 
+![Playstore banner](playstore/banner.png)
+
 An Android app for viewing weather conditions along a road trip, available on
 the [Google
 Playstore](https://play.google.com/store/apps/details?id=org.faudroids.tripweather).
